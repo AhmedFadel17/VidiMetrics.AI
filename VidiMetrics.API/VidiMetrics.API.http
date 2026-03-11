@@ -1,0 +1,6 @@
+@VidiMetrics.API_HostAddress = http://localhost:5223
+
+GET {{VidiMetrics.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
