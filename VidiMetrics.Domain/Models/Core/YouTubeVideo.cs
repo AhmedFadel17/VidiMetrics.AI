@@ -1,4 +1,6 @@
-﻿namespace VidiMetrics.Domain.Models.Core;
+﻿using VidiMetrics.Domain.Enums;
+
+namespace VidiMetrics.Domain.Models.Core;
 
 public class YouTubeVideo : Video
 {
@@ -6,5 +8,5 @@ public class YouTubeVideo : Video
     public long ViewCount { get; set; }
     public long LikeCount { get; set; }
     public DateTime PublishedAt { get; set; }
-    public string? PrivacyStatus { get; set; }
+    public YouTubePrivacyStatus? PrivacyStatus { get; set; } = YouTubePrivacyStatus.Public;
 }

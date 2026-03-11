@@ -1,11 +1,12 @@
-﻿using VidiMetrics.Domain.Models.Core;
+﻿using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Models.Core;
 
 namespace VidiMetrics.Domain.Models.Ai;
 
 public class ShortsProject : BaseEntity
 {
     public string ProjectName { get; set; } = string.Empty;
-    public string TargetPlatform { get; set; } = "YouTube Shorts"; 
+    public TargetPlatform TargetPlatform { get; set; } = TargetPlatform.YouTubeShorts; 
     public int ExpectedClipCount { get; set; }
 
     public Guid OriginalVideoId { get; set; }

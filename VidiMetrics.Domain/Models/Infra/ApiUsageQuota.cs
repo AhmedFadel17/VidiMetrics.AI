@@ -1,4 +1,6 @@
 ﻿
+using VidiMetrics.Domain.Enums;
+
 namespace VidiMetrics.Domain.Models.Infra
 {
     internal class ApiUsageQuota
@@ -6,7 +8,7 @@ namespace VidiMetrics.Domain.Models.Infra
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserAccountId { get; set; }
 
-        public string ApiType { get; set; } = string.Empty;
+        public ApiType ApiType { get; set; } = ApiType.YouTube;
 
         public int MonthlyLimit { get; set; }
         public int CurrentUsage { get; set; }
