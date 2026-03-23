@@ -1,5 +1,6 @@
 using VidiMetrics.DataAccess;
 using VidiMetrics.Application;
+using VidiMetrics.API.Middlwares;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,6 +21,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
