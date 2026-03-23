@@ -1,8 +1,11 @@
 using VidiMetrics.DataAccess;
+using VidiMetrics.Application;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 await builder.Services.AddDataAccessServices(builder.Configuration);
+await builder.Services.AddApplicationServices();
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
