@@ -1,12 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace VidiMetrics.DataAccess.Repositories
 {
     public interface IBaseRepository<T> where T : class
     {
+        Task<T?> GetByIdAsync(Guid id);
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
+        Task<T> AddAsync(T entity);
+        Task AddRangeAsync(IEnumerable<T> entities);
+        T Update(T entity);
+        void Remove(T entity);
+        void RemoveRange(IEnumerable<T> entities);
+        Task<bool> SaveChangesAsync();
     }
 }
