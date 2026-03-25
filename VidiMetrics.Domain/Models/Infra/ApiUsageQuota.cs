@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Domain.Models.Infra
 {
-    internal class ApiUsageQuota
+    public class ApiUsageQuota
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid UserAccountId { get; set; }
