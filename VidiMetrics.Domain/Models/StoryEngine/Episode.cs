@@ -1,4 +1,4 @@
-﻿using VidiMetrics.Domain.Models.Core;
+using VidiMetrics.Domain.Models.Core;
 namespace VidiMetrics.Domain.Models.StoryEngine;
 
 public class Episode : BaseEntity
@@ -7,8 +7,8 @@ public class Episode : BaseEntity
     public string Title { get; set; } = string.Empty;
     public string PlotSummary { get; set; } = string.Empty;
 
-    public Guid SeriesId { get; set; }
-    public Series Series { get; set; } = null!;
+    public Guid ShowId { get; set; }
+    public Show Show { get; set; } = null!;
 
     public Guid VideoId { get; set; }
     public Video Video { get; set; } = null!;

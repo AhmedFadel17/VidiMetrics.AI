@@ -36,10 +36,10 @@ namespace VidiMetrics.DataAccess.Data
 
         // StoryEngine
         public DbSet<Character> Characters { get; set; }
-        public DbSet<Environment> Environments { get; set; }
+        public DbSet<StoryEnvironment> StoryEnvironments { get; set; }
         public DbSet<Episode> Episodes { get; set; }
         public DbSet<Scene> Scenes { get; set; }
-        public DbSet<Series> Series { get; set; }
+        public DbSet<Show> Shows { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 

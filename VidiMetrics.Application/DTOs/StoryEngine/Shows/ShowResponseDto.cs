@@ -1,8 +1,8 @@
 using System;
 
-namespace VidiMetrics.Application.DTOs.StoryEngine.Series
+namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
 {
-    public class SeriesResponseDto
+    public class ShowResponseDto
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

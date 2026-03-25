@@ -21,10 +21,10 @@ using VidiMetrics.DataAccess.Repositories.Seo.Keywords;
 using VidiMetrics.DataAccess.Repositories.Seo.SeoAudits;
 using VidiMetrics.DataAccess.Repositories.Seo.VideoTags;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
-using VidiMetrics.DataAccess.Repositories.StoryEngine.Environments;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
-using VidiMetrics.DataAccess.Repositories.StoryEngine.Series;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 
 namespace VidiMetrics.DataAccess
 {
@@ -52,10 +52,10 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<ISeoAuditsRepository, SeoAuditsRepository>();
             services.AddScoped<IVideoTagsRepository, VideoTagsRepository>();
             services.AddScoped<ICharactersRepository, CharactersRepository>();
-            services.AddScoped<IEnvironmentsRepository, EnvironmentsRepository>();
+            services.AddScoped<IStoryEnvironmentsRepository, StoryEnvironmentsRepository>();
             services.AddScoped<IEpisodesRepository, EpisodesRepository>();
             services.AddScoped<IScenesRepository, ScenesRepository>();
-            services.AddScoped<ISeriesRepository, SeriesRepository>();
+            services.AddScoped<IShowsRepository, ShowsRepository>();
             return Task.FromResult(services);
         }
     }

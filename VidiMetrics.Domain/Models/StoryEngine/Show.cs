@@ -1,6 +1,6 @@
-﻿namespace VidiMetrics.Domain.Models.StoryEngine;
+namespace VidiMetrics.Domain.Models.StoryEngine;
 
-public class Series : BaseEntity
+public class Show : BaseEntity
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

@@ -1,10 +1,13 @@
 using System;
 
-namespace VidiMetrics.Application.DTOs.StoryEngine.Environments
+namespace VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments
 {
-    public class UpdateEnvironmentDto
+    public class StoryEnvironmentResponseDto
     {
         public Guid Id { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string? CreatedBy { get; set; }
+        public bool IsDeleted { get; set; }
         public string Name { get; set; }
         public string VisualDescription { get; set; }
         public string Atmosphere { get; set; }

@@ -11,8 +11,8 @@ public class Character : BaseEntity
 
     public string? ReferenceImageUrl { get; set; }
 
-    public Guid SeriesId { get; set; }
-    public Series Series { get; set; } = null!;
+    public Guid ShowId { get; set; }
+    public Show Show { get; set; } = null!;
 
     public ICollection<Scene> Scenes { get; set; } = new List<Scene>();
 }
