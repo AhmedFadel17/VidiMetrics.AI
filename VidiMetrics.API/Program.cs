@@ -7,7 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 await builder.Services.AddDataAccessServices(builder.Configuration);
 await builder.Services.AddApplicationServices();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => 
+{
+    // Global filters or configuration can go here
+});
+builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
