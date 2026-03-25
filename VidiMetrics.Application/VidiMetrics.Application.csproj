@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\VidiMetrics.Domain\VidiMetrics.Domain.csproj" />
+    <ProjectReference Include="..\VidiMetrics.DataAccess\VidiMetrics.DataAccess.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,32 @@
-﻿using AutoMapper;
+using AutoMapper;
+using VidiMetrics.Application.DTOs.Ai.AiPromptTemplates;
+using VidiMetrics.Application.DTOs.Ai.AiTasks;
+using VidiMetrics.Application.DTOs.Ai.ShortsProjects;
+using VidiMetrics.Application.DTOs.Ai.Transcripts;
+
+using VidiMetrics.Application.DTOs.Core.Channels;
+using VidiMetrics.Application.DTOs.Core.LocalVideos;
+using VidiMetrics.Application.DTOs.Core.PlaylistItems;
+using VidiMetrics.Application.DTOs.Core.Playlists;
 using VidiMetrics.Application.DTOs.Core.Videos;
+using VidiMetrics.Application.DTOs.Core.YouTubeVideos;
+using VidiMetrics.Application.DTOs.Infra.ApiUsageQuotas;
+using VidiMetrics.Application.DTOs.Infra.UserAccounts;
+using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
+using VidiMetrics.Application.DTOs.Seo.KeywordRankings;
+using VidiMetrics.Application.DTOs.Seo.Keywords;
+using VidiMetrics.Application.DTOs.Seo.SeoAudits;
+using VidiMetrics.Application.DTOs.Seo.VideoTags;
+using VidiMetrics.Application.DTOs.StoryEngine.Characters;
+using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
+using VidiMetrics.Application.DTOs.StoryEngine.Shows;
+using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
+using VidiMetrics.Domain.Models.Ai;
+
 using VidiMetrics.Domain.Models.Core;
+using VidiMetrics.Domain.Models.Infra;
+using VidiMetrics.Domain.Models.Seo;
+using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Mapping
 {
@@ -8,7 +34,106 @@ namespace VidiMetrics.Application.Mapping
     {
         public MappingProfile()
         {
+            CreateMap<CreateAiTaskDto, AiTask>();
+            CreateMap<UpdateAiTaskDto, AiTask>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<AiTask, AiTaskResponseDto>();
+
+            CreateMap<CreateShortsProjectDto, ShortsProject>();
+            CreateMap<UpdateShortsProjectDto, ShortsProject>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ShortsProject, ShortsProjectResponseDto>();
+
+            CreateMap<CreateTranscriptDto, Transcript>();
+            CreateMap<UpdateTranscriptDto, Transcript>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Transcript, TranscriptResponseDto>();
+
+            CreateMap<CreateChannelDto, Channel>();
+            CreateMap<UpdateChannelDto, Channel>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Channel, ChannelResponseDto>();
+
+            CreateMap<CreateLocalVideoDto, LocalVideo>();
+            CreateMap<UpdateLocalVideoDto, LocalVideo>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<LocalVideo, LocalVideoResponseDto>();
+
+            CreateMap<CreatePlaylistItemDto, PlaylistItem>();
+            CreateMap<UpdatePlaylistItemDto, PlaylistItem>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<PlaylistItem, PlaylistItemResponseDto>();
+
+            CreateMap<CreatePlaylistDto, Playlist>();
+            CreateMap<UpdatePlaylistDto, Playlist>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Playlist, PlaylistResponseDto>();
+
             CreateMap<CreateVideoDto, Video>();
+            CreateMap<UpdateVideoDto, Video>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Video, VideoResponseDto>();
+
+            CreateMap<CreateYouTubeVideoDto, YouTubeVideo>();
+            CreateMap<UpdateYouTubeVideoDto, YouTubeVideo>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<YouTubeVideo, YouTubeVideoResponseDto>();
+
+            CreateMap<CreateApiUsageQuotaDto, ApiUsageQuota>();
+            CreateMap<UpdateApiUsageQuotaDto, ApiUsageQuota>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<ApiUsageQuota, ApiUsageQuotaResponseDto>();
+
+            CreateMap<CreateUserAccountDto, UserAccount>();
+            CreateMap<UpdateUserAccountDto, UserAccount>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UserAccount, UserAccountResponseDto>();
+
+            CreateMap<CreateCompetitorVideoDto, CompetitorVideo>();
+            CreateMap<UpdateCompetitorVideoDto, CompetitorVideo>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<CompetitorVideo, CompetitorVideoResponseDto>();
+
+            CreateMap<CreateKeywordRankingDto, KeywordRanking>();
+            CreateMap<UpdateKeywordRankingDto, KeywordRanking>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<KeywordRanking, KeywordRankingResponseDto>();
+
+            CreateMap<CreateKeywordDto, Keyword>();
+            CreateMap<UpdateKeywordDto, Keyword>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Keyword, KeywordResponseDto>();
+
+            CreateMap<CreateSeoAuditDto, SeoAudit>();
+            CreateMap<UpdateSeoAuditDto, SeoAudit>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<SeoAudit, SeoAuditResponseDto>();
+
+            CreateMap<CreateVideoTagDto, VideoTag>();
+            CreateMap<UpdateVideoTagDto, VideoTag>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<VideoTag, VideoTagResponseDto>();
+
+            CreateMap<CreateCharacterDto, Character>();
+            CreateMap<UpdateCharacterDto, Character>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Character, CharacterResponseDto>();
+
+            CreateMap<CreateEpisodeDto, Episode>();
+            CreateMap<UpdateEpisodeDto, Episode>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Episode, EpisodeResponseDto>();
+
+            CreateMap<CreateShowDto, Show>();
+            CreateMap<UpdateShowDto, Show>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Show, ShowResponseDto>();
+
+            CreateMap<CreateStoryEnvironmentDto, StoryEnvironment>();
+            CreateMap<UpdateStoryEnvironmentDto, StoryEnvironment>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<StoryEnvironment, StoryEnvironmentResponseDto>();
+
         }
     }
 }
