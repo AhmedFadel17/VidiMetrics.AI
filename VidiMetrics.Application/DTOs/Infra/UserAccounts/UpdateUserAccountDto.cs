@@ -3,7 +3,6 @@ namespace VidiMetrics.Application.DTOs.Infra.UserAccounts
 {
     public class UpdateUserAccountDto
     {
-        public Guid Id { get; set; }
         public string ExternalId { get; set; }
         public string Email { get; set; }
         public string FullName { get; set; }

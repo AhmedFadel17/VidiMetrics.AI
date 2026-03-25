@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Characters
 {
     public class UpdateCharacterDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string PhysicalDescription { get; set; }
         public string ClothingStyle { get; set; }

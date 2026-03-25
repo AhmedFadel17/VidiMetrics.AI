@@ -1,4 +1,4 @@
-﻿
+
 using VidiMetrics.Application.DTOs.Core.Videos;
 using FluentValidation;
 

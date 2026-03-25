@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.Ai.AiTasks
 {
     public class UpdateAiTaskDto
     {
-        public Guid Id { get; set; }
         public string TaskType { get; set; }
         public AiTaskStatus Status { get; set; }
         public string? InputData { get; set; }

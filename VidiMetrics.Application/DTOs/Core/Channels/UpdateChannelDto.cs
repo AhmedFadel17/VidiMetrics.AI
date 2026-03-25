@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.Core.Channels
 {
     public class UpdateChannelDto
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string? YouTubeChannelId { get; set; }
         public string? Description { get; set; }

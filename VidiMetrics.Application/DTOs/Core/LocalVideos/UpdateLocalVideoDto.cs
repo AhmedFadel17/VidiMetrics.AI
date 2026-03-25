@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.Core.LocalVideos
 {
     public class UpdateLocalVideoDto
     {
-        public Guid Id { get; set; }
         public string StorageUrl { get; set; }
         public string FileExtension { get; set; }
         public long FileSizeInBytes { get; set; }

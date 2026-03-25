@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.Infra.ApiUsageQuotas
 {
     public class UpdateApiUsageQuotaDto
     {
-        public Guid Id { get; set; }
         public Guid UserAccountId { get; set; }
         public ApiType ApiType { get; set; }
         public int MonthlyLimit { get; set; }

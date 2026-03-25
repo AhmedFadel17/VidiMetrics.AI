@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.Core.Videos
 {
     public class UpdateVideoDto
     {
-        public Guid Id { get; set; }
         public string Title { get; set; }
         public string? Description { get; set; }
         public TimeSpan Duration { get; set; }

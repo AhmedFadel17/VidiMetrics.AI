@@ -4,7 +4,6 @@ namespace VidiMetrics.Application.DTOs.Seo.SeoAudits
 {
     public class UpdateSeoAuditDto
     {
-        public Guid Id { get; set; }
         public int OverallScore { get; set; }
         public string CriticalIssues { get; set; }
         public string OptimizationSuggestions { get; set; }
