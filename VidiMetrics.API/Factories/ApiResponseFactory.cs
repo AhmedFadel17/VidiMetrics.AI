@@ -1,4 +1,5 @@
-﻿namespace VidiMetrics.API.Factories
+﻿using VidiMetrics.Application.DTOs.Common;
+namespace VidiMetrics.API.Factories
 {
     public static class ApiResponseFactory
     {
