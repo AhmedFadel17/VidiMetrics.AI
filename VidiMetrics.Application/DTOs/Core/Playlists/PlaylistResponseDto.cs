@@ -1,8 +1,8 @@
 using System;
 
-namespace VidiMetrics.Application.DTOs.Core.Videos
+namespace VidiMetrics.Application.DTOs.Core.Playlists
 {
-    public class VideoResponseDto
+    public class PlaylistResponseDto
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -10,10 +10,7 @@ namespace VidiMetrics.Application.DTOs.Core.Videos
         public bool IsDeleted { get; set; }
         public string Title { get; set; }
         public string? Description { get; set; }
-        public TimeSpan Duration { get; set; }
-        public string? ThumbnailUrl { get; set; }
-        public int CurrentRank { get; set; }
-        public DateTime? LastRankCheck { get; set; }
+        public string? YouTubePlaylistId { get; set; }
         public Guid ChannelId { get; set; }
     }
 }
