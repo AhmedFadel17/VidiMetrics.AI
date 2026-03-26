@@ -46,6 +46,50 @@ namespace VidiMetrics.DataAccess.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ShortsProject>()
+                .HasOne(s => s.OriginalVideo)
+                .WithMany()
+                .HasForeignKey(s => s.OriginalVideoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<LocalVideo>()
+                .HasOne<ShortsProject>()
+                .WithMany(s => s.GeneratedClips)
+                .HasForeignKey("ShortsProjectId")
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Scene>()
+                .HasOne(s => s.StoryEnvironment)
+                .WithMany()
+                .HasForeignKey(s => s.StoryEnvironmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Episode>()
+                .HasOne<Video>()
+                .WithMany()
+                .HasForeignKey(e => e.VideoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Character>()
+                .HasOne(c => c.Show)
+                .WithMany(s => s.Characters)
+                .HasForeignKey(c => c.ShowId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PlaylistItem>()
+                .HasOne(p => p.Video)
+                .WithMany(v => v.PlaylistItems)
+                .HasForeignKey(p => p.VideoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Character>()
+                .HasMany(c => c.Scenes)
+                .WithMany(s => s.Characters)
+                .UsingEntity<Dictionary<string, object>>(
+                    "CharacterScene",
+                    j => j.HasOne<Scene>().WithMany().HasForeignKey("ScenesId").OnDelete(DeleteBehavior.Restrict),
+                    j => j.HasOne<Character>().WithMany().HasForeignKey("CharactersId").OnDelete(DeleteBehavior.Cascade));
         }
     }
 }
