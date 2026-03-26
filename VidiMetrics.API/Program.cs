@@ -15,6 +15,15 @@ builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// CORS – allow the Vite dev server
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +35,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseRouting();
+app.UseCors("AllowFrontend");
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 app.UseAuthorization();
 
