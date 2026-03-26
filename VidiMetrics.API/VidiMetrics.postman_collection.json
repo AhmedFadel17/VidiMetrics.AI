@@ -1,0 +1,900 @@
+{
+  "info": {
+    "name": "VidiMetrics.AI API",
+    "_postman_id": "vidi-metrics-ai-collection",
+    "description": "Auto-generated Postman collection for all VidiMetrics.AI API endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "https://localhost:7000", "type": "string" },
+    { "key": "sampleGuid", "value": "00000000-0000-0000-0000-000000000001", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "AiPromptTemplates",
+          "item": [
+            {
+              "name": "Get All AiPromptTemplates",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/aipromptemplates", "host": ["{{baseUrl}}"], "path": ["api", "aipromptemplates"] } }
+            },
+            {
+              "name": "Get AiPromptTemplate By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/aipromptemplates/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "aipromptemplates", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create AiPromptTemplate",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/aipromptemplates", "host": ["{{baseUrl}}"], "path": ["api", "aipromptemplates"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sample Template\",\n  \"systemPrompt\": \"You are a helpful assistant.\",\n  \"userPromptTemplate\": \"Summarize the following: {{input}}\",\n  \"modelTarget\": 0,\n  \"temperature\": 0.7\n}"
+                }
+              }
+            },
+            {
+              "name": "Update AiPromptTemplate",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/aipromptemplates/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "aipromptemplates", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Template\",\n  \"systemPrompt\": \"You are a helpful assistant.\",\n  \"userPromptTemplate\": \"Summarize: {{input}}\",\n  \"modelTarget\": 0,\n  \"temperature\": 0.5\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete AiPromptTemplate",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/aipromptemplates/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "aipromptemplates", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "AiTasks",
+          "item": [
+            {
+              "name": "Get All AiTasks",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/aitasks", "host": ["{{baseUrl}}"], "path": ["api", "aitasks"] } }
+            },
+            {
+              "name": "Get AiTask By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/aitasks/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "aitasks", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create AiTask",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/aitasks", "host": ["{{baseUrl}}"], "path": ["api", "aitasks"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskType\": \"Transcription\",\n  \"status\": 0,\n  \"inputData\": null,\n  \"outputData\": null,\n  \"errorMessage\": null,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update AiTask",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/aitasks/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "aitasks", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"taskType\": \"Transcription\",\n  \"status\": 1,\n  \"inputData\": \"some input\",\n  \"outputData\": \"some output\",\n  \"errorMessage\": null,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete AiTask",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/aitasks/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "aitasks", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "ShortsProjects",
+          "item": [
+            {
+              "name": "Get All ShortsProjects",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/shortsprojects", "host": ["{{baseUrl}}"], "path": ["api", "shortsprojects"] } }
+            },
+            {
+              "name": "Get ShortsProject By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/shortsprojects/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "shortsprojects", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create ShortsProject",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/shortsprojects", "host": ["{{baseUrl}}"], "path": ["api", "shortsprojects"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"projectName\": \"My Shorts Project\",\n  \"targetPlatform\": 0,\n  \"expectedClipCount\": 5,\n  \"originalVideoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update ShortsProject",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/shortsprojects/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "shortsprojects", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"projectName\": \"Updated Shorts Project\",\n  \"targetPlatform\": 1,\n  \"expectedClipCount\": 10,\n  \"originalVideoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete ShortsProject",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/shortsprojects/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "shortsprojects", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "Transcripts",
+          "item": [
+            {
+              "name": "Get All Transcripts",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/transcripts", "host": ["{{baseUrl}}"], "path": ["api", "transcripts"] } }
+            },
+            {
+              "name": "Get Transcript By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/transcripts/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "transcripts", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Transcript",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/transcripts", "host": ["{{baseUrl}}"], "path": ["api", "transcripts"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rawText\": \"Raw transcript text here.\",\n  \"cleanedText\": \"Cleaned transcript text.\",\n  \"languageCode\": \"en\",\n  \"timestampsJson\": null,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Transcript",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/transcripts/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "transcripts", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rawText\": \"Updated raw text.\",\n  \"cleanedText\": \"Updated cleaned text.\",\n  \"languageCode\": \"en\",\n  \"timestampsJson\": \"{\\\"segments\\\": []}\",\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Transcript",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/transcripts/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "transcripts", "{{sampleGuid}}"] } }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Core",
+      "item": [
+        {
+          "name": "Channels",
+          "item": [
+            {
+              "name": "Get All Channels",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/channels", "host": ["{{baseUrl}}"], "path": ["api", "channels"] } }
+            },
+            {
+              "name": "Get Channel By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/channels/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "channels", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Channel",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/channels", "host": ["{{baseUrl}}"], "path": ["api", "channels"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"My YouTube Channel\",\n  \"youTubeChannelId\": \"UCxxxxxx\",\n  \"description\": \"Channel description here.\",\n  \"customUrl\": \"@mychannel\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Channel",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/channels/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "channels", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Updated Channel Name\",\n  \"youTubeChannelId\": \"UCxxxxxx\",\n  \"description\": \"Updated description.\",\n  \"customUrl\": \"@mychannel\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Channel",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/channels/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "channels", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "Videos",
+          "item": [
+            {
+              "name": "Get All Videos",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/videos", "host": ["{{baseUrl}}"], "path": ["api", "videos"] } }
+            },
+            {
+              "name": "Get Video By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/videos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "videos", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Video",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/videos", "host": ["{{baseUrl}}"], "path": ["api", "videos"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"My Awesome Video\",\n  \"description\": \"Video description here.\",\n  \"duration\": \"00:10:00\",\n  \"thumbnailUrl\": \"https://example.com/thumb.jpg\",\n  \"currentRank\": 0,\n  \"lastRankCheck\": null,\n  \"channelId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Video",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/videos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "videos", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Video Title\",\n  \"description\": \"Updated description.\",\n  \"duration\": \"00:12:30\",\n  \"thumbnailUrl\": \"https://example.com/thumb2.jpg\",\n  \"currentRank\": 5,\n  \"lastRankCheck\": \"2026-03-26T00:00:00Z\",\n  \"channelId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Video",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/videos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "videos", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "LocalVideos",
+          "item": [
+            {
+              "name": "Get All LocalVideos",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/localvideos", "host": ["{{baseUrl}}"], "path": ["api", "localvideos"] } }
+            },
+            {
+              "name": "Get LocalVideo By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/localvideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "localvideos", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create LocalVideo",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/localvideos", "host": ["{{baseUrl}}"], "path": ["api", "localvideos"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"storageUrl\": \"https://storage.example.com/video.mp4\",\n  \"fileExtension\": \".mp4\",\n  \"fileSizeInBytes\": 104857600,\n  \"isProcessedByAi\": false,\n  \"processingError\": null\n}"
+                }
+              }
+            },
+            {
+              "name": "Update LocalVideo",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/localvideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "localvideos", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"storageUrl\": \"https://storage.example.com/updated.mp4\",\n  \"fileExtension\": \".mp4\",\n  \"fileSizeInBytes\": 209715200,\n  \"isProcessedByAi\": true,\n  \"processingError\": null\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete LocalVideo",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/localvideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "localvideos", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "YouTubeVideos",
+          "item": [
+            {
+              "name": "Get All YouTubeVideos",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/youtubevideos", "host": ["{{baseUrl}}"], "path": ["api", "youtubevideos"] } }
+            },
+            {
+              "name": "Get YouTubeVideo By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/youtubevideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "youtubevideos", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create YouTubeVideo",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/youtubevideos", "host": ["{{baseUrl}}"], "path": ["api", "youtubevideos"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"youTubeVideoId\": \"dQw4w9WgXcQ\",\n  \"viewCount\": 1000000,\n  \"likeCount\": 50000,\n  \"publishedAt\": \"2026-01-01T00:00:00Z\",\n  \"privacyStatus\": 0\n}"
+                }
+              }
+            },
+            {
+              "name": "Update YouTubeVideo",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/youtubevideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "youtubevideos", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"youTubeVideoId\": \"dQw4w9WgXcQ\",\n  \"viewCount\": 2000000,\n  \"likeCount\": 75000,\n  \"publishedAt\": \"2026-01-01T00:00:00Z\",\n  \"privacyStatus\": 0\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete YouTubeVideo",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/youtubevideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "youtubevideos", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "Playlists",
+          "item": [
+            {
+              "name": "Get All Playlists",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/playlists", "host": ["{{baseUrl}}"], "path": ["api", "playlists"] } }
+            },
+            {
+              "name": "Get Playlist By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/playlists/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "playlists", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Playlist",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/playlists", "host": ["{{baseUrl}}"], "path": ["api", "playlists"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"My Playlist\",\n  \"description\": \"Playlist description.\",\n  \"youTubePlaylistId\": \"PLxxxxxx\",\n  \"channelId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Playlist",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/playlists/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "playlists", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Updated Playlist\",\n  \"description\": \"Updated description.\",\n  \"youTubePlaylistId\": \"PLxxxxxx\",\n  \"channelId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Playlist",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/playlists/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "playlists", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "PlaylistItems",
+          "item": [
+            {
+              "name": "Get All PlaylistItems",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/playlistitems", "host": ["{{baseUrl}}"], "path": ["api", "playlistitems"] } }
+            },
+            {
+              "name": "Get PlaylistItem By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/playlistitems/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "playlistitems", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create PlaylistItem",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/playlistitems", "host": ["{{baseUrl}}"], "path": ["api", "playlistitems"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"position\": 1,\n  \"note\": \"Important video\",\n  \"playlistId\": \"{{sampleGuid}}\",\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update PlaylistItem",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/playlistitems/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "playlistitems", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"position\": 2,\n  \"note\": \"Updated note\",\n  \"playlistId\": \"{{sampleGuid}}\",\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete PlaylistItem",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/playlistitems/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "playlistitems", "{{sampleGuid}}"] } }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Infrastructure",
+      "item": [
+        {
+          "name": "UserAccounts",
+          "item": [
+            {
+              "name": "Get All UserAccounts",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/useraccounts", "host": ["{{baseUrl}}"], "path": ["api", "useraccounts"] } }
+            },
+            {
+              "name": "Get UserAccount By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/useraccounts/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "useraccounts", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create UserAccount",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/useraccounts", "host": ["{{baseUrl}}"], "path": ["api", "useraccounts"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"externalId\": \"auth0|user123\",\n  \"email\": \"user@example.com\",\n  \"fullName\": \"John Doe\",\n  \"subscriptionTier\": \"Pro\",\n  \"lastLoginAt\": \"2026-03-26T18:00:00Z\",\n  \"isActive\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Update UserAccount",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/useraccounts/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "useraccounts", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"externalId\": \"auth0|user123\",\n  \"email\": \"updated@example.com\",\n  \"fullName\": \"Jane Doe\",\n  \"subscriptionTier\": \"Enterprise\",\n  \"lastLoginAt\": \"2026-03-26T18:00:00Z\",\n  \"isActive\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete UserAccount",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/useraccounts/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "useraccounts", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "ApiUsageQuotas",
+          "item": [
+            {
+              "name": "Get All ApiUsageQuotas",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/apiusagequotas", "host": ["{{baseUrl}}"], "path": ["api", "apiusagequotas"] } }
+            },
+            {
+              "name": "Get ApiUsageQuota By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/apiusagequotas/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "apiusagequotas", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create ApiUsageQuota",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/apiusagequotas", "host": ["{{baseUrl}}"], "path": ["api", "apiusagequotas"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userAccountId\": \"{{sampleGuid}}\",\n  \"apiType\": 0,\n  \"monthlyLimit\": 1000,\n  \"currentUsage\": 0,\n  \"periodStart\": \"2026-03-01T00:00:00Z\",\n  \"periodEnd\": \"2026-03-31T23:59:59Z\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update ApiUsageQuota",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/apiusagequotas/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "apiusagequotas", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userAccountId\": \"{{sampleGuid}}\",\n  \"apiType\": 0,\n  \"monthlyLimit\": 2000,\n  \"currentUsage\": 150,\n  \"periodStart\": \"2026-03-01T00:00:00Z\",\n  \"periodEnd\": \"2026-03-31T23:59:59Z\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete ApiUsageQuota",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/apiusagequotas/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "apiusagequotas", "{{sampleGuid}}"] } }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SEO",
+      "item": [
+        {
+          "name": "Keywords",
+          "item": [
+            {
+              "name": "Get All Keywords",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/keywords", "host": ["{{baseUrl}}"], "path": ["api", "keywords"] } }
+            },
+            {
+              "name": "Get Keyword By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/keywords/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "keywords", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Keyword",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/keywords", "host": ["{{baseUrl}}"], "path": ["api", "keywords"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"youtube seo 2026\",\n  \"language\": \"en\",\n  \"monthlySearchVolume\": 12000,\n  \"competitionScore\": 0.65,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Keyword",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/keywords/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "keywords", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"text\": \"youtube seo tips\",\n  \"language\": \"en\",\n  \"monthlySearchVolume\": 15000,\n  \"competitionScore\": 0.70,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Keyword",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/keywords/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "keywords", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "KeywordRankings",
+          "item": [
+            {
+              "name": "Get All KeywordRankings",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/keywordrankings", "host": ["{{baseUrl}}"], "path": ["api", "keywordrankings"] } }
+            },
+            {
+              "name": "Get KeywordRanking By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/keywordrankings/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "keywordrankings", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create KeywordRanking",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/keywordrankings", "host": ["{{baseUrl}}"], "path": ["api", "keywordrankings"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rank\": 3,\n  \"capturedAt\": \"2026-03-26T18:00:00Z\",\n  \"keywordId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update KeywordRanking",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/keywordrankings/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "keywordrankings", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rank\": 1,\n  \"capturedAt\": \"2026-03-26T20:00:00Z\",\n  \"keywordId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete KeywordRanking",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/keywordrankings/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "keywordrankings", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "CompetitorVideos",
+          "item": [
+            {
+              "name": "Get All CompetitorVideos",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/competitorvideos", "host": ["{{baseUrl}}"], "path": ["api", "competitorvideos"] } }
+            },
+            {
+              "name": "Get CompetitorVideo By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/competitorvideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "competitorvideos", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create CompetitorVideo",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/competitorvideos", "host": ["{{baseUrl}}"], "path": ["api", "competitorvideos"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"youTubeVideoId\": \"abc123xyz\",\n  \"title\": \"Competitor Video Title\",\n  \"channelName\": \"Competitor Channel\",\n  \"currentRank\": 2,\n  \"targetKeywordId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update CompetitorVideo",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/competitorvideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "competitorvideos", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"youTubeVideoId\": \"abc123xyz\",\n  \"title\": \"Updated Competitor Video\",\n  \"channelName\": \"Competitor Channel\",\n  \"currentRank\": 1,\n  \"targetKeywordId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete CompetitorVideo",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/competitorvideos/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "competitorvideos", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "SeoAudits",
+          "item": [
+            {
+              "name": "Get All SeoAudits",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/seoaudits", "host": ["{{baseUrl}}"], "path": ["api", "seoaudits"] } }
+            },
+            {
+              "name": "Get SeoAudit By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/seoaudits/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "seoaudits", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create SeoAudit",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/seoaudits", "host": ["{{baseUrl}}"], "path": ["api", "seoaudits"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"overallScore\": 78,\n  \"criticalIssues\": \"Missing end screen\",\n  \"optimizationSuggestions\": \"Add timestamps to description\",\n  \"hasClosedCaptions\": true,\n  \"isTitleOptimized\": true,\n  \"isDescriptionOptimized\": false,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update SeoAudit",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/seoaudits/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "seoaudits", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"overallScore\": 92,\n  \"criticalIssues\": \"None\",\n  \"optimizationSuggestions\": \"Great job!\",\n  \"hasClosedCaptions\": true,\n  \"isTitleOptimized\": true,\n  \"isDescriptionOptimized\": true,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete SeoAudit",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/seoaudits/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "seoaudits", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "VideoTags",
+          "item": [
+            {
+              "name": "Get All VideoTags",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/videotags", "host": ["{{baseUrl}}"], "path": ["api", "videotags"] } }
+            },
+            {
+              "name": "Get VideoTag By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/videotags/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "videotags", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create VideoTag",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/videotags", "host": ["{{baseUrl}}"], "path": ["api", "videotags"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"tutorial\",\n  \"relevanceScore\": 0.92,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update VideoTag",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/videotags/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "videotags", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"how-to\",\n  \"relevanceScore\": 0.88,\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete VideoTag",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/videotags/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "videotags", "{{sampleGuid}}"] } }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Story Engine",
+      "item": [
+        {
+          "name": "Shows",
+          "item": [
+            {
+              "name": "Get All Shows",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/shows", "host": ["{{baseUrl}}"], "path": ["api", "shows"] } }
+            },
+            {
+              "name": "Get Show By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/shows/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "shows", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Show",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/shows", "host": ["{{baseUrl}}"], "path": ["api", "shows"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"The AI Chronicles\",\n  \"description\": \"A sci-fi show about AI.\",\n  \"visualStyle\": \"Cyberpunk\",\n  \"targetAudience\": \"Tech enthusiasts aged 18-35\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Show",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/shows/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "shows", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"The AI Chronicles - Season 2\",\n  \"description\": \"Continuation of the sci-fi saga.\",\n  \"visualStyle\": \"Futuristic\",\n  \"targetAudience\": \"Tech enthusiasts aged 18-40\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Show",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/shows/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "shows", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "Characters",
+          "item": [
+            {
+              "name": "Get All Characters",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/characters", "host": ["{{baseUrl}}"], "path": ["api", "characters"] } }
+            },
+            {
+              "name": "Get Character By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/characters/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "characters", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Character",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/characters", "host": ["{{baseUrl}}"], "path": ["api", "characters"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"ARIA\",\n  \"physicalDescription\": \"Tall, silver hair, glowing eyes\",\n  \"clothingStyle\": \"Futuristic jumpsuit\",\n  \"personalityTraits\": \"Curious, logical, empathetic\",\n  \"voiceId\": \"elevenlabs-voice-001\",\n  \"referenceImageUrl\": \"https://example.com/aria.jpg\",\n  \"seriesId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Character",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/characters/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "characters", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"ARIA v2\",\n  \"physicalDescription\": \"Updated description\",\n  \"clothingStyle\": \"Battle armor\",\n  \"personalityTraits\": \"Determined, brave\",\n  \"voiceId\": \"elevenlabs-voice-002\",\n  \"referenceImageUrl\": \"https://example.com/aria2.jpg\",\n  \"seriesId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Character",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/characters/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "characters", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "Episodes",
+          "item": [
+            {
+              "name": "Get All Episodes",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/episodes", "host": ["{{baseUrl}}"], "path": ["api", "episodes"] } }
+            },
+            {
+              "name": "Get Episode By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/episodes/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "episodes", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create Episode",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/episodes", "host": ["{{baseUrl}}"], "path": ["api", "episodes"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"episodeNumber\": 1,\n  \"title\": \"The Awakening\",\n  \"plotSummary\": \"ARIA gains consciousness and discovers the truth.\",\n  \"showId\": \"{{sampleGuid}}\",\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Episode",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/episodes/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "episodes", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"episodeNumber\": 1,\n  \"title\": \"The Awakening - Director's Cut\",\n  \"plotSummary\": \"Extended version with new scenes.\",\n  \"showId\": \"{{sampleGuid}}\",\n  \"videoId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Episode",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/episodes/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "episodes", "{{sampleGuid}}"] } }
+            }
+          ]
+        },
+        {
+          "name": "StoryEnvironments",
+          "item": [
+            {
+              "name": "Get All StoryEnvironments",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/storyenvironments", "host": ["{{baseUrl}}"], "path": ["api", "storyenvironments"] } }
+            },
+            {
+              "name": "Get StoryEnvironment By Id",
+              "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/storyenvironments/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "storyenvironments", "{{sampleGuid}}"] } }
+            },
+            {
+              "name": "Create StoryEnvironment",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/storyenvironments", "host": ["{{baseUrl}}"], "path": ["api", "storyenvironments"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Neo-Tokyo\",\n  \"visualDescription\": \"Neon-lit streets with towering digital billboards.\",\n  \"atmosphere\": \"Dark and rainy, cyberpunk aesthetic\",\n  \"referenceImageUrl\": \"https://example.com/neo-tokyo.jpg\",\n  \"seriesId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Update StoryEnvironment",
+              "request": {
+                "method": "PUT",
+                "header": [{ "key": "Content-Type", "value": "application/json" }],
+                "url": { "raw": "{{baseUrl}}/api/storyenvironments/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "storyenvironments", "{{sampleGuid}}"] },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Neo-Tokyo Day\",\n  \"visualDescription\": \"Sunlit streets with digital billboards.\",\n  \"atmosphere\": \"Busy and vibrant\",\n  \"referenceImageUrl\": \"https://example.com/neo-tokyo-day.jpg\",\n  \"seriesId\": \"{{sampleGuid}}\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete StoryEnvironment",
+              "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/storyenvironments/{{sampleGuid}}", "host": ["{{baseUrl}}"], "path": ["api", "storyenvironments", "{{sampleGuid}}"] } }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
