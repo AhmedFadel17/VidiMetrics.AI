@@ -1,52 +1,125 @@
 export default function Home() {
   return (
-    <>
+    <div className="bg-[#0b1326] text-white">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-8 overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute top-0 right-0 -z-10 w-[600px] h-[600px] bg-primary/10 blur-[120px] rounded-full"></div>
-        <div className="absolute bottom-0 left-0 -z-10 w-[400px] h-[400px] bg-secondary/10 blur-[100px] rounded-full"></div>
-
-        <div className="max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-high ghost-border">
-              <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
-              <span className="text-xs uppercase tracking-widest text-on-surface-variant font-bold">New: Cinematic Engine v4.0</span>
+      <section className="relative pt-44 pb-32 px-8 overflow-hidden">
+        <div className="max-w-screen-2xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-20 items-center relative z-10">
+          <div className="lg:col-span-6 space-y-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+              <span className="w-2 h-2 rounded-full bg-[#7818c6] animate-pulse"></span>
+              <span className="text-[10px] uppercase tracking-[0.2em] text-white/60 font-bold">New: Cinematic Engine v4.0</span>
             </div>
-            <h1 className="font-headline font-bold text-6xl md:text-8xl leading-tight tracking-tighter text-on-surface">
-              The Future of <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-tertiary">YouTube</span> Storytelling
+            <h1 className="font-headline font-bold text-7xl lg:text-9xl leading-[0.9] tracking-tighter">
+              The Future of <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ddb7ff] via-[#7818c6] to-[#ddb7ff]">YouTube</span> <br />
+              Storytelling
             </h1>
-            <p className="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+            <p className="text-lg text-white/60 max-w-lg leading-relaxed font-body">
               AI-powered illustrated stories and deep YouTube analytics in one place. Elevate your narrative with data-driven creative precision.
             </p>
-            <div className="flex flex-wrap gap-4 pt-4">
-              <button className="px-8 py-4 btn-gradient font-headline font-bold text-lg rounded-xl shadow-lg shadow-primary/20">
+            <div className="flex flex-wrap gap-6 pt-4">
+              <button className="px-10 py-4 bg-gradient-to-r from-[#7818c6] to-[#ddb7ff] font-label font-bold text-sm uppercase tracking-widest rounded-md shadow-2xl shadow-[#7818c6]/20 active:scale-95 transition-all">
                 Get Started
               </button>
-              <button className="px-8 py-4 glass-morphism ghost-border text-on-surface font-headline font-bold text-lg rounded-xl flex items-center gap-2 hover:bg-surface-variant/40 transition-all">
-                <span className="material-symbols-outlined">play_circle</span>
+              <button className="px-10 py-4 glass-panel border border-white/10 text-white font-label font-bold text-sm uppercase tracking-widest rounded-md flex items-center gap-3 hover:bg-white/5 transition-all active:scale-95">
+                <span className="material-symbols-outlined text-lg">play_circle</span>
                 Watch Demo
               </button>
             </div>
           </div>
 
-          <div className="lg:col-span-5 relative">
-            <div className="aspect-square rounded-3xl overflow-hidden glass-morphism ghost-border p-4">
-              <div className="w-full h-full rounded-2xl overflow-hidden relative">
-                <img
-                  className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw2K9FIoyTSkQXUl0yHnXNOLQm5bV_FRfZgcGzAZoMXevYiZgvaPxI72fgNtcOTdTepddjTbswkIxCc3sbob0pXuyUwpoFFMyFJp3rK7ehVJ5cWc67yY1hoyT42ScraztkP6O9vWeCa46GcYNPvQ9VmnxdxMRrmmVUMkvOWVxyBjSSTiW4JsqC3oULapA0fcrVRuXJlUOWUce0mQJvoZXduq3fwh57EwowCuSMr1FYlgbegeM4sjFrXv8WB1R2wpmjIh19PLzGhKQ"
-                  alt="Cinematic Visualization"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
-                <div className="absolute bottom-6 left-6 right-6 p-6 glass-morphism rounded-xl ghost-border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-secondary">Live Generation</span>
-                    <span className="text-xs text-on-surface-variant">84% Complete</span>
-                  </div>
-                  <div className="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-secondary w-[84%] h-full"></div>
-                  </div>
+          <div className="lg:col-span-6 relative">
+             <div className="relative aspect-square max-w-xl ml-auto group">
+                {/* Outer Glow */}
+                <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full -z-10 animate-pulse"></div>
+                {/* Illustration Frame */}
+                <div className="w-full h-full rounded-[2.5rem] p-8 bg-[#161f35] border border-white/10 shadow-2xl overflow-hidden relative">
+                   <div className="w-full h-full rounded-2xl overflow-hidden relative">
+                     <img
+                       className="w-full h-full object-cover grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000"
+                       src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw2K9FIoyTSkQXUl0yHnXNOLQm5bV_FRfZgcGzAZoMXevYiZgvaPxI72fgNtcOTdTepddjTbswkIxCc3sbob0pXuyUwpoFFMyFJp3rK7ehVJ5cWc67yY1hoyT42ScraztkP6O9vWeCa46GcYNPvQ9VmnxdxMRrmmVUMkvOWVxyBjSSTiW4JsqC3oULapA0fcrVRuXJlUOWUce0mQJvoZXduq3fwh57EwowCuSMr1FYlgbegeM4sjFrXv8WB1R2wpmjIh19PLzGhKQ"
+                       alt="Cinematic Visualization"
+                     />
+                     <div className="absolute inset-0 bg-gradient-to-t from-[#0b1326] via-transparent to-transparent"></div>
+                     <div className="absolute bottom-8 left-8 right-8 p-6 glass-panel rounded-xl border border-white/10">
+                       <div className="flex items-center justify-between mb-3">
+                         <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#7818c6]">Live Generation</span>
+                         <span className="text-[10px] text-white/40">84% Complete</span>
+                       </div>
+                       <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
+                         <div className="bg-[#7818c6] w-[84%] h-full shadow-[0_0_15px_rgba(120,24,198,0.8)]"></div>
+                       </div>
+                     </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+        {/* Abstract Background Gradients */}
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 blur-[160px] rounded-full -mr-96 -mt-96 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/5 blur-[120px] rounded-full -ml-40 -mb-40 pointer-events-none"></div>
+      </section>
+
+      {/* Core Engine Section */}
+      <section className="py-20 px-8">
+        <div className="max-w-screen-2xl mx-auto">
+          <div className="mb-20 space-y-4">
+            <h2 className="text-[10px] uppercase tracking-[0.3em] text-[#7818c6] font-bold">The Core Engine</h2>
+            <h3 className="text-5xl font-headline font-bold text-white tracking-tight">From Prompt to Performance.</h3>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* AI Storyboarder Card */}
+            <div className="group p-12 rounded-[2rem] bg-[#161f35] border border-white/5 hover:border-white/10 transition-all duration-500 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-3xl -mr-32 -mt-32"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center mb-8 border border-white/10 group-hover:bg-[#7818c6]/10 transition-colors">
+                  <span className="material-symbols-outlined text-[#7818c6]">movie_edit</span>
+                </div>
+                <h4 className="text-2xl font-headline font-bold mb-4">AI Storyboarder</h4>
+                <p className="text-white/40 text-lg leading-relaxed mb-10 max-w-sm">
+                  Transform scripts into visual masterpieces. Our AI generates consistent characters, breathtaking scenes, and cohesive episodes in seconds.
+                </p>
+                <div className="flex gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex-1 aspect-[4/3] rounded-xl overflow-hidden border border-white/10">
+                      <img
+                        className="w-full h-full object-cover grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
+                        src={`https://lh3.googleusercontent.com/aida-public/AB6AXuCXiSyX1kQAzw0DLxo1xyflEHg-ARKhK64ZHc2F0rZT61-uo_XHw6NtSa9Qhj1FhGqPLOgq-ZYy_YN4q5sY6zG2StccSDjRRONraGjTY2Fh1f4XznZdEOnaWK3M_4J5WfprAmRaWiZKFecqjZYVYQBYOHFJ_BnkulshnySwTHOUCOFsEWzru0dJmAumXLF-TYu-5-TLSVXtP4IzGgcTIoDggzpvvH3B6am8QhkLf0sbAcyR755DlRnGKt9Er5t7JlNdpJDMLaxCP-c`}
+                        alt="Storyboard sample"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Metric Integration Card */}
+            <div className="group p-12 rounded-[2rem] bg-[#161f35] border border-white/5 hover:border-white/10 transition-all duration-500 relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-64 h-64 bg-[#3da9fc]/5 blur-3xl -mr-32 -mt-32"></div>
+               <div className="relative z-10">
+                <div className="w-14 h-14 rounded-xl bg-white/5 flex items-center justify-center mb-8 border border-white/10 group-hover:bg-[#3da9fc]/10 transition-colors">
+                  <span className="material-symbols-outlined text-[#3da9fc]">analytics</span>
+                </div>
+                <h4 className="text-2xl font-headline font-bold mb-4">Metric Integration</h4>
+                <p className="text-white/40 text-lg leading-relaxed mb-10 max-w-sm">
+                  Link your YouTube channels directly. Visualize retention peaks, demographic shifts, and A/B test thumbnails with AI-predicted performance scores.
+                </p>
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 group-hover:bg-white/[0.08] transition-colors">
+                      <div className="flex items-center gap-4">
+                        <span className="material-symbols-outlined text-[#3da9fc] text-lg font-bold">trending_up</span>
+                        <span className="text-xs font-bold uppercase tracking-widest text-white/80">Retention Prediction</span>
+                      </div>
+                      <span className="text-[#3da9fc] font-bold">+12.4%</span>
+                    </div>
+                    <div className="flex items-center justify-between p-5 bg-white/5 rounded-xl border border-white/10 group-hover:bg-white/[0.08] transition-colors">
+                      <div className="flex items-center gap-4">
+                        <span className="material-symbols-outlined text-[#3da9fc] text-lg font-bold">groups</span>
+                        <span className="text-xs font-bold uppercase tracking-widest text-white/80">Audience Sync</span>
+                      </div>
+                      <span className="text-[#3da9fc] font-bold uppercase text-[10px] tracking-[0.2em]">Active</span>
+                    </div>
                 </div>
               </div>
             </div>
@@ -54,80 +127,91 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Core Engine Section */}
-      <section className="py-32 px-8 bg-surface-container-low/30">
+      {/* Pricing Section */}
+      <section className="py-32 px-8">
         <div className="max-w-screen-2xl mx-auto">
-          <div className="mb-20 space-y-4">
-            <h2 className="text-xs uppercase tracking-widest text-primary font-bold">The Core Engine</h2>
-            <h3 className="text-4xl md:text-5xl font-headline font-bold text-on-surface">From Prompt to Performance.</h3>
+          <div className="text-center mb-20 space-y-4">
+            <h2 className="text-[10px] uppercase tracking-[0.3em] text-[#7818c6] font-bold">The Creative Investment</h2>
+            <h3 className="text-6xl font-headline font-bold text-white tracking-tight">Choose Your Level.</h3>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* AI Storyboarder Card */}
-            <div className="group p-10 rounded-3xl glass-morphism ghost-border hover:bg-surface-container-high transition-all duration-500">
-              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-primary text-4xl">movie_edit</span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* Free Plan */}
+            <div className="p-10 rounded-[2rem] bg-[#161f35]/50 border border-white/5 flex flex-col items-center text-center">
+              <h4 className="text-xl font-bold mb-1">Free</h4>
+              <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-bold">For new observers</p>
+              <div className="flex items-baseline gap-1 mb-10">
+                <span className="text-4xl font-headline font-bold">$0</span>
+                <span className="text-white/30 text-xs">/mo</span>
               </div>
-              <h4 className="text-2xl font-headline font-bold text-on-surface mb-4">AI Storyboarder</h4>
-              <p className="text-on-surface-variant text-lg leading-relaxed mb-8">
-                Transform scripts into visual masterpieces. Our AI generates consistent characters, breathtaking scenes, and cohesive episodes in seconds.
-              </p>
-              <div className="grid grid-cols-3 gap-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="aspect-video rounded-lg overflow-hidden ghost-border">
-                    <img
-                      className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all"
-                      src={`https://lh3.googleusercontent.com/aida-public/AB6AXuCXiSyX1kQAzw0DLxo1xyflEHg-ARKhK64ZHc2F0rZT61-uo_XHw6NtSa9Qhj1FhGqPLOgq-ZYy_YN4q5sY6zG2StccSDjRRONraGjTY2Fh1f4XznZdEOnaWK3M_4J5WfprAmRaWiZKFecqjZYVYQBYOHFJ_BnkulshnySwTHOUCOFsEWzru0dJmAumXLF-TYu-5-TLSVXtP4IzGgcTIoDggzpvvH3B6am8QhkLf0sbAcyR755DlRnGKt9Er5t7JlNdpJDMLaxCP-c`}
-                      alt="Storyboard sample"
-                    />
-                  </div>
-                ))}
-              </div>
+              <ul className="space-y-5 mb-12 text-sm text-white/60 font-medium">
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> 5 AI Storyboards / mo</li>
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Basic Analytics</li>
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Standard Resolution</li>
+              </ul>
+              <button className="w-full py-4 mt-auto glass-panel border border-white/10 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-all">
+                Start Free
+              </button>
             </div>
 
-            {/* YouTube Analytics Card */}
-            <div className="group p-10 rounded-3xl glass-morphism ghost-border hover:bg-surface-container-high transition-all duration-500">
-              <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-secondary text-4xl">analytics</span>
+            {/* Creator Plan */}
+            <div className="relative p-10 rounded-[2.5rem] bg-[#1c2742] border-2 border-[#7818c6]/50 flex flex-col items-center text-center shadow-2xl shadow-[#7818c6]/20">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1.5 bg-[#7818c6] rounded-full text-[10px] font-bold uppercase tracking-widest text-white shadow-lg">
+                Most Popular
               </div>
-              <h4 className="text-2xl font-headline font-bold text-on-surface mb-4">Metric Integration</h4>
-              <p className="text-on-surface-variant text-lg leading-relaxed mb-8">
-                Link your YouTube channels directly. Visualize retention peaks, demographic shifts, and A/B test thumbnails with AI-predicted performance scores.
-              </p>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl ghost-border">
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-secondary">trending_up</span>
-                    <span className="text-sm">Retention Prediction</span>
-                  </div>
-                  <span className="text-secondary font-headline font-bold">+12.4%</span>
-                </div>
-                <div className="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl ghost-border">
-                  <div className="flex items-center gap-3">
-                    <span className="material-symbols-outlined text-secondary">groups</span>
-                    <span className="text-sm">Audience Sync</span>
-                  </div>
-                  <span className="text-secondary font-headline font-bold">Active</span>
-                </div>
+              <h4 className="text-xl font-bold mb-1">Creator</h4>
+              <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-bold">For the storytellers</p>
+              <div className="flex items-baseline gap-1 mb-10">
+                <span className="text-4xl font-headline font-bold">$29</span>
+                <span className="text-white/30 text-xs">/mo</span>
               </div>
+              <ul className="space-y-5 mb-12 text-sm text-white/60 font-medium text-left w-full pl-6">
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Unlimited Characters</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Custom Prompt Tuning</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> High-res Downloads</li>
+                <li className="flex items-center gap-3"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Retention Heatmaps</li>
+              </ul>
+              <button className="w-full py-5 mt-auto bg-gradient-to-r from-[#7818c6] to-[#ddb7ff] rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl active:scale-95 transition-all">
+                Join Creator
+              </button>
+            </div>
+
+            {/* Studio Plan */}
+            <div className="p-10 rounded-[2rem] bg-[#161f35]/50 border border-white/5 flex flex-col items-center text-center">
+              <h4 className="text-xl font-bold mb-1">Studio</h4>
+              <p className="text-[10px] uppercase tracking-widest text-white/40 mb-8 font-bold">For the production team</p>
+              <div className="flex items-baseline gap-1 mb-10">
+                <span className="text-4xl font-headline font-bold">$99</span>
+                <span className="text-white/30 text-xs">/mo</span>
+              </div>
+              <ul className="space-y-5 mb-12 text-sm text-white/60 font-medium">
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Team Collaboration</li>
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> API Access</li>
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> 4K Cinematic Export</li>
+                <li className="flex items-center gap-3 justify-center"><span className="material-symbols-outlined text-[10px] text-[#7818c6] font-bold">check</span> Priority Rendering</li>
+              </ul>
+              <button className="w-full py-4 mt-auto glass-panel border border-white/10 rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-all">
+                Contact Sales
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-32 px-8 relative overflow-hidden">
-        <div className="max-w-4xl mx-auto text-center glass-morphism ghost-border p-16 rounded-[3rem] relative z-10">
-          <h2 className="text-4xl md:text-5xl font-headline font-bold text-on-surface mb-6">Ready to see your stories through our lens?</h2>
-          <p className="text-xl text-on-surface-variant mb-10">Join 10,000+ creators using VidiMetrics.Ai to redefine their content.</p>
+      <section className="py-40 px-8 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto text-center p-20 rounded-[4rem] bg-[#161f35] border border-white/5 shadow-3xl relative z-10 overflow-hidden">
+           <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent"></div>
+          <h2 className="text-5xl font-headline font-bold text-white mb-8 tracking-tight">Ready to see your stories <br /> through our lens?</h2>
+          <p className="text-lg text-white/40 mb-12 max-w-md mx-auto leading-relaxed">Join 10,000+ creators using VidiMetrics.Ai to redefine their content.</p>
           <div className="flex justify-center">
-            <button className="px-10 py-5 bg-gradient-to-r from-secondary to-secondary-container text-on-secondary-container font-headline font-bold text-xl rounded-2xl hover:brightness-110 transition-all active:scale-95">
+            <button className="px-12 py-5 bg-[#3da9fc] text-[#0b1326] font-label font-black text-xs uppercase tracking-[0.3em] rounded-xl shadow-[0_0_40px_rgba(61,169,252,0.4)] hover:brightness-110 active:scale-95 transition-all">
               Launch Engine
             </button>
           </div>
         </div>
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-primary/10 to-transparent -mb-48 blur-[100px]"></div>
       </section>
-    </>
+    </div>
   )
 }
