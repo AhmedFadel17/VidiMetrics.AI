@@ -1,13 +1,17 @@
-using VidiMetrics.DataAccess;
-using VidiMetrics.Application;
+using OpenIddict.Validation.AspNetCore;
+using VidiMetrics.API.Extensions;
 using VidiMetrics.API.Middlwares;
+using VidiMetrics.Application;
+using VidiMetrics.DataAccess;
+using VidiMetrics.Domain.Settings;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 await builder.Services.AddDataAccessServices(builder.Configuration);
 await builder.Services.AddApplicationServices();
 
-builder.Services.AddControllers(options => 
+builder.Services.AddControllers(options =>
 {
     // Global filters or configuration can go here
 });
@@ -18,10 +22,27 @@ builder.Services.AddOpenApi();
 // CORS – allow the Vite dev server
 builder.Services.AddCors(options =>
 {
+    var frontendSettings = builder.Configuration.GetSection("FrontendSettings").Get<FrontendSettings>();
+
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins(frontendSettings?.BaseUrl??"")
               .AllowAnyHeader()
               .AllowAnyMethod());
+});
+
+// Configure Authentication using OpenIddict Validation
+builder.Services.AddOpenIddict()
+    .AddValidation(options =>
+    {
+        var identitySettings = builder.Configuration.GetJsonSection<IdentityServerSettings>("IdentityServerSettings");
+        options.SetIssuer(identitySettings.BaseUrl);
+        options.UseSystemNetHttp();
+        options.UseAspNetCore();
+    });
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
 
 var app = builder.Build();
@@ -37,6 +58,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseMiddleware<ExceptionHandlerMiddleware>();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
