@@ -1,0 +1,6 @@
+@VidiMetrics.IdentityServer_HostAddress = http://localhost:5145
+
+GET {{VidiMetrics.IdentityServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
