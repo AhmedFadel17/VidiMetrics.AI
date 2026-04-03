@@ -1,9 +1,9 @@
 import { AppRoute } from "@/types/ui";
 
 
-import Login from "@/pages/Auth/Login";
 import Register from "@/pages/Auth/Register";
 import Recovery from "@/pages/Auth/Recovery";
+import LoginError from "@/pages/Auth/LoginError";
 import UserHome from "@/pages/Dashboard/User/Home";
 import Home from "@/pages/Main/Home";
 import AIInsights from "@/pages/Main/AIInsights";
@@ -23,6 +23,7 @@ import Partners from "@/pages/Main/Partners";
 import Privacy from "@/pages/Main/Privacy";
 import Terms from "@/pages/Main/Terms";
 import Cookie from "@/pages/Main/Cookie";
+import CallbackPage from "@/pages/Auth/Callback";
 
 // =============================
 // 🚀 NAVBAR ROUTES
@@ -72,19 +73,24 @@ export const AppUserRoutes: AppRoute[] = [
 // =============================
 export const AuthRoutes: AppRoute[] = [
     {
-        path: "/login",
-        label: "Login",
-        element: <Login />,
-    },
-    {
         path: "/register",
         label: "Register",
         element: <Register />,
     },
     {
+        path: "/callback",
+        label: "Callback",
+        element: <CallbackPage />,
+    },
+    {
         path: "/recovery",
         label: "Recovery",
         element: <Recovery />,
+    },
+    {
+        path: "/login-error",
+        label: "Login Error",
+        element: <LoginError />,
     },
 ];
 // =============================
