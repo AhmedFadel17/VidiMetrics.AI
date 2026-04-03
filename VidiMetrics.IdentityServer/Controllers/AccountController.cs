@@ -38,10 +38,28 @@ namespace VidiMetrics.IdentityServer.Controllers
 
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, "User");
+                
                 return Ok(new { Message = "User registered successfully" });
             }
 
-            return BadRequest(new { Errors = result.Errors });
+            var errors = new Dictionary<string, string[]>();
+            foreach (var error in result.Errors)
+            {
+                var key = error.Code switch
+                {
+                    var c when c.Contains("Password") => "Password",
+                    var c when c.Contains("Email") || c.Contains("UserName") => "Email",
+                    _ => "General"
+                };
+
+                if (!errors.ContainsKey(key))
+                    errors[key] = new[] { error.Description };
+                else
+                    errors[key] = errors[key].Append(error.Description).ToArray();
+            }
+
+            return BadRequest(new { errors });
         }
     }
 }

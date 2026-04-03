@@ -1,20 +1,32 @@
-using VidiMetrics.IdentityServer.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options; 
+using OpenIddict.Abstractions;
+using VidiMetrics.IdentityServer.Configuration; 
+using VidiMetrics.IdentityServer.Data;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.Configure<IdentityServerSettings>(
+    builder.Configuration.GetSection("IdentityServer"));
+
+var identitySettings = builder.Configuration.GetSection("IdentityServer").Get<IdentityServerSettings>() 
+                      ?? new IdentityServerSettings();
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddRazorPages();
 
-builder.Services.AddValidatorsFromAssemblyContaining<Program>();
-builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        var firstClientUrl = identitySettings.Clients.FirstOrDefault()?.BaseUrl ?? "http://localhost:5173";
+        policy.WithOrigins(firstClientUrl)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -25,14 +37,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
-    options.Password.RequireDigit = true;
-    options.Password.RequireLowercase = true;
-    options.Password.RequireNonAlphanumeric = true;
-    options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
 })
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddOpenIddict()
     .AddCore(options =>
@@ -41,23 +49,34 @@ builder.Services.AddOpenIddict()
     })
     .AddServer(options =>
     {
-        // 1. Enable the endpoints
-        options.SetTokenEndpointUris("/connect/token");
-        options.SetAuthorizationEndpointUris("/connect/authorize");
+        // Using JSON-defined endpoints
+        options.SetTokenEndpointUris(identitySettings.Endpoints.Token)
+               .SetAuthorizationEndpointUris(identitySettings.Endpoints.Authorization)
+               .SetEndSessionEndpointUris(identitySettings.Endpoints.Logout)
+               .SetUserInfoEndpointUris(identitySettings.Endpoints.UserInfo);
 
-        // 2. Enable the flows
-        options.AllowAuthorizationCodeFlow();
-        options.AllowRefreshTokenFlow();
-        options.AllowClientCredentialsFlow();
+        options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
 
-        // 3. Encryption & Signing (Use developer certificates for local, KeyVault for Prod)
+        // Register default scopes + any custom ones from your JSON clients
+        options.RegisterScopes(Scopes.OpenId, Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess);
+        
+        foreach (var client in identitySettings.Clients)
+        {
+            foreach (var scope in client.Scopes)
+            {
+                options.RegisterScopes(scope);
+            }
+        }
+
         options.AddDevelopmentEncryptionCertificate()
                .AddDevelopmentSigningCertificate();
 
-        // 4. Register the AspNetCore integration
         options.UseAspNetCore()
                .EnableTokenEndpointPassthrough()
-               .EnableAuthorizationEndpointPassthrough();
+               .EnableAuthorizationEndpointPassthrough()
+               .EnableEndSessionEndpointPassthrough()
+               .EnableUserInfoEndpointPassthrough()
+               .DisableTransportSecurityRequirement();
     })
     .AddValidation(options =>
     {
@@ -65,19 +84,38 @@ builder.Services.AddOpenIddict()
         options.UseAspNetCore();
     });
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Using the Login path from JSON
+    options.LoginPath = identitySettings.Endpoints.Login; 
+    options.LogoutPath = identitySettings.Endpoints.Logout;
+    options.AccessDeniedPath = identitySettings.Endpoints.AccessDenied;
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+await DbInitializer.SeedAsync(app.Services);
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapRazorPages();
 
 app.Run();

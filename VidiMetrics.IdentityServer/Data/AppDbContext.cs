@@ -12,6 +12,7 @@ namespace VidiMetrics.IdentityServer.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.UseOpenIddict();
         }
     }
 }
