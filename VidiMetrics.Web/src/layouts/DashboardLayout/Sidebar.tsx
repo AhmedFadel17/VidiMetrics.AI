@@ -1,62 +1,83 @@
+import { useAuth } from 'react-oidc-context';
 import { Link, useLocation } from 'react-router-dom'
+import { SidebarRoutes } from '@/routes/sidebar';
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', path: '/dashboard', icon: 'dashboard' },
-  { label: 'Storyboarder', path: '/storyboarder', icon: 'movie_edit' },
-  { label: 'Tasks', path: '/tasks', icon: 'assignment_turned_in' },
-  { label: 'Prompts', path: '/prompts', icon: 'psychology' },
-  { label: 'Settings', path: '/settings', icon: 'settings' },
-]
 
 export default function Sidebar() {
   const { pathname } = useLocation()
+  const auth = useAuth();
+  const user = auth.user;
 
   return (
-    <aside className="h-screen w-64 fixed left-0 top-0 z-40 bg-surface-container-low bg-gradient-to-b from-surface-container-low to-background shadow-[4px_0_24px_rgba(0,0,0,0.5)] flex flex-col py-6">
-      <div className="px-6 mb-10">
-        <h1 className="text-primary font-headline font-bold text-2xl tracking-tight">VidiMetrics</h1>
-        <p className="text-secondary text-[10px] uppercase tracking-[0.2em] mt-1 font-bold">AI Engine Active</p>
+    <aside className="h-screen w-72 fixed left-0 top-0 z-40 bg-dashboard-bg border-r border-white/5 flex flex-col py-8 overflow-y-auto">
+      {/* Logo */}
+      <div className="px-8 mb-8">
+        <h1 className="text-white font-headline font-bold text-2xl tracking-tight flex items-center gap-2">
+          VidiMetrics.Ai
+        </h1>
       </div>
-      
-      <nav className="flex-1 px-2 space-y-1">
-        {NAV_ITEMS.map((item) => {
+
+      {/* New Production Button */}
+      <div className="px-8 mb-8">
+        <button className="w-full py-2 btn-premium rounded-2xl flex items-center justify-center gap-3">
+          <span className="material-symbols-outlined text-2xl">add</span>
+          <span className="uppercase tracking-widest text-xs font-black">New Production</span>
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-4 space-y">
+        {SidebarRoutes.map((item) => {
           const isActive = pathname === item.path
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all duration-200 ease-in-out hover:translate-x-1 font-body font-medium text-sm
-                ${isActive 
-                  ? 'bg-primary/10 text-primary border-r-4 border-primary' 
-                  : 'text-on-surface/50 hover:bg-on-surface/5'}`}
+              className={`flex items-center gap-4 px-6 py-2 rounded-xl transition-all duration-300 group
+                ${isActive
+                  ? 'bg-accent-purple/10 text-white border border-accent-purple/20 shadow-[0_0_20px_rgba(138,43,226,0.1)]'
+                  : 'text-white/40 hover:bg-white/5 hover:text-white/80'}`}
             >
-              <span className="material-symbols-outlined">{item.icon}</span>
-              <span>{item.label}</span>
+              <span className={`material-symbols-outlined text-2xl transition-colors ${isActive ? 'text-accent-purple' : 'group-hover:text-white/60'}`}>
+                {item.icon}
+              </span>
+              <span className="font-bold text-[13px] tracking-wide">{item.label}</span>
+              {isActive && (
+                <div className="ml-auto w-1.5 h-6 bg-accent-purple rounded-full shadow-[0_0_10px_#8a2be2]"></div>
+              )}
             </Link>
           )
         })}
       </nav>
 
-      <div className="px-4 mt-auto">
-        <button className="w-full py-3 btn-gradient rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 transition-transform">
-          <span className="material-symbols-outlined text-sm">add_circle</span>
-          <span>New Story</span>
-        </button>
-        
-        <div className="mt-6 flex items-center gap-3 px-2">
-          <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20 bg-surface-container-highest">
-            <img 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9udzcgy1BvWVJoZYHGn67KJQ601QPn2sCn2bddzmfZN_FcEhXT6fiGvt6dV1KM-LAwb9R7M_ASSWZlSEz4unjetvY1ElmQ3Ny0B33xNPayLn9KdUYqWmq7gOt1r7uoLWLXWfhRMLwtIfhCNpv29-TwPHcxUZipJUC3TcS7JtyPwTPh8Z8wu13mqhJWMNJw8VfZZUE-16h7trh0JCeiPN4B-FcLcYNAZOEy8UWpvzQVzIG9ItMwKvO0AFIzHjgb_PD7JT_vWLSLz0" 
-              alt="User Profile" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-bold text-on-surface">Alex Rivera</span>
-            <span className="text-[10px] text-on-surface-variant uppercase tracking-tighter">Pro Creator</span>
+      {/* Pro Producer Card */}
+      <div className="px-4 mt-8 mb-6">
+        <div className="glass-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-accent-pink/10 blur-3xl -mr-8 -mt-8 group-hover:bg-accent-pink/20 transition-colors"></div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-accent-pink/20 flex items-center justify-center border border-accent-pink/30">
+                <span className="material-symbols-outlined text-accent-pink text-xl">stars</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-white font-bold text-sm">Pro Producer</span>
+                <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">{user?.profile.name?.split(' ')[0] || 'User'}</span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] font-black uppercase tracking-tighter">
+                <span className="text-white/40">75% Render Credits used</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-accent-purple to-accent-pink w-[75%] shadow-[0_0_10px_rgba(255,0,127,0.5)]"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+
     </aside>
   )
 }

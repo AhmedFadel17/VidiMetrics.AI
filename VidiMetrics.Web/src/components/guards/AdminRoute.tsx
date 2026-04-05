@@ -1,11 +1,11 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAppSelector } from '@/store/hooks';
-import { selectCurrentUser } from '@/store/slices/authSlice';
+import { useAuth } from 'react-oidc-context';
 
 const AdminRoute = () => {
-  const user = useAppSelector(selectCurrentUser);
+  const auth = useAuth();
+  const user = auth.user;
 
-  if (!user || user.role !== 'Admin') {
+  if (!user || user.claims.role !== 'Admin') {
     // If not admin, redirect to dashboard or home
     return <Navigate to="/dashboard" replace />;
   }

@@ -54,7 +54,12 @@ export default {
         "surface-container": "#171f33",
         "on-primary-fixed": "#2c0051",
         "on-tertiary": "#640039",
-        "on-tertiary-fixed-variant": "#8c0053"
+        "on-tertiary-fixed-variant": "#8c0053",
+        "accent-pink": "#ff007f",
+        "accent-cyan": "#00f2ff",
+        "accent-purple": "#8a2be2",
+        "dashboard-bg": "#060912",
+        "card-bg": "rgba(23, 31, 51, 0.6)",
       },
       fontFamily: {
         "headline": ["Space Grotesk", "sans-serif"],
@@ -65,7 +70,23 @@ export default {
         "DEFAULT": "0.25rem",
         "lg": "0.5rem",
         "xl": "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
         "full": "9999px"
+      },
+      animation: {
+        'glow-pulse': 'glow-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'subtle-float': 'subtle-float 3s ease-in-out infinite',
+      },
+      keyframes: {
+        'glow-pulse': {
+          '0%, 100%': { opacity: 1, filter: 'brightness(1)' },
+          '50%': { opacity: 0.8, filter: 'brightness(1.5)' },
+        },
+        'subtle-float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        }
       },
     },
   },

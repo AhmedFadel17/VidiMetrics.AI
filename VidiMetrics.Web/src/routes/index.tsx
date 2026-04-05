@@ -25,16 +25,6 @@ import Terms from "@/pages/Main/Terms";
 import Cookie from "@/pages/Main/Cookie";
 import CallbackPage from "@/pages/Auth/Callback";
 
-// =============================
-// 🚀 NAVBAR ROUTES
-// =============================
-export const NavbarRoutes: AppRoute[] = [
-    { path: "/", label: "Home", element: <Home /> },
-    { path: "/features", label: "Features", element: <Features /> },
-    { path: "/ai-insights", label: "AI Insights", element: <AIInsights /> },
-    { path: "/pricing", label: "Pricing", element: <PricingPage /> },
-    { path: "/community", label: "Community", element: <Community /> },
-];
 
 // =============================
 // 🚀 MAIN ROUTES
