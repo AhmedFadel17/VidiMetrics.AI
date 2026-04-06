@@ -24,6 +24,12 @@ import Privacy from "@/pages/Main/Privacy";
 import Terms from "@/pages/Main/Terms";
 import Cookie from "@/pages/Main/Cookie";
 import CallbackPage from "@/pages/Auth/Callback";
+import SeriesLibrary from "@/pages/Dashboard/User/Series";
+import SeriesDetails from "@/pages/Dashboard/User/Series/Details";
+import EpisodeDetails from "@/pages/Dashboard/User/Episodes/Details";
+import CharacterDetails from "@/pages/Dashboard/User/Characters/Details";
+import EnvironmentDetails from "@/pages/Dashboard/User/Environments/Details";
+import SceneDetails from "@/pages/Dashboard/User/Scenes/Details";
 
 
 // =============================
@@ -57,6 +63,37 @@ export const AppUserRoutes: AppRoute[] = [
         label: "Dashboard",
         element: <UserHome />,
     },
+    {
+        path: "/dashboard/series",
+        label: "Series Library",
+        element: <SeriesLibrary />,
+    },
+    {
+        path: "/dashboard/series/:id",
+        label: "Series Workspace",
+        element: <SeriesDetails />,
+    },
+    {
+        path: "/dashboard/eposides/:id",
+        label: "Eposides",
+        element: <EpisodeDetails />,
+    },
+    {
+        path: "/dashboard/characters/:id",
+        label: "Characters",
+        element: <CharacterDetails />,
+    },
+    {
+        path: "/dashboard/environments/:id",
+        label: "Environments",
+        element: <EnvironmentDetails />,
+    },
+    {
+        path: "/dashboard/scenes/:id",
+        label: "Scenes",
+        element: <SceneDetails />,
+    },
+
 ];
 // =============================
 // 🚀 Auth ROUTES
