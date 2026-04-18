@@ -7,9 +7,9 @@ namespace VidiMetrics.Application.Interfaces.StoryEngine;
 
 public interface IShowsService
 {
-    Task<ShowResponseDto> GetByIdAsync(Guid id);
-    Task<IEnumerable<ShowResponseDto>> GetAllAsync();
-    Task<ShowResponseDto> CreateAsync(CreateShowDto dto);
-    Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin);
+    Task<IEnumerable<ShowResponseDto>> GetAllAsync(Guid userId, bool isAdmin);
+    Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId);
+    Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto, Guid userId, bool isAdmin);
+    Task<bool> DeleteAsync(Guid id, Guid userId, bool isAdmin);
 }

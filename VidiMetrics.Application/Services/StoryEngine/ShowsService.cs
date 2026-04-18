@@ -1,8 +1,9 @@
-using AutoMapper;
-using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
@@ -18,7 +19,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IValidator<UpdateShowDto> _updateValidator;
 
         public ShowsService(
-            IShowsRepository repository, 
+            IShowsRepository repository,
             IMapper mapper,
             IValidator<CreateShowDto> createValidator,
             IValidator<UpdateShowDto> updateValidator)
@@ -29,27 +30,41 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _updateValidator = updateValidator;
         }
 
-        public async Task<ShowResponseDto> GetByIdAsync(Guid id)
+        public async Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin)
         {
             var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) throw new Exception("Show not found.");
+
+
+            if (entity == null)
+
+                throw new KeyNotFoundException("Show not found.");
+
+            if (!isAdmin && entity.CreatedBy != userId)
+
+                throw new UnauthorizedAccessException("You are not authorized to view this show.");
 
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
-        public async Task<IEnumerable<ShowResponseDto>> GetAllAsync()
+        public async Task<IEnumerable<ShowResponseDto>> GetAllAsync(Guid userId, bool isAdmin)
         {
             var entities = await _repository.GetAllAsync();
+
+            if (!isAdmin)
+            {
+                entities = entities.Where(x => x.CreatedBy == userId);
+            }
+
             return _mapper.Map<IEnumerable<ShowResponseDto>>(entities);
         }
 
-        public async Task<ShowResponseDto> CreateAsync(CreateShowDto dto)
+        public async Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId)
         {
             await _createValidator.ValidateAndThrowAsync(dto);
 
             var entity = _mapper.Map<Show>(dto);
-            // Assuming BaseEntity has CreatedAt or similar if needed, otherwise skip
-            // entity.CreatedAt = DateTime.UtcNow; 
+            entity.CreatedBy = userId;
+            entity.CreatedAt = DateTime.UtcNow;
 
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
@@ -57,14 +72,19 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
-        public async Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto)
+        public async Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto, Guid userId, bool isAdmin)
         {
             await _updateValidator.ValidateAndThrowAsync(dto);
 
             var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) throw new Exception("Show not found.");
+            if (entity == null)
+                throw new KeyNotFoundException("Show not found.");
+
+            if (!isAdmin && entity.CreatedBy != userId)
+                throw new UnauthorizedAccessException("You are not authorized to update this show.");
 
             _mapper.Map(dto, entity);
+            entity.UpdatedAt = DateTime.UtcNow;
 
             _repository.Update(entity);
             await _repository.SaveChangesAsync();
@@ -72,10 +92,14 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id, Guid userId, bool isAdmin)
         {
             var entity = await _repository.GetByIdAsync(id);
-            if (entity == null) throw new Exception("Show not found.");
+            if (entity == null)
+                throw new KeyNotFoundException("Show not found.");
+
+            if (!isAdmin && entity.CreatedBy != userId)
+                throw new UnauthorizedAccessException("You are not authorized to delete this show.");
 
             _repository.Remove(entity);
             return await _repository.SaveChangesAsync();

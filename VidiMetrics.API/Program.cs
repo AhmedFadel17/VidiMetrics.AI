@@ -1,4 +1,6 @@
+using MassTransit;
 using OpenIddict.Validation.AspNetCore;
+using VidiMetrics.API.Consumers;
 using VidiMetrics.API.Extensions;
 using VidiMetrics.API.Middlwares;
 using VidiMetrics.Application;
@@ -25,7 +27,7 @@ builder.Services.AddCors(options =>
     var frontendSettings = builder.Configuration.GetSection("FrontendSettings").Get<FrontendSettings>();
 
     options.AddPolicy("AllowFrontend", policy =>
-        policy.WithOrigins(frontendSettings?.BaseUrl??"")
+        policy.WithOrigins(frontendSettings?.BaseUrl ?? "")
               .AllowAnyHeader()
               .AllowAnyMethod());
 });
@@ -45,7 +47,25 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
 
+builder.Services.Configure<SubscriptionSettings>(builder.Configuration.GetSection("SubscriptionSettings"));
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<UserRegisteredConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/");
+        cfg.ReceiveEndpoint("user-registration-queue", e =>
+        {
+            e.ConfigureConsumer<UserRegisteredConsumer>(context);
+        });
+    });
+});
 var app = builder.Build();
+
+// Run DB Auto-Seed / Migration
+await VidiMetrics.DataAccess.Data.DbInitializer.SeedAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

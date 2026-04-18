@@ -4,5 +4,6 @@ namespace VidiMetrics.DataAccess.Repositories.StoryEngine.Shows
 {
     public interface IShowsRepository : IBaseRepository<Show>
     {
+        // Task<IEnumerable<Show>> GetUserShowsAsync(Guid userId);
     }
 }

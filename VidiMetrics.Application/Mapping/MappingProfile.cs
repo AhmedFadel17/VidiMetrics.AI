@@ -11,7 +11,7 @@ using VidiMetrics.Application.DTOs.Core.Playlists;
 using VidiMetrics.Application.DTOs.Core.Videos;
 using VidiMetrics.Application.DTOs.Core.YouTubeVideos;
 using VidiMetrics.Application.DTOs.Infra.ApiUsageQuotas;
-using VidiMetrics.Application.DTOs.Infra.UserAccounts;
+using VidiMetrics.Application.DTOs.Infra.UserProfiles;
 using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
 using VidiMetrics.Application.DTOs.Seo.KeywordRankings;
 using VidiMetrics.Application.DTOs.Seo.Keywords;
@@ -84,10 +84,10 @@ namespace VidiMetrics.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ApiUsageQuota, ApiUsageQuotaResponseDto>();
 
-            CreateMap<CreateUserAccountDto, UserAccount>();
-            CreateMap<UpdateUserAccountDto, UserAccount>()
+            CreateMap<CreateUserProfileDto, UserProfile>();
+            CreateMap<UpdateUserProfileDto, UserProfile>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<UserAccount, UserAccountResponseDto>();
+            CreateMap<UserProfile, UserProfileResponseDto>();
 
             CreateMap<CreateCompetitorVideoDto, CompetitorVideo>();
             CreateMap<UpdateCompetitorVideoDto, CompetitorVideo>()

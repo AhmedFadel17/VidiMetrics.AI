@@ -48,7 +48,7 @@ namespace VidiMetrics.Application
             services.AddScoped<IShowsService, ShowsService>();
             services.AddScoped<IStoryEnvironmentsService, StoryEnvironmentsService>();
             services.AddScoped<ITranscriptsService, TranscriptsService>();
-            services.AddScoped<IUserAccountsService, UserAccountsService>();
+            services.AddScoped<IUserProfilesService, UserProfilesService>();
             services.AddScoped<IVideoTagsService, VideoTagsService>();
             services.AddScoped<IYouTubeVideosService, YouTubeVideosService>();
 
