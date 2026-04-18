@@ -25,6 +25,7 @@ import Terms from "@/pages/Main/Terms";
 import Cookie from "@/pages/Main/Cookie";
 import CallbackPage from "@/pages/Auth/Callback";
 import SeriesLibrary from "@/pages/Dashboard/User/Series";
+import SeriesSetup from "@/pages/Dashboard/User/Series/SeriesSetup";
 import SeriesDetails from "@/pages/Dashboard/User/Series/Details";
 import EpisodeDetails from "@/pages/Dashboard/User/Episodes/Details";
 import CharacterDetails from "@/pages/Dashboard/User/Characters/Details";
@@ -67,6 +68,11 @@ export const AppUserRoutes: AppRoute[] = [
         path: "/dashboard/series",
         label: "Series Library",
         element: <SeriesLibrary />,
+    },
+    {
+        path: "/dashboard/series/new",
+        label: "Series Setup",
+        element: <SeriesSetup />,
     },
     {
         path: "/dashboard/series/:id",

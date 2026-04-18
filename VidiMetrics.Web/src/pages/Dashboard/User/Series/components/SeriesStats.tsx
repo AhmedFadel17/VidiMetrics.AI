@@ -1,4 +1,9 @@
+import { useGetShowsQuery } from '@/store/apis/mainApi'
+
 export default function SeriesStats() {
+    const { data: response } = useGetShowsQuery()
+    const showsCount = response?.data?.length || 0
+
     return (
         <div className="grid grid-cols-3 gap-6">
             {/* Total Series */}
@@ -7,8 +12,7 @@ export default function SeriesStats() {
                 <div className="relative z-10">
                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 block mb-4">Total Series</span>
                     <div className="flex items-baseline gap-4">
-                        <span className="text-5xl font-headline font-bold text-white tracking-tight">42</span>
-                        <span className="text-accent-cyan text-xs font-bold font-body">+3 this month</span>
+                        <span className="text-5xl font-headline font-bold text-white tracking-tight">{showsCount}</span>
                     </div>
                 </div>
                 {/* Background Icon */}

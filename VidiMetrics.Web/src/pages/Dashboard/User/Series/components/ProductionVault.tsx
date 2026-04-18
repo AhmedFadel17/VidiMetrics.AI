@@ -1,50 +1,12 @@
 import ProductionCard from './ProductionCard'
 import CreateSeriesCard from './CreateSeriesCard'
-
-const SAMPLE_SERIES = [
-    {
-        id: '1',
-        title: 'Neon Chronicles: Void',
-        episodes: 12,
-        views: '45.2k',
-        status: 'IN PRODUCTION' as const,
-        image: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60'
-    },
-    {
-        id: '2',
-        title: 'Fractal Architectures',
-        episodes: 8,
-        views: '128.9k',
-        status: 'RELEASED' as const,
-        image: 'https://images.unsplash.com/photo-1633167606207-d840b5070fc2?w=800&auto=format&fit=crop&q=60'
-    },
-    {
-        id: '3',
-        title: 'The Ember Path',
-        episodes: 0,
-        views: '--',
-        status: 'DRAFT' as const,
-        image: 'https://images.unsplash.com/photo-1464802686167-b939a67e0b21?w=800&auto=format&fit=crop&q=60'
-    },
-    {
-        id: '4',
-        title: 'Station Delta: Echoes',
-        episodes: 4,
-        views: '12.1k',
-        status: 'IN PRODUCTION' as const,
-        image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=60'
-    },
-    {
-        id: '5',
-        title: "Nature's Algorithm",
-        episodes: 15,
-        views: '890.3k',
-        status: 'RELEASED' as const,
-        image: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=800&auto=format&fit=crop&q=60'
-    }
-]
+import { useGetShowsQuery } from '@/store/apis/mainApi'
+import { Series } from '@/types/series'
 
 export default function ProductionVault() {
+    const { data: response, isLoading, error } = useGetShowsQuery()
+    const shows: Series[] = response?.data || []
+
     return (
         <div className="space-y-10">
             {/* Header Area */}
@@ -62,17 +24,31 @@ export default function ProductionVault() {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* Create New Card */}
+                <CreateSeriesCard />
 
-                <div className="">
-                    <CreateSeriesCard />
-                </div>
-                {SAMPLE_SERIES.map(series => (
-                    <ProductionCard key={series.id} {...series} />
-                ))}
-
-
+                {isLoading ? (
+                    // Simple skeleton loader for cards
+                    [1, 2].map(i => (
+                        <div key={i} className="glass-card rounded-3xl h-[400px] animate-pulse bg-white/5 border border-white/5"></div>
+                    ))
+                ) : error ? (
+                    <div className="col-span-full p-12 glass-panel border-error/20 flex flex-col items-center justify-center text-center space-y-4">
+                        <span className="material-symbols-outlined text-error text-5xl">warning</span>
+                        <h3 className="text-xl font-bold text-white">Neural Uplink Failed</h3>
+                        <p className="text-white/40">Unable to retrieve series data from the core engine.</p>
+                    </div>
+                ) : (
+                    shows.map(series => (
+                        <ProductionCard
+                            key={series.id}
+                            id={series.id}
+                            title={series.title}
+                        // status, views, episodes will use defaults from ProductionCard
+                        />
+                    ))
+                )}
             </div>
         </div>
     )

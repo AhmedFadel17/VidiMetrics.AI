@@ -1,4 +1,4 @@
-type PricingPlan = {
+export type PricingPlan = {
     id: string;
     name: string;
     targetAudience: string;

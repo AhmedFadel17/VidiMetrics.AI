@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 interface ProductionCardProps {
     id: string
     title: string
-    episodes: number
-    views: string
-    status: 'IN PRODUCTION' | 'RELEASED' | 'DRAFT'
-    image: string
+    episodes?: number
+    views?: string
+    status?: 'IN PRODUCTION' | 'RELEASED' | 'DRAFT'
+    image?: string
 }
 
 const statusStyles = {
@@ -15,7 +15,14 @@ const statusStyles = {
     'DRAFT': 'bg-white/20 text-white backdrop-blur-md'
 }
 
-export default function ProductionCard({ id, title, episodes, views, status, image }: ProductionCardProps) {
+export default function ProductionCard({ 
+    id, 
+    title, 
+    episodes = 0, 
+    views = '---', 
+    status = 'DRAFT', 
+    image = 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60' 
+}: ProductionCardProps) {
     return (
         <Link
             to={`/dashboard/series/${id}`}
