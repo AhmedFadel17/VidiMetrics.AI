@@ -14,7 +14,7 @@ using VidiMetrics.DataAccess.Repositories.Core.PlaylistItems;
 using VidiMetrics.DataAccess.Repositories.Core.Playlists;
 using VidiMetrics.DataAccess.Repositories.Core.YouTubeVideos;
 using VidiMetrics.DataAccess.Repositories.Infra.ApiUsageQuotas;
-using VidiMetrics.DataAccess.Repositories.Infra.UserAccounts;
+using VidiMetrics.DataAccess.Repositories.Infra.UserProfiles;
 using VidiMetrics.DataAccess.Repositories.Seo.CompetitorVideos;
 using VidiMetrics.DataAccess.Repositories.Seo.KeywordRankings;
 using VidiMetrics.DataAccess.Repositories.Seo.Keywords;
@@ -45,7 +45,7 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<IPlaylistItemsRepository, PlaylistItemsRepository>();
             services.AddScoped<IYouTubeVideosRepository, YouTubeVideosRepository>();
             services.AddScoped<IApiUsageQuotasRepository, ApiUsageQuotasRepository>();
-            services.AddScoped<IUserAccountsRepository, UserAccountsRepository>();
+            services.AddScoped<IUserProfilesRepository, UserProfilesRepository>();
             services.AddScoped<ICompetitorVideosRepository, CompetitorVideosRepository>();
             services.AddScoped<IKeywordsRepository, KeywordsRepository>();
             services.AddScoped<IKeywordRankingsRepository, KeywordRankingsRepository>();

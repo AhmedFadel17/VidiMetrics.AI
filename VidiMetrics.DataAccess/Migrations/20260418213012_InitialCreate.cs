@@ -22,29 +22,13 @@ namespace VidiMetrics.DataAccess.Migrations
                     ModelTarget = table.Column<int>(type: "int", nullable: false),
                     Temperature = table.Column<double>(type: "float", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AiPromptTemplates", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ApiUsageQuotas",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ApiType = table.Column<int>(type: "int", nullable: false),
-                    MonthlyLimit = table.Column<int>(type: "int", nullable: false),
-                    CurrentUsage = table.Column<int>(type: "int", nullable: false),
-                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ApiUsageQuotas", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -57,7 +41,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -66,38 +51,20 @@ namespace VidiMetrics.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Shows",
+                name: "SubscriptionPlans",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VisualStyle = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TargetAudience = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Shows", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserAccounts",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SubscriptionTier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    MonthlyPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MaxChannelsAllowed = table.Column<int>(type: "int", nullable: false),
+                    DailyApiQuotaLimit = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserAccounts", x => x.Id);
+                    table.PrimaryKey("PK_SubscriptionPlans", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,7 +77,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     YouTubePlaylistId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ChannelId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -121,6 +89,112 @@ namespace VidiMetrics.DataAccess.Migrations
                         column: x => x.ChannelId,
                         principalTable: "Channels",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserProfiles",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FullName = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    ProfilePictureUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Bio = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastLoginAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    SubscriptionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserProfiles", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_UserProfiles_SubscriptionPlans_SubscriptionPlanId",
+                        column: x => x.SubscriptionPlanId,
+                        principalTable: "SubscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApiUsageQuotas",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserProfileUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ApiType = table.Column<int>(type: "int", nullable: false),
+                    MonthlyLimit = table.Column<int>(type: "int", nullable: false),
+                    CurrentUsage = table.Column<int>(type: "int", nullable: false),
+                    PeriodStart = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PeriodEnd = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApiUsageQuotas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ApiUsageQuotas_UserProfiles_UserProfileUserId",
+                        column: x => x.UserProfileUserId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Shows",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VisualStyle = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetAudience = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    ExternalReferenceId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserProfileUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Shows", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Shows_UserProfiles_UserProfileUserId",
+                        column: x => x.UserProfileUserId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserSubscriptions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserSubscriptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_SubscriptionPlans_PlanId",
+                        column: x => x.PlanId,
+                        principalTable: "SubscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_UserSubscriptions_UserProfiles_UserId",
+                        column: x => x.UserId,
+                        principalTable: "UserProfiles",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -137,7 +211,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     ReferenceImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShowId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -162,7 +237,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     ReferenceImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ShowId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -188,7 +264,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     ErrorMessage = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -225,7 +302,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     CurrentRank = table.Column<int>(type: "int", nullable: false),
                     TargetKeywordId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -245,7 +323,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VideoId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -271,7 +350,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     EpisodeId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     StoryEnvironmentId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -321,7 +401,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     CompetitionScore = table.Column<double>(type: "float", nullable: false),
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -339,7 +420,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     PlaylistId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -366,7 +448,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     IsDescriptionOptimized = table.Column<bool>(type: "bit", nullable: false),
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -384,7 +467,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     ExpectedClipCount = table.Column<int>(type: "int", nullable: false),
                     OriginalVideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -417,7 +501,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     PublishedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PrivacyStatus = table.Column<int>(type: "int", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -448,7 +533,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     TimestampsJson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -471,7 +557,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     RelevanceScore = table.Column<double>(type: "float", nullable: false),
                     VideoId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -485,10 +572,20 @@ namespace VidiMetrics.DataAccess.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "SubscriptionPlans",
+                columns: new[] { "Id", "DailyApiQuotaLimit", "Description", "IsActive", "MaxChannelsAllowed", "MonthlyPrice", "Name" },
+                values: new object[] { new Guid("11111111-1111-1111-1111-111111111111"), 100, "Basic Free Tier", true, 1, 0m, "Free" });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AiTasks_VideoId",
                 table: "AiTasks",
                 column: "VideoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiUsageQuotas_UserProfileUserId",
+                table: "ApiUsageQuotas",
+                column: "UserProfileUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Characters_ShowId",
@@ -571,6 +668,11 @@ namespace VidiMetrics.DataAccess.Migrations
                 column: "OriginalVideoId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Shows_UserProfileUserId",
+                table: "Shows",
+                column: "UserProfileUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StoryEnvironments_ShowId",
                 table: "StoryEnvironments",
                 column: "ShowId");
@@ -579,6 +681,21 @@ namespace VidiMetrics.DataAccess.Migrations
                 name: "IX_Transcripts_VideoId",
                 table: "Transcripts",
                 column: "VideoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserProfiles_SubscriptionPlanId",
+                table: "UserProfiles",
+                column: "SubscriptionPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_PlanId",
+                table: "UserSubscriptions",
+                column: "PlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserSubscriptions_UserId",
+                table: "UserSubscriptions",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Videos_ChannelId",
@@ -711,7 +828,7 @@ namespace VidiMetrics.DataAccess.Migrations
                 name: "Transcripts");
 
             migrationBuilder.DropTable(
-                name: "UserAccounts");
+                name: "UserSubscriptions");
 
             migrationBuilder.DropTable(
                 name: "VideoTags");
@@ -736,6 +853,12 @@ namespace VidiMetrics.DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Shows");
+
+            migrationBuilder.DropTable(
+                name: "UserProfiles");
+
+            migrationBuilder.DropTable(
+                name: "SubscriptionPlans");
 
             migrationBuilder.DropTable(
                 name: "Videos");

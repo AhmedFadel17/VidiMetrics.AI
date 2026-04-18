@@ -1,8 +1,7 @@
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options; 
-using OpenIddict.Abstractions;
-using VidiMetrics.IdentityServer.Configuration; 
+using VidiMetrics.IdentityServer.Configuration;
 using VidiMetrics.IdentityServer.Data;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -11,7 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<IdentityServerSettings>(
     builder.Configuration.GetSection("IdentityServer"));
 
-var identitySettings = builder.Configuration.GetSection("IdentityServer").Get<IdentityServerSettings>() 
+var identitySettings = builder.Configuration.GetSection("IdentityServer").Get<IdentityServerSettings>()
+
                       ?? new IdentityServerSettings();
 
 builder.Services.AddControllers();
@@ -33,6 +33,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.UseOpenIddict();
 });
+
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
@@ -59,7 +60,8 @@ builder.Services.AddOpenIddict()
 
         // Register default scopes + any custom ones from your JSON clients
         options.RegisterScopes(Scopes.OpenId, Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess);
-        
+
+
         foreach (var client in identitySettings.Clients)
         {
             foreach (var scope in client.Scopes)
@@ -87,7 +89,8 @@ builder.Services.AddOpenIddict()
 builder.Services.ConfigureApplicationCookie(options =>
 {
     // Using the Login path from JSON
-    options.LoginPath = identitySettings.Endpoints.Login; 
+    options.LoginPath = identitySettings.Endpoints.Login;
+
     options.LogoutPath = identitySettings.Endpoints.Logout;
     options.AccessDeniedPath = identitySettings.Endpoints.AccessDenied;
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
@@ -96,6 +99,22 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.IsEssential = true;
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddEntityFrameworkOutbox<AppDbContext>(o =>
+    {
+        o.UseSqlServer();
+        o.UseBusOutbox();
+
+    });
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/");
+        cfg.ConfigureEndpoints(context);
+    });
 });
 
 var app = builder.Build();

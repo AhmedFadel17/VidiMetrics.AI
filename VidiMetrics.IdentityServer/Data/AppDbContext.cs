@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-
+using MassTransit;
 namespace VidiMetrics.IdentityServer.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
@@ -13,6 +13,9 @@ namespace VidiMetrics.IdentityServer.Data
         {
             base.OnModelCreating(builder);
             builder.UseOpenIddict();
+            builder.AddInboxStateEntity();
+            builder.AddOutboxMessageEntity();
+            builder.AddOutboxStateEntity();
         }
     }
 }

@@ -12,7 +12,7 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260326155627_InitialCreate")]
+    [Migration("20260418213012_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -49,8 +49,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -68,6 +68,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<double>("Temperature")
                         .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserPromptTemplate")
                         .IsRequired()
@@ -87,8 +90,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("nvarchar(max)");
@@ -109,6 +112,9 @@ namespace VidiMetrics.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
 
@@ -128,8 +134,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("ExpectedClipCount")
                         .HasColumnType("int");
@@ -146,6 +152,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<int>("TargetPlatform")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -167,8 +176,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -183,6 +192,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<string>("TimestampsJson")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
@@ -203,8 +215,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CustomUrl")
                         .HasColumnType("nvarchar(max)");
@@ -218,6 +230,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("YouTubeChannelId")
                         .HasColumnType("nvarchar(max)");
@@ -239,8 +254,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -251,6 +266,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("YouTubePlaylistId")
                         .HasColumnType("nvarchar(max)");
@@ -271,8 +289,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -285,6 +303,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
@@ -310,8 +331,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CurrentRank")
                         .HasColumnType("int");
@@ -339,6 +360,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -372,45 +396,137 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("PeriodStart")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UserAccountId")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserProfileUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserProfileUserId");
+
                     b.ToTable("ApiUsageQuotas");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserAccount", b =>
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.SubscriptionPlan", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DailyApiQuotaLimit")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ExternalId")
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxChannelsAllowed")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("MonthlyPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionPlans");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            DailyApiQuotaLimit = 100,
+                            Description = "Basic Free Tier",
+                            IsActive = true,
+                            MaxChannelsAllowed = 1,
+                            MonthlyPrice = 0m,
+                            Name = "Free"
+                        });
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserProfile", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("LastLoginAt")
+                    b.Property<DateTime?>("LastLoginAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("SubscriptionTier")
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("SubscriptionPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId");
+
+                    b.HasIndex("SubscriptionPlanId");
+
+                    b.ToTable("UserProfiles");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserSubscription", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("UserAccounts");
+                    b.HasIndex("PlanId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserSubscriptions");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.CompetitorVideo", b =>
@@ -426,8 +542,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("CurrentRank")
                         .HasColumnType("int");
@@ -441,6 +557,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("YouTubeVideoId")
                         .IsRequired()
@@ -465,8 +584,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -481,6 +600,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
@@ -523,8 +645,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CriticalIssues")
                         .IsRequired()
@@ -549,6 +671,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<int>("OverallScore")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
 
@@ -568,8 +693,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -580,6 +705,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<double>("RelevanceScore")
                         .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
@@ -604,8 +732,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -628,6 +756,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<Guid>("ShowId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("VoiceId")
                         .HasColumnType("nvarchar(max)");
 
@@ -647,8 +778,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("EpisodeNumber")
                         .HasColumnType("int");
@@ -666,6 +797,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
@@ -693,8 +827,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("EpisodeId")
                         .HasColumnType("uniqueidentifier");
@@ -714,6 +848,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<Guid?>("StoryEnvironmentId1")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("VisualPrompt")
                         .IsRequired()
@@ -739,15 +876,21 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ExternalReferenceId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("TargetAudience")
                         .IsRequired()
@@ -757,11 +900,22 @@ namespace VidiMetrics.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserProfileUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("VisualStyle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserProfileUserId");
 
                     b.ToTable("Shows");
                 });
@@ -779,8 +933,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -794,6 +948,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<Guid>("ShowId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("VisualDescription")
                         .IsRequired()
@@ -947,6 +1104,47 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("Channel");
                 });
 
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.ApiUsageQuota", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
+                        .WithMany()
+                        .HasForeignKey("UserProfileUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserProfile");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserProfile", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Infra.SubscriptionPlan", "SubscriptionPlan")
+                        .WithMany("UserProfiles")
+                        .HasForeignKey("SubscriptionPlanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubscriptionPlan");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserSubscription", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Infra.SubscriptionPlan", "SubscriptionPlan")
+                        .WithMany("UserSubscriptions")
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
+                        .WithMany("SubscriptionHistory")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SubscriptionPlan");
+
+                    b.Navigation("UserProfile");
+                });
+
             modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.CompetitorVideo", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.Seo.Keyword", "TargetKeyword")
@@ -1061,6 +1259,17 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("StoryEnvironment");
                 });
 
+            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Show", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
+                        .WithMany()
+                        .HasForeignKey("UserProfileUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserProfile");
+                });
+
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Show", "Show")
@@ -1100,6 +1309,18 @@ namespace VidiMetrics.DataAccess.Migrations
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Video", b =>
                 {
                     b.Navigation("PlaylistItems");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.SubscriptionPlan", b =>
+                {
+                    b.Navigation("UserProfiles");
+
+                    b.Navigation("UserSubscriptions");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserProfile", b =>
+                {
+                    b.Navigation("SubscriptionHistory");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.Keyword", b =>
