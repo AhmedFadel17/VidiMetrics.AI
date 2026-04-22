@@ -3,7 +3,7 @@ using VidiMetrics.Application.DTOs.Ai.AiPromptTemplates;
 using VidiMetrics.Application.DTOs.Ai.AiTasks;
 using VidiMetrics.Application.DTOs.Ai.ShortsProjects;
 using VidiMetrics.Application.DTOs.Ai.Transcripts;
-
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.DTOs.Core.LocalVideos;
 using VidiMetrics.Application.DTOs.Core.PlaylistItems;
@@ -34,6 +34,9 @@ namespace VidiMetrics.Application.Mapping
     {
         public MappingProfile()
         {
+            CreateMap(typeof(PaginationSource<>), typeof(PaginationResponseDto<>))
+                .ConvertUsing(typeof(PaginationConverter<,>));
+
             CreateMap<CreateAiTaskDto, AiTask>();
             CreateMap<UpdateAiTaskDto, AiTask>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

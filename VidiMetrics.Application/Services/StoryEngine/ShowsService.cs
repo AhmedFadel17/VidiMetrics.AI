@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
@@ -30,7 +32,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _updateValidator = updateValidator;
         }
 
-        public async Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin)
+        public async Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin = false)
         {
             var entity = await _repository.GetByIdAsync(id);
 
@@ -46,19 +48,15 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
-        public async Task<IEnumerable<ShowResponseDto>> GetAllAsync(Guid userId, bool isAdmin)
+        public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, PaginationFilterDto filter, bool isAdmin = false)
         {
-            var entities = await _repository.GetAllAsync();
-
-            if (!isAdmin)
-            {
-                entities = entities.Where(x => x.CreatedBy == userId);
-            }
-
-            return _mapper.Map<IEnumerable<ShowResponseDto>>(entities);
+            var predicate = !isAdmin ? (Expression<Func<Show, bool>>)(x => x.CreatedBy == userId) : null;
+            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(filter.PageNumber, filter.PageSize, predicate);
+            var paginationSource = new PaginationSource<Show>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
+            return _mapper.Map<PaginationResponseDto<ShowResponseDto>>(paginationSource);
         }
 
-        public async Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId)
+        public async Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId, bool isAdmin = false)
         {
             await _createValidator.ValidateAndThrowAsync(dto);
 
