@@ -63,6 +63,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _createValidator.ValidateAndThrowAsync(dto);
 
             var entity = _mapper.Map<Show>(dto);
+            entity.UserId = userId;
             entity.CreatedBy = userId;
             entity.CreatedAt = DateTime.UtcNow;
 

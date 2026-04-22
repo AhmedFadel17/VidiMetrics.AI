@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Infra;
 
@@ -13,6 +14,7 @@ public class Show : BaseEntity
     public string? ExternalReferenceId { get; set; }
 
     public Guid UserId { get; set; }
+    [ForeignKey("UserId")]
     public UserProfile UserProfile { get; set; } = null!;
 
     public ICollection<Episode> Episodes { get; set; } = new List<Episode>();
