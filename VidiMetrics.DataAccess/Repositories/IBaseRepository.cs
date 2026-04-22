@@ -9,6 +9,7 @@ namespace VidiMetrics.DataAccess.Repositories
     {
         Task<T?> GetByIdAsync(Guid id);
         Task<IEnumerable<T>> GetAllAsync();
+        Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(int page, int pageSize, Expression<Func<T, bool>>? predicate = null);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);

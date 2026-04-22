@@ -1,9 +1,9 @@
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using VidiMetrics.DataAccess.Data;
 
 namespace VidiMetrics.DataAccess.Repositories
@@ -26,6 +26,23 @@ namespace VidiMetrics.DataAccess.Repositories
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
+        }
+
+        public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(int page, int pageSize, Expression<Func<T, bool>>? predicate = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+
+            int totalCount = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize)
+                                   .Take(pageSize)
+                                   .ToListAsync();
+
+            return (items, totalCount);
         }
 
         public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
