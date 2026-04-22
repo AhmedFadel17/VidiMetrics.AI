@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using MassTransit;
 using OpenIddict.Validation.AspNetCore;
 using VidiMetrics.API.Consumers;
@@ -32,10 +33,12 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod());
 });
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 // Configure Authentication using OpenIddict Validation
 builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
+
         var identitySettings = builder.Configuration.GetJsonSection<IdentityServerSettings>("IdentityServerSettings");
         options.SetIssuer(identitySettings.BaseUrl);
         options.UseSystemNetHttp();
