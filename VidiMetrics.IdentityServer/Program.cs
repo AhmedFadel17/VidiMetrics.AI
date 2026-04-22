@@ -70,6 +70,8 @@ builder.Services.AddOpenIddict()
             }
         }
 
+        options.DisableAccessTokenEncryption();
+
         options.AddDevelopmentEncryptionCertificate()
                .AddDevelopmentSigningCertificate();
 

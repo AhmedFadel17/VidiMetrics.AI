@@ -6,6 +6,7 @@ import { Toaster } from 'sonner'
 import { AuthProvider } from 'react-oidc-context'
 import { store } from '@/store'
 import App from '@/App'
+import AuthSync from '@/components/auth/AuthSync'
 import '@/css/index.css'
 
 import { authService } from '@/api/authConfig'
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <AuthProvider userManager={authService} onSigninCallback={() => {
         window.history.replaceState({}, document.title, window.location.pathname)
       }}>
+        <AuthSync />
         <BrowserRouter>
           <App />
         </BrowserRouter>
