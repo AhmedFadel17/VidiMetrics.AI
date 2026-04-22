@@ -1,10 +1,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
+using VidiMetrics.API.Filters;
 using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.API.Controllers
 {
     [ApiController]
+    [ServiceFilter(typeof(UserRequirementFilter))]
     public abstract class ApiBaseController : ControllerBase
     {
 

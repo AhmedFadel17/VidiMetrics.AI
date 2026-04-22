@@ -3,6 +3,7 @@ using MassTransit;
 using OpenIddict.Validation.AspNetCore;
 using VidiMetrics.API.Consumers;
 using VidiMetrics.API.Extensions;
+using VidiMetrics.API.Filters;
 using VidiMetrics.API.Middlwares;
 using VidiMetrics.Application;
 using VidiMetrics.DataAccess;
@@ -22,6 +23,7 @@ builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddScoped<UserRequirementFilter>();
 // CORS – allow the Vite dev server
 builder.Services.AddCors(options =>
 {

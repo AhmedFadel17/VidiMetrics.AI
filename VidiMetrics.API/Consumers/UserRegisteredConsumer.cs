@@ -1,5 +1,5 @@
 using MassTransit;
-using Microsoft.Extensions.Options; 
+using Microsoft.Extensions.Options;
 using VidiMetrics.API.Events;
 using VidiMetrics.Application.DTOs.Infra.UserProfiles;
 using VidiMetrics.Application.Interfaces.Infra;
