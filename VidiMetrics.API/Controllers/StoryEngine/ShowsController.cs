@@ -25,9 +25,9 @@ namespace VidiMetrics.API.Controllers.StoryEngine
         }
 
         [HttpGet]
-        public async Task<ActionResult<SuccessResponseDto<IEnumerable<ShowResponseDto>>>> GetUserShows()
+        public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<ShowResponseDto>>>> GetAllShows([FromQuery] PaginationFilterDto filter)
         {
-            var results = await _service.GetAllAsync(CurrentUserGuid, IsAdmin);
+            var results = await _service.GetAllAsync(CurrentUserGuid, filter, IsAdmin);
             return Ok(ApiResponseFactory.Success(results, "Shows retrieved successfully."));
         }
 
