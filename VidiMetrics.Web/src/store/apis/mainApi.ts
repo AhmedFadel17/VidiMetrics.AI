@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { Series } from '@/types/series';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse, PaginationResponse } from '@/types/api';
 export const mainApi = createApi({
   reducerPath: 'mainApi',
   baseQuery: fetchBaseQuery({
@@ -18,8 +18,8 @@ export const mainApi = createApi({
     getProfile: builder.query<any, void>({
       query: () => '/api/profile',
     }),
-    getShows: builder.query<ApiResponse<Series[]>, void>({
-      query: () => '/api/shows',
+    getShows: builder.query<ApiResponse<PaginationResponse<Series>>, { page: number, pageSize: number }>({
+      query: ({ page, pageSize }) => `/api/shows?pageNumber=${page}&pageSize=${pageSize}`,
       providesTags: ['Series'],
     }),
     createSeries: builder.mutation<ApiResponse<Series>, { title: string; description: string; visualStyle: string; targetAudience: string }>({

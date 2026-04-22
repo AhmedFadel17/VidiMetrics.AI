@@ -5,3 +5,19 @@ export type ApiResponse<T> = {
     message: string;
     status: number;
 }
+
+export interface PaginationResponse<T> {
+    items: T[];
+    pageNumber: number;
+    pageSize: number;
+    totalPages: number;
+    totalCount: number;
+    itemsCount: number;
+    hasPreviousPage: boolean;
+    hasNextPage: boolean;
+}
+
+export interface PaginationFilter {
+    pageNumber: number;
+    pageSize: number;
+}

@@ -2,10 +2,14 @@ import ProductionCard from './ProductionCard'
 import CreateSeriesCard from './CreateSeriesCard'
 import { useGetShowsQuery } from '@/store/apis/mainApi'
 import { Series } from '@/types/series'
+import Pagination from './Pagination'
+import { useState } from 'react'
 
 export default function ProductionVault() {
-    const { data: response, isLoading, error } = useGetShowsQuery()
-    const shows: Series[] = response?.data || []
+    const [page, setPage] = useState(1)
+    const [pageSize, setPageSize] = useState(10)
+    const { data: response, isLoading, error } = useGetShowsQuery({ page, pageSize })
+    const shows: Series[] = response?.data?.items || []
 
     return (
         <div className="space-y-10">
@@ -50,6 +54,10 @@ export default function ProductionVault() {
                     ))
                 )}
             </div>
+            {/* Footer Pagination */}
+            <section className="pt-8">
+                <Pagination page={response?.data?.pageNumber || 0} pageSize={response?.data?.pageSize || 0} totalPages={response?.data?.totalPages || 0} totalCount={response?.data?.totalCount || 0} onPageChange={(page) => setPage(page)} />
+            </section>
         </div>
     )
 }

@@ -10,7 +10,7 @@ export default function SeriesLibrary() {
                 <h1 className="text-5xl font-headline font-bold text-white tracking-tight flex items-center gap-4">
                     Series <span className="text-gradient-purple">Library</span>
                 </h1>
-                
+
                 {/* Actions Group */}
                 <div className="flex gap-4">
                     <button className="glass-card w-12 h-12 rounded-2xl flex items-center justify-center border border-white/5 hover:border-white/20 transition-all duration-300">
@@ -33,10 +33,6 @@ export default function SeriesLibrary() {
                 <ProductionVault />
             </section>
 
-            {/* Footer Pagination */}
-            <section className="pt-8">
-                <Pagination />
-            </section>
         </div>
     )
 }
