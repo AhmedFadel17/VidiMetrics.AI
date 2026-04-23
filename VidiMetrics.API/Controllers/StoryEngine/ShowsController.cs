@@ -32,9 +32,9 @@ namespace VidiMetrics.API.Controllers.StoryEngine
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<SuccessResponseDto<ShowResponseDto>>> GetById(Guid id)
+        public async Task<ActionResult<SuccessResponseDto<ShowWithDetailsResponseDto>>> GetById(Guid id)
         {
-            var result = await _service.GetByIdAsync(id, CurrentUserGuid, IsAdmin);
+            var result = await _service.GetWithDetailsByIdAsync(id, CurrentUserGuid, IsAdmin);
             return Ok(ApiResponseFactory.Success(result, "Show retrieved successfully."));
         }
 
