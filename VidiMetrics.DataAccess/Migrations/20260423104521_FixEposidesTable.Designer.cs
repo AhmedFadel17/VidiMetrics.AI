@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260423104521_FixEposidesTable")]
+    partial class FixEposidesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -784,6 +787,9 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<Guid?>("FinalVideoId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("FinalVideoId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -804,6 +810,8 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FinalVideoId");
+
+                    b.HasIndex("FinalVideoId1");
 
                     b.HasIndex("ShowId");
 
@@ -1202,10 +1210,14 @@ namespace VidiMetrics.DataAccess.Migrations
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Episode", b =>
                 {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "FinalVideo")
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", null)
                         .WithMany()
                         .HasForeignKey("FinalVideoId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "FinalVideo")
+                        .WithMany()
+                        .HasForeignKey("FinalVideoId1");
 
                     b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Show", "Show")
                         .WithMany("Episodes")

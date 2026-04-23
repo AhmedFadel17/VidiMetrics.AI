@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260423090751_AddEnvsForeginToShowsTable")]
+    partial class AddEnvsForeginToShowsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -337,6 +340,11 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<TimeSpan>("Duration")
                         .HasColumnType("time");
 
@@ -356,18 +364,13 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("VideoType")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ChannelId");
 
                     b.ToTable("Videos");
 
-                    b.HasDiscriminator<string>("VideoType").HasValue("Video");
+                    b.HasDiscriminator().HasValue("Video");
 
                     b.UseTphMappingStrategy();
                 });
@@ -781,9 +784,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<int>("EpisodeNumber")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("FinalVideoId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -801,11 +801,19 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<Guid>("VideoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VideoId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FinalVideoId");
-
                     b.HasIndex("ShowId");
+
+                    b.HasIndex("VideoId");
+
+                    b.HasIndex("VideoId1");
 
                     b.ToTable("Episodes");
                 });
@@ -978,7 +986,7 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.HasIndex("ShortsProjectId");
 
-                    b.HasDiscriminator().HasValue("Local");
+                    b.HasDiscriminator().HasValue("LocalVideo");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.YouTubeVideo", b =>
@@ -1001,7 +1009,7 @@ namespace VidiMetrics.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasDiscriminator().HasValue("YouTube");
+                    b.HasDiscriminator().HasValue("YouTubeVideo");
                 });
 
             modelBuilder.Entity("CharacterScene", b =>
@@ -1202,20 +1210,27 @@ namespace VidiMetrics.DataAccess.Migrations
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Episode", b =>
                 {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "FinalVideo")
-                        .WithMany()
-                        .HasForeignKey("FinalVideoId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Show", "Show")
                         .WithMany("Episodes")
                         .HasForeignKey("ShowId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("FinalVideo");
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", null)
+                        .WithMany()
+                        .HasForeignKey("VideoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
+                        .WithMany()
+                        .HasForeignKey("VideoId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Show");
+
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Scene", b =>

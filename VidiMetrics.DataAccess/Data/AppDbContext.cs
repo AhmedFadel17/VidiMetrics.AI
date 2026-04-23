@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Ai;
+using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Models.Seo;
 using VidiMetrics.Domain.Models.StoryEngine;
@@ -44,7 +44,7 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<Show> Shows { get; set; }
 
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
-        public AppDbContext(DbContextOptions<AppDbContext> options, Microsoft.Extensions.Configuration.IConfiguration configuration) : base(options) 
+        public AppDbContext(DbContextOptions<AppDbContext> options, Microsoft.Extensions.Configuration.IConfiguration configuration) : base(options)
         {
             _configuration = configuration;
         }
@@ -52,6 +52,10 @@ namespace VidiMetrics.DataAccess.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Video>()
+                    .HasDiscriminator<string>("VideoType")
+                    .HasValue<LocalVideo>("Local")
+                    .HasValue<YouTubeVideo>("YouTube");
 
             modelBuilder.Entity<ShortsProject>()
                 .HasOne(s => s.OriginalVideo)
@@ -72,10 +76,12 @@ namespace VidiMetrics.DataAccess.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Episode>()
-                .HasOne<Video>()
+                .HasOne(e => e.FinalVideo)
                 .WithMany()
-                .HasForeignKey(e => e.VideoId)
+                .HasForeignKey(e => e.FinalVideoId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
 
             modelBuilder.Entity<Character>()
                 .HasOne(c => c.Show)
