@@ -19,6 +19,7 @@ public class Show : BaseEntity
 
     public ICollection<Episode> Episodes { get; set; } = new List<Episode>();
     public ICollection<Character> Characters { get; set; } = new List<Character>();
+    public ICollection<StoryEnvironment> StoryEnvironments { get; set; } = new List<StoryEnvironment>();
 
     public int TotalEpisodes => Episodes?.Count ?? 0;
 }
