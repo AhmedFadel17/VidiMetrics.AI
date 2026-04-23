@@ -48,6 +48,22 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
+        public async Task<ShowWithDetailsResponseDto> GetWithDetailsByIdAsync(Guid id, Guid userId, bool isAdmin = false)
+        {
+            var entity = await _repository.GetWithDetailsByIdAsync(id);
+            if (entity == null)
+
+                throw new KeyNotFoundException("Show not found.");
+
+            if (!isAdmin && entity.CreatedBy != userId)
+
+                throw new UnauthorizedAccessException("You are not authorized to view this show.");
+
+            return _mapper.Map<ShowWithDetailsResponseDto>(entity);
+
+
+        }
+
         public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, PaginationFilterDto filter, bool isAdmin = false)
         {
             var predicate = !isAdmin ? (Expression<Func<Show, bool>>)(x => x.CreatedBy == userId) : null;

@@ -131,6 +131,8 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<UpdateShowDto, Show>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Show, ShowResponseDto>();
+            CreateMap<Show, ShowWithDetailsResponseDto>();
+
 
             CreateMap<CreateStoryEnvironmentDto, StoryEnvironment>();
             CreateMap<UpdateStoryEnvironmentDto, StoryEnvironment>()

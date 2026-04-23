@@ -1,4 +1,5 @@
 using System;
+using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
 {
@@ -8,5 +9,6 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
         public string? Description { get; set; }
         public string? VisualStyle { get; set; }
         public string? TargetAudience { get; set; }
+        public ShowStatus? Status { get; set; }
     }
 }
