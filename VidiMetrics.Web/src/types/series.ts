@@ -1,8 +1,3 @@
-export type Series = {
-  id: string;
-  title: string;
-  description: string;
-  visualStyle: string;
-  targetAudience: string;
-  createdAt: string;
-}
+// Re-exported from models/storyEngine for backward compatibility.
+// Prefer importing from "@/types" or "@/types/models/storyEngine" directly.
+export type { Show as Series, Character, Episode, Scene, StoryEnvironment } from "./models/storyEngine";

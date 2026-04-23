@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Series } from '@/types/series';
-import { ApiResponse, PaginationResponse } from '@/types/api';
+
 export const mainApi = createApi({
   reducerPath: 'mainApi',
   baseQuery: fetchBaseQuery({
@@ -13,24 +12,34 @@ export const mainApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['User', 'Admin', 'Series'],
-  endpoints: (builder) => ({
-    getProfile: builder.query<any, void>({
-      query: () => '/api/profile',
-    }),
-    getShows: builder.query<ApiResponse<PaginationResponse<Series>>, { page: number, pageSize: number }>({
-      query: ({ page, pageSize }) => `/api/shows?pageNumber=${page}&pageSize=${pageSize}`,
-      providesTags: ['Series'],
-    }),
-    createSeries: builder.mutation<ApiResponse<Series>, { title: string; description: string; visualStyle: string; targetAudience: string }>({
-      query: (body) => ({
-        url: '/api/shows',
-        method: 'POST',
-        body,
-      }),
-      invalidatesTags: ['Series'],
-    }),
-  }),
+  tagTypes: [
+    // Infra
+    'User',
+    'Admin',
+    // StoryEngine
+    'Show',
+    'Character',
+    'Episode',
+    'Scene',
+    'StoryEnvironment',
+    // Core
+    'Channel',
+    'Video',
+    'LocalVideo',
+    'YouTubeVideo',
+    'Playlist',
+    'PlaylistItem',
+    // Ai
+    'AiTask',
+    'AiPromptTemplate',
+    'ShortsProject',
+    'Transcript',
+    // Seo
+    'Keyword',
+    'KeywordRanking',
+    'CompetitorVideo',
+    'SeoAudit',
+    'VideoTag',
+  ],
+  endpoints: () => ({}),
 });
-
-export const { useGetProfileQuery, useGetShowsQuery, useCreateSeriesMutation } = mainApi;
