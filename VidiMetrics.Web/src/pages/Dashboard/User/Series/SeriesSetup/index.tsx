@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
-import { useCreateSeriesMutation } from '@/store/apis/mainApi'
+import { useCreateShowMutation } from '@/store/apis/storyEngine/shows.api'
 
 const AUDIENCE_OPTIONS = [
   'Gen Z (Teens & Young Adults)',
@@ -51,7 +51,7 @@ type SeriesFormValues = z.infer<typeof seriesSchema>
 
 export default function SeriesSetup() {
   const navigate = useNavigate()
-  const [createSeries, { isLoading }] = useCreateSeriesMutation()
+  const [createShow, { isLoading }] = useCreateShowMutation()
 
   const {
     register,
@@ -73,7 +73,7 @@ export default function SeriesSetup() {
         targetAudience: values.targetAudience === 'Other (Custom Input)' ? values.targetAudienceCustom : values.targetAudience,
       }
       
-      await createSeries(data as any).unwrap()
+      await createShow(data as any).unwrap()
       toast.success('Series Initialized', {
         description: 'Parameters accepted. Creating new cinematic universe...',
       })

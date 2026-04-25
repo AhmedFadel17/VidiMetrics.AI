@@ -1,15 +1,21 @@
 import { useState } from 'react'
 
-export default function SeriesInfoTab() {
+import { Show } from '@/types/models/storyEngine';
+
+interface SeriesInfoTabProps {
+    show: Show;
+}
+
+export default function SeriesInfoTab({ show }: SeriesInfoTabProps) {
     const [isEditing, setIsEditing] = useState(false)
 
-    // Mock initial data
+    // Initial data from props
     const [formData, setFormData] = useState({
-        title: 'Neon Symphony: Part II',
-        synopsis: 'A cyberpunk odyssey exploring the intersection of synthetic consciousness and forgotten street culture in the sprawling megacity of Neo-Kyoto.',
-        genre: 'Sci-Fi / Cyberpunk',
-        targetAudience: '18-35, High-Tech Enthusiasts',
-        status: 'Active Production'
+        title: show.title,
+        synopsis: show.description,
+        genre: show.visualStyle,
+        targetAudience: show.targetAudience,
+        status: show.status === 0 ? 'Active Production' : 'Inactive'
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

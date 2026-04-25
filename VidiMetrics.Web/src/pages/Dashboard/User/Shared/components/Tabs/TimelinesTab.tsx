@@ -1,4 +1,8 @@
-export default function TimelinesTab() {
+interface TimelinesTabProps {
+    showId: string;
+}
+
+export default function TimelinesTab({ showId }: TimelinesTabProps) {
     return (
         <div className="space-y-8">
             {/* Distribution Channels */}

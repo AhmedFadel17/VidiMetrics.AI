@@ -1,18 +1,50 @@
 import SeriesHero from './components/SeriesHero'
 import SeriesInfoTab from './components/SeriesInfoTab'
 import TimelinesTab from '../../Shared/components/Tabs/TimelinesTab'
-import { useState } from 'react'
 import OverviewTab from './components/OverviewTab'
 import EpisodesTab from '../../Shared/components/Tabs/EpisodesTab'
 import CharactersTab from '../../Shared/components/Tabs/CharactersTab'
 import EnvironmentsTab from '../../Shared/components/Tabs/EnvironmentsTab'
 import ScenesTab from '../../Shared/components/Tabs/ScenesTab'
-
+import { useParams } from 'react-router-dom'
+import { useGetShowByIdQuery } from '@/store/apis'
+import { useState } from 'react'
 export default function SeriesDetails() {
-    type TabType = 'Overview' | "Info" | 'Episodes' | 'Characters' | 'Environments' | 'Scenes' | 'Timelines'
+    const { id } = useParams<{ id: string }>();
+    const { data: response, isLoading, error } = useGetShowByIdQuery(id || '');
+    const show = response?.data;
+
+    type TabType = 'Overview' | "Info" | 'Episodes' | 'Characters' | 'Environments' | 'Timelines'
     const [activeTab, setActiveTab] = useState<TabType>('Overview')
 
-    const tabs: TabType[] = ['Overview', 'Info', 'Episodes', 'Characters', 'Environments', 'Scenes', 'Timelines']
+    const tabs: TabType[] = ['Overview', 'Info', 'Episodes', 'Characters', 'Environments', 'Timelines']
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+                <div className="w-16 h-16 border-4 border-accent-purple/30 border-t-accent-purple rounded-full animate-spin"></div>
+                <p className="text-white/40 font-label text-xs uppercase tracking-widest animate-pulse">Syncing with Neural Engine...</p>
+            </div>
+        );
+    }
+
+    if (error || !show) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 glass-card rounded-[3rem] border border-error/20 p-12">
+                <span className="material-symbols-outlined text-6xl text-error">warning</span>
+                <div className="text-center space-y-2">
+                    <h2 className="text-2xl font-headline font-bold text-white tracking-tight">Signal Lost</h2>
+                    <p className="text-white/40">Unable to retrieve series parameters from the core. Please verify project ID.</p>
+                </div>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-all uppercase text-[10px] font-black tracking-widest"
+                >
+                    Reconnect Uplink
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-10 pb-20">
@@ -41,7 +73,7 @@ export default function SeriesDetails() {
             </div>
 
             {/* Hero Section */}
-            <SeriesHero />
+            <SeriesHero show={show} />
 
             {/* Content Tabs */}
             <div className="flex items-center gap-10 border-b border-white/5 pb-4">
@@ -63,28 +95,26 @@ export default function SeriesDetails() {
             <div className="mt-8">
 
                 {activeTab === 'Overview' && (
-                    <OverviewTab />
+                    <OverviewTab show={show} />
                 )}
 
                 {activeTab === 'Info' && (
-                    <SeriesInfoTab />
+                    <SeriesInfoTab show={show} />
                 )}
 
                 {activeTab === 'Episodes' && (
-                    <EpisodesTab />
+                    <EpisodesTab showId={show.id} initialData={show.episodes} />
                 )}
 
                 {activeTab === 'Characters' && (
-                    <CharactersTab />
+                    <CharactersTab showId={show.id} initialData={show.characters} />
                 )}
                 {activeTab === 'Environments' && (
-                    <EnvironmentsTab />
+                    <EnvironmentsTab showId={show.id} initialData={show.storyEnvironments} />
                 )}
-                {activeTab === 'Scenes' && (
-                    <ScenesTab />
-                )}
+
                 {activeTab === 'Timelines' && (
-                    <TimelinesTab />
+                    <TimelinesTab showId={show.id} />
                 )}
             </div>
         </div>

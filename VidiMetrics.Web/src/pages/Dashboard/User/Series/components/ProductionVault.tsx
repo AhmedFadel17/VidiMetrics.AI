@@ -1,6 +1,6 @@
 import ProductionCard from './ProductionCard'
 import CreateSeriesCard from './CreateSeriesCard'
-import { useGetShowsQuery } from '@/store/apis/mainApi'
+import { useGetShowsQuery } from '@/store/apis/storyEngine/shows.api'
 import { Series } from '@/types/series'
 import Pagination from './Pagination'
 import { useState } from 'react'
@@ -8,7 +8,7 @@ import { useState } from 'react'
 export default function ProductionVault() {
     const [page, setPage] = useState(1)
     const [pageSize, setPageSize] = useState(10)
-    const { data: response, isLoading, error } = useGetShowsQuery({ page, pageSize })
+    const { data: response, isLoading, error } = useGetShowsQuery({ pageNumber: page, pageSize })
     const shows: Series[] = response?.data?.items || []
 
     return (

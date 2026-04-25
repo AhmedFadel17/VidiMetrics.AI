@@ -1,4 +1,10 @@
-export default function SeriesHero() {
+import { Show } from '@/types/models/storyEngine';
+
+interface SeriesHeroProps {
+    show: Show;
+}
+
+export default function SeriesHero({ show }: SeriesHeroProps) {
     return (
         <div className="relative group">
             {/* Hero Card */}
@@ -11,19 +17,18 @@ export default function SeriesHero() {
                     {/* Status Badge */}
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 px-3 py-1 bg-white/5 backdrop-blur-md rounded-full border border-white/10">
-                            <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan animate-pulse shadow-[0_0_8px_#00f2ff]"></div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-accent-cyan">Active Production</span>
+                            <div className={`w-1.5 h-1.5 rounded-full ${show.status === 0 ? 'bg-accent-cyan animate-pulse shadow-[0_0_8px_#00f2ff]' : 'bg-white/20'}`}></div>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{show.status === 0 ? 'Active Production' : 'Inactive'}</span>
                         </div>
                     </div>
 
                     {/* Title & Description */}
                     <div className="space-y-4">
                         <h1 className="text-8xl font-headline font-bold text-white tracking-tight leading-[0.9]">
-                            Neon <span className="italic font-light text-gradient-purple font-serif">Symphony</span>: <br />
-                            Part II
+                            {show.title}
                         </h1>
                         <p className="text-white/60 text-lg leading-relaxed max-w-xl">
-                            A cyberpunk odyssey exploring the intersection of synthetic consciousness and forgotten street culture in the sprawling megacity of Neo-Kyoto.
+                            {show.description}
                         </p>
                     </div>
 
@@ -43,8 +48,8 @@ export default function SeriesHero() {
                             <div>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block mb-1">Episodes</span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-headline font-bold text-white">12</span>
-                                    <span className="text-white/20 text-sm font-bold">/ 18</span>
+                                    <span className="text-2xl font-headline font-bold text-white">{show.episodes?.length || 0}</span>
+                                    <span className="text-white/20 text-sm font-bold">/ {show.totalEpisodes || 0}</span>
                                 </div>
                             </div>
                             <div>

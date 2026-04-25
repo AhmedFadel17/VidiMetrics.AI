@@ -1,5 +1,16 @@
-export default function EnvironmentsSection() {
-    const environments = [
+import EnvironmentCard from "@/components/ui/Cards/EnvironmentCard"
+import { StoryEnvironment } from "@/types/models/storyEngine"
+
+interface EnvironmentsSectionProps {
+    showId: string
+    initialData?: StoryEnvironment[]
+}
+
+export default function EnvironmentsSection({ showId, initialData = [] }: EnvironmentsSectionProps) {
+    const environments = initialData.length > 0 ? initialData.map(env => ({
+        name: env.name,
+        image: env.referenceImageUrl || 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=800&auto=format&fit=crop&q=60'
+    })) : [
         { name: 'The Under-city', image: 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=800&auto=format&fit=crop&q=60' },
         { name: 'Sky Garden HQ', image: 'https://images.unsplash.com/photo-1449156006071-8597395ed74b?w=800&auto=format&fit=crop&q=60' }
     ]
@@ -13,13 +24,7 @@ export default function EnvironmentsSection() {
 
             <div className="space-y-4 flex-grow">
                 {environments.map((env, index) => (
-                    <div key={index} className="relative h-24 rounded-2xl overflow-hidden group cursor-pointer border border-white/5 hover:border-accent-cyan/30 transition-all duration-300">
-                        <img src={env.image} alt={env.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-dashboard-bg/80 via-dashboard-bg/20 to-transparent"></div>
-                        <div className="absolute inset-0 flex items-center px-6">
-                            <span className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors">{env.name}</span>
-                        </div>
-                    </div>
+                    <EnvironmentCard key={index} environment={env} />
                 ))}
             </div>
 

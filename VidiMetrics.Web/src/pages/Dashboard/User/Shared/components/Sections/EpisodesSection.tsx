@@ -1,68 +1,19 @@
-interface EpisodeCardProps {
-    title: string
-    code: string
-    status: 'READY' | 'RENDERING' | 'DRAFT'
-    image: string
-    progress?: number
-    meta?: string
+import EpisodeCard from "@/components/ui/Cards/EposideCard"
+import { Episode } from "@/types/models/storyEngine"
+
+interface EpisodesSectionProps {
+    showId: string
+    initialData?: Episode[]
 }
 
-function EpisodeCard({ title, code, status, image, progress, meta }: EpisodeCardProps) {
-    const statusStyles = {
-        'READY': 'bg-accent-cyan text-on-surface font-bold',
-        'RENDERING': 'bg-accent-purple text-white animate-pulse',
-        'DRAFT': 'bg-white/10 text-white/40'
-    }
-
-    return (
-        <div className="glass-card rounded-[2rem] p-4 border border-white/5 group hover:border-white/20 transition-all duration-500">
-            <div className="relative h-44 rounded-2xl overflow-hidden mb-5">
-                <img src={image} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60" />
-                <div className="absolute inset-0 bg-gradient-to-t from-dashboard-bg/90 to-transparent"></div>
-                <div className="absolute top-4 left-4">
-                    <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-md ${statusStyles[status]}`}>
-                        {status}
-                    </span>
-                </div>
-            </div>
-            
-            <div className="space-y-3">
-                <div className="flex justify-between items-start">
-                    <h4 className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors">{code}: {title}</h4>
-                </div>
-                
-                {status === 'RENDERING' && progress !== undefined && (
-                    <div className="space-y-2">
-                        <div className="flex justify-between text-[9px] font-black uppercase tracking-widest text-white/30">
-                            <span>Processing Layers</span>
-                            <span>{progress}%</span>
-                        </div>
-                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                            <div className="h-full bg-accent-purple shadow-[0_0_8px_#8a2be2]" style={{ width: `${progress}%` }}></div>
-                        </div>
-                    </div>
-                )}
-                
-                {status === 'READY' && meta && (
-                    <div className="flex items-center gap-3 pt-2">
-                        <span className="text-[10px] font-bold text-white/40">{meta}</span>
-                        <div className="flex gap-1">
-                            <span className="w-3 h-3 rounded-full bg-accent-cyan shadow-[0_0_4px_#00f2ff]"></span>
-                            <span className="w-3 h-3 rounded-full bg-accent-purple shadow-[0_0_4px_#8a2be2]"></span>
-                        </div>
-                    </div>
-                )}
-
-                {status === 'DRAFT' && (
-                    <span className="text-[10px] font-bold text-white/20 block pt-2">Planning...</span>
-                )}
-            </div>
-        </div>
-    )
-}
-
-export default function EpisodesSection() {
-    const episodes = [
+export default function EpisodesSection({ showId, initialData = [] }: EpisodesSectionProps) {
+    const episodes = initialData.length > 0 ? initialData.map(ep => ({
+        title: ep.title,
+        code: `E${ep.episodeNumber.toString().padStart(2, '0')}`,
+        status: 'READY' as const, // Placeholder status logic
+        meta: 'Active',
+        image: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60'
+    })) : [
         {
             title: 'The Ghost Signal',
             code: 'S02 E01',
@@ -99,9 +50,9 @@ export default function EpisodesSection() {
 
             <div className="grid grid-cols-4 gap-6">
                 {episodes.map((ep, index) => (
-                    <EpisodeCard key={index} {...ep} />
+                    <EpisodeCard key={index} episode={ep} />
                 ))}
-                
+
                 {/* New Episode Action */}
                 <button className="border-[1.5px] border-dashed border-white/10 rounded-[2rem] bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-cyan/40 transition-all duration-500 group flex flex-col items-center justify-center p-8 text-center min-h-[280px]">
                     <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:bg-accent-cyan/20 transition-all duration-500">
