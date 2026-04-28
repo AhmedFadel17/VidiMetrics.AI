@@ -22,6 +22,8 @@ export interface Character extends BaseEntity {
   physicalDescription: string;
   clothingStyle: string;
   personalityTraits: string;
+  role: string;
+  insightLevel: number;
   voiceId?: string;
   referenceImageUrl?: string;
   showId: string;
@@ -33,6 +35,7 @@ export interface Episode extends BaseEntity {
   episodeNumber: number;
   title: string;
   plotSummary: string;
+  thumbnailUrl: string;
   showId: string;
   videoId: string;
   scenes?: Scene[];

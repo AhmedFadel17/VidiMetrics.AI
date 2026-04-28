@@ -7,13 +7,7 @@ interface EnvironmentsSectionProps {
 }
 
 export default function EnvironmentsSection({ showId, initialData = [] }: EnvironmentsSectionProps) {
-    const environments = initialData.length > 0 ? initialData.map(env => ({
-        name: env.name,
-        image: env.referenceImageUrl || 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=800&auto=format&fit=crop&q=60'
-    })) : [
-        { name: 'The Under-city', image: 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=800&auto=format&fit=crop&q=60' },
-        { name: 'Sky Garden HQ', image: 'https://images.unsplash.com/photo-1449156006071-8597395ed74b?w=800&auto=format&fit=crop&q=60' }
-    ]
+    const environments = initialData.length > 0 ? initialData : [];
 
     return (
         <div className="glass-card rounded-[3rem] p-10 border border-white/5 h-full flex flex-col">

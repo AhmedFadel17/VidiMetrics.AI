@@ -7,35 +7,7 @@ interface EpisodesSectionProps {
 }
 
 export default function EpisodesSection({ showId, initialData = [] }: EpisodesSectionProps) {
-    const episodes = initialData.length > 0 ? initialData.map(ep => ({
-        title: ep.title,
-        code: `E${ep.episodeNumber.toString().padStart(2, '0')}`,
-        status: 'READY' as const, // Placeholder status logic
-        meta: 'Active',
-        image: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60'
-    })) : [
-        {
-            title: 'The Ghost Signal',
-            code: 'S02 E01',
-            status: 'READY' as const,
-            meta: '28m 45s',
-            image: 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60'
-        },
-        {
-            title: 'Fractured Mirror',
-            code: 'S02 E02',
-            status: 'RENDERING' as const,
-            progress: 45,
-            image: 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800&auto=format&fit=crop&q=60'
-        },
-        {
-            title: 'Orbital Drift',
-            code: 'S02 E03',
-            status: 'DRAFT' as const,
-            image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=60'
-        }
-    ]
-
+    const episodes = initialData.length > 0 ? initialData : [];
     return (
         <div className="glass-card rounded-[3rem] p-10 border border-white/5">
             <div className="flex justify-between items-center mb-10">

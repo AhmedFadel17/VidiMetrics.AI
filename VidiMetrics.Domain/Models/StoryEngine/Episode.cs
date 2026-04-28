@@ -6,6 +6,7 @@ public class Episode : BaseEntity
     public int EpisodeNumber { get; set; }
     public string Title { get; set; } = string.Empty;
     public string PlotSummary { get; set; } = string.Empty;
+    public string ThumbnailUrl { get; set; } = string.Empty;
     public Guid ShowId { get; set; }
     public Show Show { get; set; } = null!;
 
