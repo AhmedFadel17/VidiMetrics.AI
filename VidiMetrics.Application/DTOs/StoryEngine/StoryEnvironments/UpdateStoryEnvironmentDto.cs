@@ -8,6 +8,6 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments
         public string? VisualDescription { get; set; }
         public string? Atmosphere { get; set; }
         public string? ReferenceImageUrl { get; set; }
-        public Guid? SeriesId { get; set; }
+        public Guid? ShowId { get; set; }
     }
 }

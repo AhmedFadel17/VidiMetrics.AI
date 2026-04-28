@@ -11,7 +11,7 @@ namespace VidiMetrics.Application.Validators.StoryEngine.StoryEnvironments
             RuleFor(x => x.VisualDescription).NotEmpty().WithMessage("VisualDescription cannot be empty.").When(x => x.VisualDescription != null);
             RuleFor(x => x.Atmosphere).NotEmpty().WithMessage("Atmosphere cannot be empty.").When(x => x.Atmosphere != null);
             RuleFor(x => x.ReferenceImageUrl).NotEmpty().WithMessage("ReferenceImageUrl cannot be empty.").When(x => x.ReferenceImageUrl != null);
-            RuleFor(x => x.SeriesId).NotEmpty().WithMessage("SeriesId cannot be empty.").When(x => x.SeriesId != null);
+            RuleFor(x => x.ShowId).NotEmpty().WithMessage("ShowId cannot be empty.").When(x => x.ShowId != null);
         }
     }
 }
