@@ -12,8 +12,8 @@ namespace VidiMetrics.DataAccess.Repositories.StoryEngine.Shows
         {
             return await _context.Shows
                 .Include(s => s.Episodes.Take(3).OrderBy(e => e.EpisodeNumber))
-                .Include(s => s.Characters.Take(3))
-                .Include(s => s.StoryEnvironments.Take(3))
+                .Include(s => s.Characters.Take(2))
+                .Include(s => s.StoryEnvironments.Take(2))
                 .FirstOrDefaultAsync(s => s.Id == id);
         }
     }
