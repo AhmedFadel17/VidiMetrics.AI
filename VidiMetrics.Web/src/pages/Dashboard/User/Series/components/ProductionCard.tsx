@@ -1,27 +1,36 @@
 import { Link } from 'react-router-dom'
+import { ShowStatus } from '@/types/enums'
 
 interface ProductionCardProps {
     id: string
     title: string
     episodes?: number
     views?: string
-    status?: 'IN PRODUCTION' | 'RELEASED' | 'DRAFT'
+    status?: ShowStatus
     image?: string
 }
 
 const statusStyles = {
-    'IN PRODUCTION': 'bg-accent-purple text-white shadow-[0_0_10px_rgba(138,43,226,0.3)]',
-    'RELEASED': 'bg-accent-cyan text-on-surface font-bold shadow-[0_0_10px_rgba(0,242,255,0.3)]',
-    'DRAFT': 'bg-white/20 text-white backdrop-blur-md'
+    [ShowStatus.Draft]: 'bg-white/20 text-white backdrop-blur-md',
+    [ShowStatus.InProduction]: 'bg-accent-purple text-white shadow-[0_0_10px_rgba(138,43,226,0.3)]',
+    [ShowStatus.Published]: 'bg-accent-cyan text-on-surface font-bold shadow-[0_0_10px_rgba(0,242,255,0.3)]',
+    [ShowStatus.Archived]: 'bg-error/20 text-error backdrop-blur-md border border-error/20',
 }
 
-export default function ProductionCard({ 
-    id, 
-    title, 
-    episodes = 0, 
-    views = '---', 
-    status = 'DRAFT', 
-    image = 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60' 
+const statusLabels = {
+    [ShowStatus.Draft]: 'Draft',
+    [ShowStatus.InProduction]: 'In Production',
+    [ShowStatus.Published]: 'Published',
+    [ShowStatus.Archived]: 'Archived',
+}
+
+export default function ProductionCard({
+    id,
+    title,
+    episodes = 0,
+    views = '---',
+    status = ShowStatus.Draft,
+    image = 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60'
 }: ProductionCardProps) {
     return (
         <Link
@@ -40,7 +49,7 @@ export default function ProductionCard({
                 {/* Status Badge */}
                 <div className="absolute top-6 left-6">
                     <span className={`px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded-lg ${statusStyles[status]}`}>
-                        {status}
+                        {statusLabels[status]}
                     </span>
                 </div>
             </div>

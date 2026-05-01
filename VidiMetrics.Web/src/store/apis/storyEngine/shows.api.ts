@@ -10,20 +10,37 @@ export interface CreateShowRequest {
   targetAudience: string;
 }
 
-export interface UpdateShowRequest extends CreateShowRequest {}
+export interface UpdateShowRequest extends CreateShowRequest { }
+export interface ShowFilter extends PaginationFilter {
+  status?: number;
+  createdAfter?: string;
+  createdBefore?: string;
+}
 
 // ─── Injected endpoints ───────────────────────────────────────────────────────
 export const showsApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    getShows: builder.query<ApiResponse<PaginationResponse<Show>>, PaginationFilter>({
-      query: ({ pageNumber, pageSize }) =>
-        `/api/shows?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    getShows: builder.query<ApiResponse<PaginationResponse<Show>>, ShowFilter>({
+      query: (filter) => {
+        const params = new URLSearchParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: '/api/shows',
+          params: params,
+        };
+      },
       providesTags: (result) =>
         result?.data?.items
           ? [
-              ...result.data.items.map(({ id }) => ({ type: 'Show' as const, id })),
-              { type: 'Show', id: 'LIST' },
-            ]
+            ...result.data.items.map(({ id }) => ({ type: 'Show' as const, id })),
+            { type: 'Show', id: 'LIST' },
+          ]
           : [{ type: 'Show', id: 'LIST' }],
     }),
 

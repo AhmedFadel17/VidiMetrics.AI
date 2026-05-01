@@ -20,4 +20,7 @@ export interface PaginationResponse<T> {
 export interface PaginationFilter {
     pageNumber: number;
     pageSize: number;
+    orderBy?: string;
+    sortOrder?: string;
+    searchTerm?: string;
 }

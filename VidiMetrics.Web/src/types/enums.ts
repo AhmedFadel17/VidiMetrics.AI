@@ -33,10 +33,10 @@ export enum SearchEngine {
 }
 
 export enum ShowStatus {
-  Draft = 1,
-  InProduction = 2,
-  Published = 3,
-  Archived = 4,
+  Draft = 0,
+  InProduction = 1,
+  Published = 2,
+  Archived = 3,
 }
 
 export enum SubscriptionStatus {
