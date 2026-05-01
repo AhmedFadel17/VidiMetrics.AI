@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using VidiMetrics.DataAccess.Data;
+using VidiMetrics.DataAccess.Extensions;
 
 namespace VidiMetrics.DataAccess.Repositories
 {
@@ -18,6 +19,11 @@ namespace VidiMetrics.DataAccess.Repositories
             _dbSet = _context.Set<T>();
         }
 
+        public IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
+        }
+
         public async Task<T?> GetByIdAsync(Guid id)
         {
             return await _dbSet.FindAsync(id);
@@ -28,19 +34,15 @@ namespace VidiMetrics.DataAccess.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(int page, int pageSize, Expression<Func<T, bool>>? predicate = null)
+        public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(IQueryable<T> query, int page, int pageSize, string? orderBy, string? sortOrder)
         {
-            IQueryable<T> query = _dbSet;
-
-            if (predicate != null)
-            {
-                query = query.Where(predicate);
-            }
 
             int totalCount = await query.CountAsync();
-            var items = await query.Skip((page - 1) * pageSize)
-                                   .Take(pageSize)
-                                   .ToListAsync();
+            // Apply sorting
+            query = query.ApplyOrdering(orderBy, sortOrder);
+            // Apply pagination
+            query = query.ApplyPagination(page, pageSize);
+            var items = await query.ToListAsync();
 
             return (items, totalCount);
         }

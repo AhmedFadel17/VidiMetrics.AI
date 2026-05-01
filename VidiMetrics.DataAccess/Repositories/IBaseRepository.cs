@@ -9,7 +9,7 @@ namespace VidiMetrics.DataAccess.Repositories
     {
         Task<T?> GetByIdAsync(Guid id);
         Task<IEnumerable<T>> GetAllAsync();
-        Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(int page, int pageSize, Expression<Func<T, bool>>? predicate = null);
+        Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(IQueryable<T> query, int page, int pageSize, string? orderBy, string? sortOrder);
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task<T> AddAsync(T entity);
         Task AddRangeAsync(IEnumerable<T> entities);
@@ -17,5 +17,6 @@ namespace VidiMetrics.DataAccess.Repositories
         void Remove(T entity);
         void RemoveRange(IEnumerable<T> entities);
         Task<bool> SaveChangesAsync();
+        IQueryable<T> Query();
     }
 }
