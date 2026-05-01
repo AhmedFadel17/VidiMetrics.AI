@@ -10,7 +10,7 @@ public interface IShowsService
 {
     Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin = false);
     Task<ShowWithDetailsResponseDto> GetWithDetailsByIdAsync(Guid id, Guid userId, bool isAdmin = false);
-    Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, PaginationFilterDto filter, bool isAdmin = false);
+    Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, bool isAdmin = false);
     Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId, bool isAdmin = false);
     Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto, Guid userId, bool isAdmin = false);
     Task<bool> DeleteAsync(Guid id, Guid userId, bool isAdmin = false);

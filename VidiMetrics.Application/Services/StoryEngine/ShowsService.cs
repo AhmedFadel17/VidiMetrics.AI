@@ -64,10 +64,36 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
         }
 
-        public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, PaginationFilterDto filter, bool isAdmin = false)
+        public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, bool isAdmin = false)
         {
-            var predicate = !isAdmin ? (Expression<Func<Show, bool>>)(x => x.CreatedBy == userId) : null;
-            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(filter.PageNumber, filter.PageSize, predicate);
+            var query = _repository.Query();
+            if (!isAdmin)
+            {
+                query = query.Where(x => x.CreatedBy == userId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) || x.Description.ToLower().Contains(filter.SearchTerm.ToLower()));
+            }
+
+            if (filter.Status.HasValue)
+            {
+                query = query.Where(x => x.Status == filter.Status.Value);
+            }
+
+            if (filter.CreatedAfter.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
+            }
+
+            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
+                query,
+                filter.PageNumber,
+                filter.PageSize,
+                filter.OrderBy,
+                filter.SortOrder);
+
             var paginationSource = new PaginationSource<Show>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
             return _mapper.Map<PaginationResponseDto<ShowResponseDto>>(paginationSource);
         }
