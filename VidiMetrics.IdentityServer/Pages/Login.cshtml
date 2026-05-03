@@ -1,213 +1,94 @@
 @page "/login"
 @model VidiMetrics.IdentityServer.Pages.Account.LoginModel
 @{
-    Layout = null;
+    Layout = "_AuthLayout";
     ViewData["Title"] = "Log in";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VidiMetrics Access Terminal</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                     colors: {
-        "primary-fixed-dim": "#ddb7ff",
-        "on-primary-container": "#deb9ff",
-        "surface-container-lowest": "#060e20",
-        "tertiary-container": "#a40062",
-        "error-container": "#93000a",
-        "on-tertiary-container": "#ffb2cf",
-        "outline": "#948da2",
-        "surface-container-low": "#131b2e",
-        "on-error-container": "#ffdad6",
-        "secondary-container": "#03b5d3",
-        "error": "#ffb4ab",
-        "surface-container-highest": "#2d3449",
-        "on-secondary-container": "#00424e",
-        "secondary-fixed": "#acedff",
-        "primary-fixed": "#f0dbff",
-        "secondary-fixed-dim": "#4cd7f6",
-        "on-error": "#690005",
-        "outline-variant": "#494456",
-        "surface-container-high": "#222a3d",
-        "surface-dim": "#0b1326",
-        "primary": "#ddb7ff",
-        "on-surface": "#dae2fd",
-        "tertiary-fixed-dim": "#ffb0cd",
-        "on-secondary": "#003640",
-        "on-surface-variant": "#cbc3d9",
-        "on-primary-fixed-variant": "#6900b3",
-        "primary-container": "#7818c6",
-        "surface-bright": "#31394d",
-        "inverse-on-surface": "#283044",
-        "on-primary": "#490080",
-        "tertiary": "#ffb0cd",
-        "background": "#0b1326",
-        "inverse-primary": "#842bd2",
-        "tertiary-fixed": "#ffd9e4",
-        "secondary": "#4cd7f6",
-        "on-background": "#dae2fd",
-        "surface-tint": "#ddb7ff",
-        "inverse-surface": "#dae2fd",
-        "surface-variant": "#2d3449",
-        "on-secondary-fixed-variant": "#004e5c",
-        "on-secondary-fixed": "#001f26",
-        "on-tertiary-fixed": "#3e0022",
-        "surface": "#0b1326",
-        "surface-container": "#171f33",
-        "on-primary-fixed": "#2c0051",
-        "on-tertiary": "#640039",
-        "on-tertiary-fixed-variant": "#8c0053"
-      },
-      fontFamily: {
-        "headline": ["Space Grotesk", "sans-serif"],
-        "body": ["Inter", "sans-serif"],
-        "label": ["Inter", "sans-serif"]
-      },
-      borderRadius: {
-        "DEFAULT": "0.25rem",
-        "lg": "0.5rem",
-        "xl": "0.75rem",
-        "full": "9999px"
-      },
-                }
+<div class="w-full max-w-lg">
+    <div class="text-center mb-10">
+        <a class="inline-block mb-6" href="/">
+            <span class="text-3xl font-headline font-bold text-gradient-primary tracking-tight">VidiMetrics.Ai</span>
+        </a>
+        <h1 class="text-4xl md:text-5xl font-headline font-bold text-on-surface tracking-tighter mb-4">Welcome Back, Observer</h1>
+        <p class="text-on-surface-variant font-label text-sm uppercase tracking-[0.2em]">Initiating access to the data stream</p>
+    </div>
+    <div class="glass-panel ghost-border rounded-xl p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)]">
+        <form method="post" asp-page-handler="" asp-route-returnUrl="@Model.ReturnUrl" class="space-y-8">
+            <div class="space-y-2">
+                <label class="block text-xs font-label uppercase tracking-widest text-secondary font-semibold ml-1" for="email">Terminal ID (Email)</label>
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-on-surface-variant text-lg">alternate_email</span>
+                    </div>
+                    <input 
+                        asp-for="Input.Email"
+                        class="block w-full bg-surface-container-lowest/50 border-0 focus:ring-2 focus:ring-secondary/20 text-on-surface rounded-lg py-4 pl-12 transition-all duration-300 placeholder:text-on-surface-variant/30 font-body text-sm " 
+                        id="email" 
+                        placeholder="observer@vidimetrics.ai" 
+                        type="email">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center ml-1">
+                    <label class="block text-xs font-label uppercase tracking-widest text-secondary font-semibold" for="password">Encryption Key</label>
+                    <a class="text-[10px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors" href="/recovery">Forgot Password?</a>
+                </div>
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <span class="material-symbols-outlined text-on-surface-variant text-lg">lock</span>
+                    </div>
+                    <input 
+                        asp-for="Input.Password"
+                        class="block w-full bg-surface-container-lowest/50 border-0 focus:ring-2 focus:ring-secondary/20 text-on-surface rounded-lg py-4 pl-12 transition-all duration-300 placeholder:text-on-surface-variant/30 font-body text-sm " 
+                        id="password" 
+                        placeholder="••••••••••••" 
+                        type="password">
+                </div>
+            </div>
+            @* Show success messages *@
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="text-secondary text-sm font-body bg-secondary/10 border border-secondary/20 rounded-lg px-4 py-3 mb-6">
+                    <p>@Model.SuccessMessage</p>
+                </div>
             }
-        }
-    </script>
 
-    <style type="text/css">
-    body{
-       font-family: 'Inter', sans-serif;
-    }
-        .text-gradient-primary {
-            background: linear-gradient(135deg, #7818c6 0%, #2196f3 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(24px);
-        }
-        .ghost-border {
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .btn-gradient {
-            background: linear-gradient(135deg, #7818c6 0%, #2196f3 100%);
-        }
-        .input-field {
-            background: rgba(255, 255, 255, 0.04);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .input-field:focus {
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
-        }
-    </style>
-</head>
-<body>
-<div>
-    <div class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen flex flex-col items-center justify-center overflow-x-hidden relative">
-        <div class="fixed inset-0 z-0">
-            <div class="absolute inset-0 bg-gradient-to-br from-surface via-surface-container-lowest to-surface opacity-90"></div>
-            <img alt="VidiMetrics AI Background" class="w-full h-full object-cover mix-blend-overlay opacity-30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw_yBD7uqDjUY4xgSzPTLjKz-P_HcLWko-3Zxvk1VJN9C8OYhtEVgbiASqKNrq-DkexATIpsc2NkUgIykdya0xyw4f98PU_7UVTXtrERRYmU4b9knZKfVeqlmQayN6aybvASBlQujeussoaiBClOZLOm26SvQou4QMNERqvrbdepziL_B4WCwz7sXDpoCCviSs3RjAzu7x4IVqDFtarWR21rXbqjk_TuDt3Iq2H3WKf6lB64U_y8vZsE1AJhQy7T89YooRyg8216M">
-            <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/10 blur-[120px] rounded-full"></div>
+            @* Show validation errors *@
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="text-error text-sm font-body bg-error-container/20 border border-error/20 rounded-lg px-4 py-3">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <p>@error.ErrorMessage</p>
+                    }
+                </div>
+            }
+            <button class="w-full relative overflow-hidden group btn-gradient font-headline font-bold py-4 rounded-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-[0_8px_24px_-4px_rgba(120,24,198,0.4)] disabled:opacity-70 disabled:cursor-not-allowed" type="submit">
+                <span class="text-sm tracking-widest uppercase">Sign In</span>
+                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </button>
+        </form>
+        <div class="mt-10 pt-8 border-t border-on-surface-variant/10">
+            <p class="text-center text-xs text-on-surface-variant font-label uppercase tracking-widest mb-6">Or synchronize with</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button class="ghost-border bg-surface-variant/20 hover:bg-surface-variant/40 py-3 rounded-lg flex items-center justify-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-lg text-secondary">cloud</span>
+                    <span class="text-xs font-bold uppercase tracking-tighter">Google</span>
+                </button>
+                <button class="ghost-border bg-surface-variant/20 hover:bg-surface-variant/40 py-3 rounded-lg flex items-center justify-center gap-2 transition-all">
+                    <span class="material-symbols-outlined text-lg text-primary">terminal</span>
+                    <span class="text-xs font-bold uppercase tracking-tighter">GitHub</span>
+                </button>
+            </div>
         </div>
-        <main class="relative z-10 w-full px-6 py-12 flex flex-col items-center justify-center">
-            <div class="w-full max-w-lg">
-                <div class="text-center mb-10">
-                    <a class="inline-block mb-6" href="/">
-                        <span class="text-3xl font-headline font-bold text-gradient-primary tracking-tight">VidiMetrics.Ai</span>
-                    </a>
-                    <h1 class="text-4xl md:text-5xl font-headline font-bold text-on-surface tracking-tighter mb-4">Welcome Back, Observer</h1>
-                    <p class="text-on-surface-variant font-label text-sm uppercase tracking-[0.2em]">Initiating access to the data stream</p>
-                </div>
-                <div class="glass-panel ghost-border rounded-xl p-8 md:p-12 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)]">
-                    <form method="post" asp-page-handler="" asp-route-returnUrl="@Model.ReturnUrl" class="space-y-8">
-                        <div class="space-y-2">
-                            <label class="block text-xs font-label uppercase tracking-widest text-secondary font-semibold ml-1" for="email">Terminal ID (Email)</label>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <span class="material-symbols-outlined text-on-surface-variant text-lg">alternate_email</span>
-                                </div>
-                                <input 
-                                    asp-for="Input.Email"
-                                    class="block w-full bg-surface-container-lowest/50 border-0 focus:ring-2 focus:ring-secondary/20 text-on-surface rounded-lg py-4 pl-12 transition-all duration-300 placeholder:text-on-surface-variant/30 font-body text-sm " 
-                                    id="email" 
-                                    placeholder="observer@vidimetrics.ai" 
-                                    type="email">
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center ml-1">
-                                <label class="block text-xs font-label uppercase tracking-widest text-secondary font-semibold" for="password">Encryption Key</label>
-                                <a class="text-[10px] uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors" href="/recovery">Forgot Password?</a>
-                            </div>
-                            <div class="relative group">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <span class="material-symbols-outlined text-on-surface-variant text-lg">lock</span>
-                                </div>
-                                <input 
-                                    asp-for="Input.Password"
-                                    class="block w-full bg-surface-container-lowest/50 border-0 focus:ring-2 focus:ring-secondary/20 text-on-surface rounded-lg py-4 pl-12 transition-all duration-300 placeholder:text-on-surface-variant/30 font-body text-sm " 
-                                    id="password" 
-                                    placeholder="••••••••••••" 
-                                    type="password">
-                            </div>
-                        </div>
-                        @* Show validation errors *@
-                        @if (!ViewData.ModelState.IsValid)
-                        {
-                            <div class="text-error text-sm font-body bg-error-container/20 border border-error/20 rounded-lg px-4 py-3">
-                                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-                                {
-                                    <p>@error.ErrorMessage</p>
-                                }
-                            </div>
-                        }
-                        <button class="w-full relative overflow-hidden group btn-gradient font-headline font-bold py-4 rounded-lg flex items-center justify-center gap-3 active:scale-[0.98] transition-all shadow-[0_8px_24px_-4px_rgba(120,24,198,0.4)] disabled:opacity-70 disabled:cursor-not-allowed" type="submit">
-                            <span class="text-sm tracking-widest uppercase">Sign In</span>
-                            <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                        </button>
-                    </form>
-                    <div class="mt-10 pt-8 border-t border-on-surface-variant/10">
-                        <p class="text-center text-xs text-on-surface-variant font-label uppercase tracking-widest mb-6">Or synchronize with</p>
-                        <div class="grid grid-cols-2 gap-4">
-                            <button class="ghost-border bg-surface-variant/20 hover:bg-surface-variant/40 py-3 rounded-lg flex items-center justify-center gap-2 transition-all" fdprocessedid="jxcrd">
-                                <span class="material-symbols-outlined text-lg text-secondary">cloud</span>
-                                <span class="text-xs font-bold uppercase tracking-tighter">Google</span>
-                            </button>
-                            <button class="ghost-border bg-surface-variant/20 hover:bg-surface-variant/40 py-3 rounded-lg flex items-center justify-center gap-2 transition-all" fdprocessedid="p8zvu">
-                                <span class="material-symbols-outlined text-lg text-primary">terminal</span>
-                                <span class="text-xs font-bold uppercase tracking-tighter">GitHub</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mt-8 text-center space-y-4">
-                        <p class="text-on-surface-variant text-sm font-body">
-                            New to the system? 
-                            <a class="text-secondary font-semibold hover:text-primary transition-colors underline-offset-4 hover:underline" href="/register">
-                                Create an Account
-                            </a>
-                        </p>
-                    </div>
-                </div>
-            </main>
+        <div class="mt-8 text-center space-y-4">
+            <p class="text-on-surface-variant text-sm font-body">
+                New to the system? 
+                <a class="text-secondary font-semibold hover:text-primary transition-colors underline-offset-4 hover:underline" href="/register">
+                    Create an Account
+                </a>
+            </p>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
-</body>
-</html>
+</div>

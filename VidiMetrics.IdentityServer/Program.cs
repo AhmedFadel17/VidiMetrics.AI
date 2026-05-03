@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using VidiMetrics.IdentityServer.Configuration;
 using VidiMetrics.IdentityServer.Data;
+using VidiMetrics.IdentityServer.Services;
+
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +15,10 @@ builder.Services.Configure<IdentityServerSettings>(
 var identitySettings = builder.Configuration.GetSection("IdentityServer").Get<IdentityServerSettings>()
 
                       ?? new IdentityServerSettings();
-
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
+builder.Services.AddMemoryCache();
 
 builder.Services.AddCors(options =>
 {
@@ -34,11 +37,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOpenIddict();
 });
 
+builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
     options.Password.RequiredLength = 8;
+    options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
@@ -102,7 +107,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
-
+builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
 builder.Services.AddMassTransit(x =>
 {
     x.AddEntityFrameworkOutbox<AppDbContext>(o =>

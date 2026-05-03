@@ -40,11 +40,18 @@ namespace VidiMetrics.IdentityServer.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string? returnUrl = null)
+        public string? SuccessMessage { get; set; }
+
+        public async Task OnGetAsync(string? returnUrl = null, string? message = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
                 ModelState.AddModelError(string.Empty, ErrorMessage);
+            }
+
+            if (!string.IsNullOrEmpty(message))
+            {
+                SuccessMessage = message;
             }
 
             returnUrl ??= Url.Content("~/");

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VidiMetrics Access Terminal</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary-fixed-dim": "#ddb7ff",
+                        "on-primary-container": "#deb9ff",
+                        "surface-container-lowest": "#060e20",
+                        "tertiary-container": "#a40062",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#ffb2cf",
+                        "outline": "#948da2",
+                        "surface-container-low": "#131b2e",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#03b5d3",
+                        "error": "#ffb4ab",
+                        "surface-container-highest": "#2d3449",
+                        "on-secondary-container": "#00424e",
+                        "secondary-fixed": "#acedff",
+                        "primary-fixed": "#f0dbff",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "on-error": "#690005",
+                        "outline-variant": "#494456",
+                        "surface-container-high": "#222a3d",
+                        "surface-dim": "#0b1326",
+                        "primary": "#ddb7ff",
+                        "on-surface": "#dae2fd",
+                        "tertiary-fixed-dim": "#ffb0cd",
+                        "on-secondary": "#003640",
+                        "on-surface-variant": "#cbc3d9",
+                        "on-primary-fixed-variant": "#6900b3",
+                        "primary-container": "#7818c6",
+                        "surface-bright": "#31394d",
+                        "inverse-on-surface": "#283044",
+                        "on-primary": "#490080",
+                        "tertiary": "#ffb0cd",
+                        "background": "#0b1326",
+                        "inverse-primary": "#842bd2",
+                        "tertiary-fixed": "#ffd9e4",
+                        "secondary": "#4cd7f6",
+                        "on-background": "#dae2fd",
+                        "surface-tint": "#ddb7ff",
+                        "inverse-surface": "#dae2fd",
+                        "surface-variant": "#2d3449",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "on-secondary-fixed": "#001f26",
+                        "on-tertiary-fixed": "#3e0022",
+                        "surface": "#0b1326",
+                        "surface-container": "#171f33",
+                        "on-primary-fixed": "#2c0051",
+                        "on-tertiary": "#640039",
+                        "on-tertiary-fixed-variant": "#8c0053"
+                    },
+                    fontFamily: {
+                        "headline": ["Space Grotesk", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/css">
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .text-gradient-primary {
+            background: linear-gradient(135deg, #7818c6 0%, #2196f3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #7818c6 0%, #2196f3 100%);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.04);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen overflow-x-hidden relative">
+    <div class="fixed inset-0 z-0">
+        <div class="absolute inset-0 bg-gradient-to-br from-surface via-surface-container-lowest to-surface opacity-90"></div>
+        <img 
+            alt="VidiMetrics AI Background" 
+            class="w-full h-full object-cover mix-blend-overlay opacity-30" 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDw_yBD7uqDjUY4xgSzPTLjKz-P_HcLWko-3Zxvk1VJN9C8OYhtEVgbiASqKNrq-DkexATIpsc2NkUgIykdya0xyw4f98PU_7UVTXtrERRYmU4b9knZKfVeqlmQayN6aybvASBlQujeussoaiBClOZLOm26SvQou4QMNERqvrbdepziL_B4WCwz7sXDpoCCviSs3RjAzu7x4IVqDFtarWR21rXbqjk_TuDt3Iq2H3WKf6lB64U_y8vZsE1AJhQy7T89YooRyg8216M"
+        />
+        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-secondary/10 blur-[120px] rounded-full"></div>
+    </div>
+
+    <main class="relative z-10 w-full px-6 py-12 flex flex-col items-center justify-center">
+        @RenderBody()
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

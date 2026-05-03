@@ -1,0 +1,97 @@
+@page "/recovery"
+@model VidiMetrics.IdentityServer.Pages.RecoveryModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Recovery";
+}
+
+<div class="w-full max-w-md">
+    <div class="text-center mb-10">
+        <a href="/" class="inline-block mb-8">
+            <span class="text-3xl font-headline font-bold text-gradient-primary tracking-tight">VidiMetrics.Ai</span>
+        </a>
+        <div class="w-20 h-20 bg-surface-container-high rounded-3xl mx-auto flex items-center justify-center mb-8 ghost-border shadow-xl">
+            <span class="material-symbols-outlined text-on-surface-variant text-4xl">key</span>
+        </div>
+        <h1 class="text-4xl font-headline font-bold text-on-surface tracking-tighter mb-4">Lost in the Stream?</h1>
+        <p class="text-on-surface-variant text-sm font-label uppercase tracking-[0.2em]">Recover Your Access Token</p>
+    </div>
+
+    <div class="glass-panel ghost-border rounded-xl p-8 shadow-2xl">
+        <p class="text-sm text-on-surface-variant mb-8 text-center leading-relaxed">
+            Enter your synchronization email. If an account is linked, we will transmit a recovery sequence to your terminal.
+        </p>
+        
+        <form method="post" class="space-y-6" id="recoveryForm">
+            @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+            {
+                <div class="text-secondary text-sm font-body bg-secondary/10 border border-secondary/20 rounded-lg px-4 py-3 mb-6 animate-pulse">
+                    <p>@Model.SuccessMessage</p>
+                </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div id="errorAlert" class="text-error text-sm font-body bg-error-container/20 border border-error/20 rounded-lg px-4 py-3 mb-6">
+                    <div asp-validation-summary="All" class="list-none" id="validationSummary"></div>
+                </div>
+            }
+
+            <div class="space-y-2">
+                <label class="block text-[10px] font-label uppercase tracking-[0.2em] text-on-surface-variant ml-1 font-bold">Terminal ID (Email)</label>
+                <input 
+                    asp-for="Input.Email"
+                    class="w-full bg-surface-container-lowest/50 border-none rounded-lg py-4 px-4 text-on-surface placeholder:text-on-surface-variant/20 focus:ring-2 focus:ring-secondary/20 transition-all font-body text-sm" 
+                    placeholder="observer@vidimetrics.ai" 
+                    required 
+                    type="email"
+                />
+            </div>
+            
+            <button id="submitBtn" class="w-full py-4 btn-gradient rounded-lg font-bold tracking-widest uppercase text-xs shadow-lg shadow-primary/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed" type="submit">
+                Send Recovery Sequence
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-8 text-center">
+        <a class="text-on-surface-variant hover:text-primary transition-colors text-sm flex items-center justify-center gap-2 group" asp-page="./Login">
+            <span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+            Return to Login
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let remainingSeconds = @Model.RemainingSeconds;
+        const submitBtn = document.getElementById('submitBtn');
+        const validationSummary = document.getElementById('validationSummary');
+        
+        if (remainingSeconds > 0) {
+            submitBtn.disabled = true;
+            
+            const interval = setInterval(function() {
+                remainingSeconds--;
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(interval);
+                    submitBtn.disabled = false;
+                    if (validationSummary) {
+                        validationSummary.innerHTML = '<li>Sequence ready. You may now resend the request.</li>';
+                        validationSummary.parentElement.classList.remove('text-error', 'bg-error-container/20', 'border-error/20');
+                        validationSummary.parentElement.classList.add('text-secondary', 'bg-secondary/10', 'border-secondary/20');
+                    }
+                } else {
+                    const minutes = Math.floor(remainingSeconds / 60);
+                    const seconds = remainingSeconds % 60;
+                    if (validationSummary) {
+                        validationSummary.innerHTML = `<li>A recovery sequence was recently transmitted. Please wait ${minutes}m ${seconds}s before requesting a new one.</li>`;
+                    }
+                }
+            }, 1000);
+        }
+    });
+</script>
+
+
