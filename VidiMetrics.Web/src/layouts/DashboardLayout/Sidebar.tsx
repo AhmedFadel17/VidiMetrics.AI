@@ -12,9 +12,11 @@ export default function Sidebar() {
     <aside className="h-screen w-72 fixed left-0 top-0 z-40 bg-dashboard-bg border-r border-white/5 flex flex-col py-8 overflow-y-auto">
       {/* Logo */}
       <div className="px-8 mb-8">
-        <h1 className="text-white font-headline font-bold text-2xl tracking-tight flex items-center gap-2">
-          VidiMetrics.Ai
-        </h1>
+        <Link to="/">
+          <h1 className="text-white font-headline font-bold text-2xl tracking-tight flex items-center gap-2">
+            VidiMetrics.Ai
+          </h1>
+        </Link>
       </div>
 
       {/* New Production Button */}

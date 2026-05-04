@@ -106,19 +106,9 @@ export const AppUserRoutes: AppRoute[] = [
 // =============================
 export const AuthRoutes: AppRoute[] = [
     {
-        path: "/register",
-        label: "Register",
-        element: <Register />,
-    },
-    {
         path: "/callback",
         label: "Callback",
         element: <CallbackPage />,
-    },
-    {
-        path: "/recovery",
-        label: "Recovery",
-        element: <Recovery />,
     },
     {
         path: "/login-error",

@@ -13,6 +13,14 @@ export default function TopNavBar() {
     }
   }
 
+  const handleRegister = async () => {
+    try {
+      await auth.signinRedirect({ extraQueryParams: { prompt: 'register' } })
+    } catch (error) {
+      console.error("Register redirect failed:", error)
+    }
+  }
+
   const handleLogout = async () => {
     try {
       await auth.signoutRedirect()
@@ -72,14 +80,13 @@ export default function TopNavBar() {
               >
                 Login
               </button>
-              <Link to="/register">
-                <Button
-                  variant="light"
-                  wrapperClassName="overflow-hidden"
-                >
-                  Get Started
-                </Button>
-              </Link>
+              <Button
+                variant="light"
+                wrapperClassName="overflow-hidden"
+                onClick={handleRegister}
+              >
+                Get Started
+              </Button>
             </>
           )}
         </div>
