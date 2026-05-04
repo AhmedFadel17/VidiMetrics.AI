@@ -11,17 +11,24 @@ namespace VidiMetrics.IdentityServer.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
+        private readonly Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.IdentityServerSettings> _identitySettings;
 
-        public LoginModel(SignInManager<ApplicationUser> signInManager, ILogger<LoginModel> logger)
+        public LoginModel(
+            SignInManager<ApplicationUser> signInManager, 
+            ILogger<LoginModel> logger,
+            Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.IdentityServerSettings> identitySettings)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _identitySettings = identitySettings;
         }
 
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
         public string? ReturnUrl { get; set; }
+        public string? RegisterUrl { get; set; }
+        public bool IsUrlInvalid { get; set; }
 
         [TempData]
         public string? ErrorMessage { get; set; }
@@ -54,12 +61,20 @@ namespace VidiMetrics.IdentityServer.Pages.Account
                 SuccessMessage = message;
             }
 
+            if (string.IsNullOrEmpty(returnUrl))
+            {
+                IsUrlInvalid = true;
+            }
+
             returnUrl ??= Url.Content("~/");
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ReturnUrl = returnUrl;
+
+            // The registration page is now native to the IdentityServer
+            RegisterUrl = "/register";
         }
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)

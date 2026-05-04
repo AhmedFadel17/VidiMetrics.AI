@@ -66,6 +66,9 @@ builder.Services.AddOpenIddict()
         // Register default scopes + any custom ones from your JSON clients
         options.RegisterScopes(Scopes.OpenId, Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess);
 
+        // Allow 'register' prompt for registration flow
+        options.RegisterPromptValues("register");
+
 
         foreach (var client in identitySettings.Clients)
         {

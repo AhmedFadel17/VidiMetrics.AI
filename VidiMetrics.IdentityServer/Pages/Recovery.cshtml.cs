@@ -38,11 +38,21 @@ namespace VidiMetrics.IdentityServer.Pages
             public string Email { get; set; } = string.Empty;
         }
 
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
+
+        public bool IsUrlInvalid { get; set; }
+
         public string? SuccessMessage { get; set; }
         public int RemainingSeconds { get; set; }
 
-        public void OnGet()
+        public void OnGet(string? returnUrl = null)
         {
+            if (string.IsNullOrEmpty(returnUrl))
+            {
+                IsUrlInvalid = true;
+            }
+            ReturnUrl = returnUrl;
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -81,7 +91,7 @@ namespace VidiMetrics.IdentityServer.Pages
                 var callbackUrl = Url.Page(
                     "/ResetPassword",
                     pageHandler: null,
-                    values: new { code, email = Input.Email },
+                    values: new { code, email = Input.Email, returnUrl = ReturnUrl },
                     protocol: Request.Scheme);
 
                 await _emailSender.SendPasswordResetLinkAsync(user, Input.Email, callbackUrl!);

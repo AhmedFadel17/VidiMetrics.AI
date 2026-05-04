@@ -20,6 +20,11 @@ namespace VidiMetrics.IdentityServer.Pages
         [BindProperty]
         public InputModel Input { get; set; } = new();
 
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
+
+        public bool IsUrlInvalid { get; set; }
+
         public class InputModel
         {
             [Required]
@@ -40,11 +45,16 @@ namespace VidiMetrics.IdentityServer.Pages
             public string Code { get; set; } = string.Empty;
         }
 
-        public IActionResult OnGet(string? code = null, string? email = null)
+        public IActionResult OnGet(string? code = null, string? email = null, string? returnUrl = null)
         {
-            if (code == null)
+            ReturnUrl = returnUrl;
+            if (code == null || string.IsNullOrEmpty(returnUrl))
             {
-                return BadRequest("A code must be supplied for password reset.");
+                IsUrlInvalid = true;
+                // We still need a code to show the page without immediate crash if they stay on it, 
+                // but IsUrlInvalid will show the error.
+                Input = new InputModel { Code = string.Empty, Email = email ?? string.Empty };
+                return Page();
             }
             else
             {
@@ -68,13 +78,13 @@ namespace VidiMetrics.IdentityServer.Pages
             if (user == null)
             {
                 // Don't reveal that the user does not exist
-                return RedirectToPage("./Login", new { message = "Your password has been reset. Please log in." });
+                return RedirectToPage("./Login", new { message = "Your password has been reset. Please log in.", returnUrl = ReturnUrl });
             }
 
             var result = await _userManager.ResetPasswordAsync(user, Input.Code, Input.Password);
             if (result.Succeeded)
             {
-                return RedirectToPage("./Login", new { message = "Your password has been reset. Please log in." });
+                return RedirectToPage("./Login", new { message = "Your password has been reset. Please log in.", returnUrl = ReturnUrl });
             }
 
             foreach (var error in result.Errors)

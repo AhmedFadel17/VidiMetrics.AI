@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.WebUtilities;
 using VidiMetrics.IdentityServer.Data;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -34,6 +35,16 @@ public class AuthorizationController : Controller
     {
         var request = HttpContext.GetOpenIddictServerRequest() ??
             throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
+
+        // Handle prompt=register by redirecting to the registration page
+        if (request.Prompt == "register")
+        {
+            // Strip prompt=register from the return URL to avoid infinite loops after registration
+            var queryParameters = Request.Query.Where(x => x.Key != "prompt").ToDictionary(x => x.Key, x => x.Value);
+            var returnUrl = Microsoft.AspNetCore.WebUtilities.QueryHelpers.AddQueryString(Request.Path, queryParameters!);
+            
+            return Redirect($"/register?ReturnUrl={Uri.EscapeDataString(returnUrl)}");
+        }
 
         // 1. Check if the user is already signed into the Identity Server
         var result = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme);
