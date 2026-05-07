@@ -46,6 +46,7 @@ namespace VidiMetrics.Application
 
             services.AddScoped<IShortsProjectsService, ShortsProjectsService>();
             services.AddScoped<IShowsService, ShowsService>();
+            services.AddScoped<IScenesService, ScenesService>();
             services.AddScoped<IStoryEnvironmentsService, StoryEnvironmentsService>();
             services.AddScoped<ITranscriptsService, TranscriptsService>();
             services.AddScoped<IUserProfilesService, UserProfilesService>();

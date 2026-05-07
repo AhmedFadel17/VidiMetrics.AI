@@ -42,6 +42,7 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<Episode> Episodes { get; set; }
         public DbSet<Scene> Scenes { get; set; }
         public DbSet<Show> Shows { get; set; }
+        public DbSet<SceneCharacter> SceneCharacters { get; set; }
 
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
         public AppDbContext(DbContextOptions<AppDbContext> options, Microsoft.Extensions.Configuration.IConfiguration configuration) : base(options)
@@ -71,7 +72,7 @@ namespace VidiMetrics.DataAccess.Data
 
             modelBuilder.Entity<Scene>()
                 .HasOne(s => s.StoryEnvironment)
-                .WithMany()
+                .WithMany(se => se.Scenes)
                 .HasForeignKey(s => s.StoryEnvironmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -95,13 +96,18 @@ namespace VidiMetrics.DataAccess.Data
                 .HasForeignKey(p => p.VideoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Character>()
-                .HasMany(c => c.Scenes)
-                .WithMany(s => s.Characters)
-                .UsingEntity<Dictionary<string, object>>(
-                    "CharacterScene",
-                    j => j.HasOne<Scene>().WithMany().HasForeignKey("ScenesId").OnDelete(DeleteBehavior.Restrict),
-                    j => j.HasOne<Character>().WithMany().HasForeignKey("CharactersId").OnDelete(DeleteBehavior.Cascade));
+            modelBuilder.Entity<SceneCharacter>()
+                .HasKey(sc => new { sc.SceneId, sc.CharacterId });
+
+            modelBuilder.Entity<SceneCharacter>()
+                .HasOne(sc => sc.Scene)
+                .WithMany(s => s.SceneCharacters)
+                .HasForeignKey(sc => sc.SceneId);
+
+            modelBuilder.Entity<SceneCharacter>()
+                .HasOne(sc => sc.Character)
+                .WithMany(c => c.SceneCharacters)
+                .HasForeignKey(sc => sc.CharacterId);
 
             // UserProfile Configuration
             modelBuilder.Entity<UserProfile>(entity =>

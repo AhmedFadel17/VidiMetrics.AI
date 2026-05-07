@@ -19,14 +19,15 @@ using VidiMetrics.Application.DTOs.Seo.SeoAudits;
 using VidiMetrics.Application.DTOs.Seo.VideoTags;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
+using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
 using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
 using VidiMetrics.Domain.Models.Ai;
-
 using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Models.Seo;
 using VidiMetrics.Domain.Models.StoryEngine;
+using System.Linq;
 
 namespace VidiMetrics.Application.Mapping
 {
@@ -133,12 +134,18 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<Show, ShowResponseDto>();
             CreateMap<Show, ShowWithDetailsResponseDto>();
 
-
             CreateMap<CreateStoryEnvironmentDto, StoryEnvironment>();
             CreateMap<UpdateStoryEnvironmentDto, StoryEnvironment>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<StoryEnvironment, StoryEnvironmentResponseDto>();
 
+            CreateMap<CreateSceneDto, Scene>()
+                .ForMember(dest => dest.SceneCharacters, opt => opt.Ignore());
+            CreateMap<UpdateSceneDto, Scene>()
+                .ForMember(dest => dest.SceneCharacters, opt => opt.Ignore())
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Scene, SceneResponseDto>()
+                .ForMember(dest => dest.Characters, opt => opt.MapFrom(src => src.SceneCharacters.Select(sc => sc.Character)));
         }
     }
 }

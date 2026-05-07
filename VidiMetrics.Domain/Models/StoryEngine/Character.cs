@@ -1,4 +1,4 @@
-﻿namespace VidiMetrics.Domain.Models.StoryEngine;
+namespace VidiMetrics.Domain.Models.StoryEngine;
 
 public class Character : BaseEntity
 {
@@ -15,5 +15,5 @@ public class Character : BaseEntity
     public Guid ShowId { get; set; }
     public Show Show { get; set; } = null!;
 
-    public ICollection<Scene> Scenes { get; set; } = new List<Scene>();
+    public ICollection<SceneCharacter> SceneCharacters { get; set; } = new List<SceneCharacter>();
 }

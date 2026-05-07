@@ -12,5 +12,5 @@ public class Scene : BaseEntity
     public Guid EpisodeId { get; set; }
     public Episode Episode { get; set; } = null!;
 
-    public ICollection<Character> Characters { get; set; } = new List<Character>();
+    public ICollection<SceneCharacter> SceneCharacters { get; set; } = new List<SceneCharacter>();
 }
