@@ -10,7 +10,7 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
     const { id, title, plotSummary, thumbnailUrl, episodeNumber, showId, createdAt } = episode;
     const code = `E${episodeNumber}`
     return (
-        <Link to={`dashboard/shows/${showId}/episodes/${id}`}>
+        <Link to={`/dashboard/series/${showId}/episodes/${id}`}>
             <div className="glass-card rounded-[2rem] p-4 border border-white/5 group hover:border-white/20 transition-all duration-500">
                 <div className="relative h-44 rounded-2xl overflow-hidden mb-5">
                     <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60" />
