@@ -1,5 +1,5 @@
 import { mainApi } from '../mainApi';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse, PaginationResponse, PaginationFilter } from '@/types/api';
 import { Character } from '@/types/models/storyEngine';
 
 export interface CreateCharacterRequest {
@@ -7,21 +7,41 @@ export interface CreateCharacterRequest {
   physicalDescription: string;
   clothingStyle: string;
   personalityTraits: string;
+  role: string;
   voiceId?: string;
   referenceImageUrl?: string;
   showId: string;
 }
 
-export interface UpdateCharacterRequest extends CreateCharacterRequest {}
+export interface UpdateCharacterRequest extends Partial<CreateCharacterRequest> {}
+
+export interface CharacterFilter extends PaginationFilter {
+  showId?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+}
 
 export const charactersApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCharactersByShow: builder.query<ApiResponse<Character[]>, string>({
-      query: (showId) => `/api/characters?showId=${showId}`,
+    getCharacters: builder.query<ApiResponse<PaginationResponse<Character>>, CharacterFilter>({
+      query: (filter) => {
+        const params = new URLSearchParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: '/api/characters',
+          params: params,
+        };
+      },
       providesTags: (result) =>
-        result?.data
+        result?.data?.items
           ? [
-              ...result.data.map(({ id }) => ({ type: 'Character' as const, id })),
+              ...result.data.items.map(({ id }) => ({ type: 'Character' as const, id })),
               { type: 'Character', id: 'LIST' },
             ]
           : [{ type: 'Character', id: 'LIST' }],
@@ -56,7 +76,7 @@ export const charactersApi = mainApi.injectEndpoints({
 });
 
 export const {
-  useGetCharactersByShowQuery,
+  useGetCharactersQuery,
   useGetCharacterByIdQuery,
   useCreateCharacterMutation,
   useUpdateCharacterMutation,

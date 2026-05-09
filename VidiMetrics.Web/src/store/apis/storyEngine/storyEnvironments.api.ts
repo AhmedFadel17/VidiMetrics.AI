@@ -1,5 +1,5 @@
 import { mainApi } from '../mainApi';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse, PaginationResponse, PaginationFilter } from '@/types/api';
 import { StoryEnvironment } from '@/types/models/storyEngine';
 
 export interface CreateStoryEnvironmentRequest {
@@ -10,16 +10,35 @@ export interface CreateStoryEnvironmentRequest {
   showId: string;
 }
 
-export interface UpdateStoryEnvironmentRequest extends CreateStoryEnvironmentRequest {}
+export interface UpdateStoryEnvironmentRequest extends Partial<CreateStoryEnvironmentRequest> {}
+
+export interface StoryEnvironmentFilter extends PaginationFilter {
+  showId?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+}
 
 export const storyEnvironmentsApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    getEnvironmentsByShow: builder.query<ApiResponse<StoryEnvironment[]>, string>({
-      query: (showId) => `/api/storyenvironments?showId=${showId}`,
+    getEnvironments: builder.query<ApiResponse<PaginationResponse<StoryEnvironment>>, StoryEnvironmentFilter>({
+      query: (filter) => {
+        const params = new URLSearchParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: '/api/storyenvironments',
+          params: params,
+        };
+      },
       providesTags: (result) =>
-        result?.data
+        result?.data?.items
           ? [
-              ...result.data.map(({ id }) => ({ type: 'StoryEnvironment' as const, id })),
+              ...result.data.items.map(({ id }) => ({ type: 'StoryEnvironment' as const, id })),
               { type: 'StoryEnvironment', id: 'LIST' },
             ]
           : [{ type: 'StoryEnvironment', id: 'LIST' }],
@@ -54,7 +73,7 @@ export const storyEnvironmentsApi = mainApi.injectEndpoints({
 });
 
 export const {
-  useGetEnvironmentsByShowQuery,
+  useGetEnvironmentsQuery,
   useGetEnvironmentByIdQuery,
   useCreateEnvironmentMutation,
   useUpdateEnvironmentMutation,

@@ -10,7 +10,12 @@ export interface CreateShowRequest {
   targetAudience: string;
 }
 
-export interface UpdateShowRequest extends CreateShowRequest { }
+export interface UpdateShowRequest {
+  title?: string;
+  description?: string;
+  visualStyle?: string;
+  targetAudience?: string;
+}
 export interface ShowFilter extends PaginationFilter {
   status?: number;
   createdAfter?: string;

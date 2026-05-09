@@ -1,5 +1,5 @@
 import { mainApi } from '../mainApi';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse, PaginationResponse, PaginationFilter } from '@/types/api';
 import { Episode } from '@/types/models/storyEngine';
 
 export interface CreateEpisodeRequest {
@@ -7,19 +7,40 @@ export interface CreateEpisodeRequest {
   title: string;
   plotSummary: string;
   showId: string;
-  videoId: string;
+  thumbnailUrl?: string;
+  finalVideoId?: string;
 }
 
-export interface UpdateEpisodeRequest extends CreateEpisodeRequest {}
+export interface UpdateEpisodeRequest extends Partial<CreateEpisodeRequest> {}
+
+export interface EpisodeFilter extends PaginationFilter {
+  showId?: string;
+  searchTerm?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+}
 
 export const episodesApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    getEpisodesByShow: builder.query<ApiResponse<Episode[]>, string>({
-      query: (showId) => `/api/episodes?showId=${showId}`,
+    getEpisodes: builder.query<ApiResponse<PaginationResponse<Episode>>, EpisodeFilter>({
+      query: (filter) => {
+        const params = new URLSearchParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: '/api/episodes',
+          params: params,
+        };
+      },
       providesTags: (result) =>
-        result?.data
+        result?.data?.items
           ? [
-              ...result.data.map(({ id }) => ({ type: 'Episode' as const, id })),
+              ...result.data.items.map(({ id }) => ({ type: 'Episode' as const, id })),
               { type: 'Episode', id: 'LIST' },
             ]
           : [{ type: 'Episode', id: 'LIST' }],
@@ -54,7 +75,7 @@ export const episodesApi = mainApi.injectEndpoints({
 });
 
 export const {
-  useGetEpisodesByShowQuery,
+  useGetEpisodesQuery,
   useGetEpisodeByIdQuery,
   useCreateEpisodeMutation,
   useUpdateEpisodeMutation,
