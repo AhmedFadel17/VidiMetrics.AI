@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
@@ -56,15 +57,49 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<SceneResponseDto>(entity);
         }
 
-        public async Task<IEnumerable<SceneResponseDto>> GetAllAsync()
+        public async Task<PaginationResponseDto<SceneResponseDto>> GetAllAsync(SceneFilterDto filter)
         {
-            var entities = await _repository.Query()
+            IQueryable<Scene> query = _repository.Query()
                 .Include(s => s.StoryEnvironment)
                 .Include(s => s.SceneCharacters)
-                    .ThenInclude(sc => sc.Character)
-                .ToListAsync();
+                    .ThenInclude(sc => sc.Character);
 
-            return _mapper.Map<IEnumerable<SceneResponseDto>>(entities);
+            if (filter.EpisodeId.HasValue)
+            {
+                query = query.Where(x => x.EpisodeId == filter.EpisodeId.Value);
+            }
+
+            if (filter.StoryEnvironmentId.HasValue)
+            {
+                query = query.Where(x => x.StoryEnvironmentId == filter.StoryEnvironmentId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                query = query.Where(x => x.Script.ToLower().Contains(filter.SearchTerm.ToLower()) || 
+                                       x.VisualPrompt.ToLower().Contains(filter.SearchTerm.ToLower()));
+            }
+
+            if (filter.CreatedAfter.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
+            }
+
+            if (filter.CreatedBefore.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
+            }
+
+            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
+                query,
+                filter.PageNumber,
+                filter.PageSize,
+                filter.OrderBy,
+                filter.SortOrder,
+                filter.Limit);
+
+            var paginationSource = new PaginationSource<Scene>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
+            return _mapper.Map<PaginationResponseDto<SceneResponseDto>>(paginationSource);
         }
 
         public async Task<SceneResponseDto> CreateAsync(CreateSceneDto dto)
@@ -80,6 +115,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (environment.ShowId != episode.ShowId) throw new Exception("Story environment must belong to the same show as the episode.");
 
             var entity = _mapper.Map<Scene>(dto);
+            entity.CreatedAt = DateTime.UtcNow;
 
             if (dto.CharacterIds != null && dto.CharacterIds.Any())
             {
@@ -121,6 +157,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (environment.ShowId != episode.ShowId) throw new Exception("Story environment must belong to the same show as the episode.");
 
             _mapper.Map(dto, entity);
+            entity.UpdatedAt = DateTime.UtcNow;
 
             if (dto.CharacterIds != null)
             {

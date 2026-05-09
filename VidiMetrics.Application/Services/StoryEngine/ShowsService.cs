@@ -48,7 +48,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
-        public async Task<ShowWithDetailsResponseDto> GetWithDetailsByIdAsync(Guid id, Guid userId, bool isAdmin = false)
+        public async Task<ShowResponseDto> GetWithDetailsByIdAsync(Guid id, Guid userId, bool isAdmin = false)
         {
             var entity = await _repository.GetWithDetailsByIdAsync(id);
             if (entity == null)
@@ -59,7 +59,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
                 throw new UnauthorizedAccessException("You are not authorized to view this show.");
 
-            return _mapper.Map<ShowWithDetailsResponseDto>(entity);
+            return _mapper.Map<ShowResponseDto>(entity);
 
 
         }
@@ -87,12 +87,18 @@ namespace VidiMetrics.Application.Services.StoryEngine
                 query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
             }
 
+            if (filter.CreatedBefore.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
+            }
+
             var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
                 query,
                 filter.PageNumber,
                 filter.PageSize,
                 filter.OrderBy,
-                filter.SortOrder);
+                filter.SortOrder,
+                filter.Limit);
 
             var paginationSource = new PaginationSource<Show>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
             return _mapper.Map<PaginationResponseDto<ShowResponseDto>>(paginationSource);

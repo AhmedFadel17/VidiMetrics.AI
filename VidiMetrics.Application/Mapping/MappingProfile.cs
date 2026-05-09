@@ -1,3 +1,4 @@
+using System.Linq;
 using AutoMapper;
 using VidiMetrics.Application.DTOs.Ai.AiPromptTemplates;
 using VidiMetrics.Application.DTOs.Ai.AiTasks;
@@ -27,7 +28,6 @@ using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Models.Seo;
 using VidiMetrics.Domain.Models.StoryEngine;
-using System.Linq;
 
 namespace VidiMetrics.Application.Mapping
 {
@@ -132,7 +132,6 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<UpdateShowDto, Show>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Show, ShowResponseDto>();
-            CreateMap<Show, ShowWithDetailsResponseDto>();
 
             CreateMap<CreateStoryEnvironmentDto, StoryEnvironment>();
             CreateMap<UpdateStoryEnvironmentDto, StoryEnvironment>()

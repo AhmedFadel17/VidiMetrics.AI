@@ -9,4 +9,5 @@ public class BaseFilterDto
     public string? SearchTerm { get; set; }
     public string? OrderBy { get; set; }
     public string? SortOrder { get; set; }
+    public int? Limit { get; set; }
 }

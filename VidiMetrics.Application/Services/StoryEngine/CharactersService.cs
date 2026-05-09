@@ -2,7 +2,9 @@ using AutoMapper;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
@@ -37,10 +39,42 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<CharacterResponseDto>(entity);
         }
 
-        public async Task<IEnumerable<CharacterResponseDto>> GetAllAsync()
+        public async Task<PaginationResponseDto<CharacterResponseDto>> GetAllAsync(CharacterFilterDto filter)
         {
-            var entities = await _repository.GetAllAsync();
-            return _mapper.Map<IEnumerable<CharacterResponseDto>>(entities);
+            var query = _repository.Query();
+
+            if (filter.ShowId.HasValue)
+            {
+                query = query.Where(x => x.ShowId == filter.ShowId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
+            {
+                query = query.Where(x => x.Name.ToLower().Contains(filter.SearchTerm.ToLower()) || 
+                                       x.Role.ToLower().Contains(filter.SearchTerm.ToLower()) ||
+                                       x.PersonalityTraits.ToLower().Contains(filter.SearchTerm.ToLower()));
+            }
+
+            if (filter.CreatedAfter.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
+            }
+
+            if (filter.CreatedBefore.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
+            }
+
+            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
+                query,
+                filter.PageNumber,
+                filter.PageSize,
+                filter.OrderBy,
+                filter.SortOrder,
+                filter.Limit);
+
+            var paginationSource = new PaginationSource<Character>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
+            return _mapper.Map<PaginationResponseDto<CharacterResponseDto>>(paginationSource);
         }
 
         public async Task<CharacterResponseDto> CreateAsync(CreateCharacterDto dto)
@@ -48,8 +82,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _createValidator.ValidateAndThrowAsync(dto);
 
             var entity = _mapper.Map<Character>(dto);
-            // Assuming BaseEntity has CreatedAt or similar if needed, otherwise skip
-            // entity.CreatedAt = DateTime.UtcNow; 
+            entity.CreatedAt = DateTime.UtcNow;
 
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
@@ -65,6 +98,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (entity == null) throw new Exception("Character not found.");
 
             _mapper.Map(dto, entity);
+            entity.UpdatedAt = DateTime.UtcNow;
 
             _repository.Update(entity);
             await _repository.SaveChangesAsync();
