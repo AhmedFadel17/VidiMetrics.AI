@@ -5,6 +5,13 @@ export type AppRoute = {
     label: string;
     element: JSX.Element;
 }
+
+export interface FilterOption {
+    label: string;
+    value: string | number;
+    sortOrder?: 'asc' | 'desc';
+    orderBy?: string;
+}
 export type SidebarRoute = {
     path: string;
     label: string;

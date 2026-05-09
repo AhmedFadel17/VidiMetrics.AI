@@ -27,9 +27,12 @@ import CallbackPage from "@/pages/Auth/Callback";
 import SeriesLibrary from "@/pages/Dashboard/User/Series";
 import SeriesSetup from "@/pages/Dashboard/User/Series/SeriesSetup";
 import SeriesDetails from "@/pages/Dashboard/User/Series/Details";
+import EpisodeSetup from "@/pages/Dashboard/User/Episodes/EpisodeSetup";
 import EpisodeDetails from "@/pages/Dashboard/User/Episodes/Details";
 import CharacterDetails from "@/pages/Dashboard/User/Characters/Details";
+import CharacterSetup from "@/pages/Dashboard/User/Characters/CharacterSetup";
 import EnvironmentDetails from "@/pages/Dashboard/User/Environments/Details";
+import SceneSetup from "@/pages/Dashboard/User/Scenes/SceneSetup";
 import SceneDetails from "@/pages/Dashboard/User/Scenes/Details";
 
 
@@ -80,14 +83,29 @@ export const AppUserRoutes: AppRoute[] = [
         element: <SeriesDetails />,
     },
     {
-        path: "/dashboard/eposides/:id",
+        path: "/dashboard/series/:showId/episodes/:id",
         label: "Eposides",
         element: <EpisodeDetails />,
     },
     {
-        path: "/dashboard/characters/:id",
+        path: "/dashboard/series/:showId/episodes/new",
+        label: "Eposides",
+        element: <EpisodeSetup />,
+    },
+    {
+        path: "/dashboard/series/:showId/characters/:id",
         label: "Characters",
         element: <CharacterDetails />,
+    },
+    {
+        path: "/dashboard/series/:showId/characters/new",
+        label: "Characters",
+        element: <CharacterSetup />,
+    },
+    {
+        path: "/dashboard/series/:showId/episodes/:episodeId/scenes/new",
+        label: "Scenes",
+        element: <SceneSetup />,
     },
     {
         path: "/dashboard/environments/:id",

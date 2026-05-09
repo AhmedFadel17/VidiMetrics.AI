@@ -1,4 +1,5 @@
 import { Show } from '@/types/models/storyEngine';
+import { formatDate } from '@/utils/dateFormatter';
 
 interface SeriesHeroProps {
     show: Show;
@@ -34,7 +35,7 @@ export default function SeriesHero({ show }: SeriesHeroProps) {
 
                     {/* Progress Stats */}
                     <div className="flex items-end gap-12 pt-4">
-                        <div className="w-64 space-y-3">
+                        {/* <div className="w-64 space-y-3">
                             <div className="flex justify-between items-end">
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white/30">Overall Progress</span>
                                 <span className="text-xs font-bold text-white">68%</span>
@@ -42,21 +43,19 @@ export default function SeriesHero({ show }: SeriesHeroProps) {
                             <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                                 <div className="h-full bg-gradient-to-r from-accent-purple to-accent-pink w-[68%] shadow-[0_0_15px_rgba(138,43,226,0.4)]"></div>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="flex gap-12 border-l border-white/10 pl-12">
                             <div>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block mb-1">Episodes</span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-headline font-bold text-white">{show.episodes?.length || 0}</span>
-                                    <span className="text-white/20 text-sm font-bold">/ {show.totalEpisodes || 0}</span>
+                                    <span className="text-2xl font-headline font-bold text-white">{show.totalEpisodes || 0}</span>
                                 </div>
                             </div>
                             <div>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block mb-1">Runtime</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block mb-1">Creation Date</span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-headline font-bold text-white">342</span>
-                                    <span className="text-white/20 text-sm font-bold">m</span>
+                                    <span className="text-2xl font-headline font-bold text-white">{formatDate(show.createdAt)}</span>
                                 </div>
                             </div>
                         </div>
@@ -68,12 +67,12 @@ export default function SeriesHero({ show }: SeriesHeroProps) {
                     {/* The "Eye" / Abstract Graphic from image */}
                     <div className="absolute inset-0 rounded-full border border-white/5 animate-[spin_20s_linear_infinite]"></div>
                     <div className="absolute inset-4 rounded-full border border-white/10 animate-[spin_15s_linear_infinite_reverse]"></div>
-                    
+
                     <div className="relative w-[300px] h-[300px] rounded-full overflow-hidden border border-white/10 shadow-[0_0_50px_rgba(138,43,226,0.2)]">
                         {/* Placeholder for the central art */}
                         <div className="absolute inset-0 bg-cover bg-center opacity-80" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=60)' }}></div>
                         <div className="absolute inset-0 bg-gradient-to-t from-dashboard-bg/80 to-transparent"></div>
-                        
+
                         {/* Neon Rings */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="w-[80%] h-[80%] rounded-full border-2 border-accent-pink/30 shadow-[0_0_20px_rgba(255,0,127,0.3)]"></div>

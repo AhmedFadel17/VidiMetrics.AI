@@ -6,18 +6,28 @@ import EpisodesTab from '../../Shared/components/Tabs/EpisodesTab'
 import CharactersTab from '../../Shared/components/Tabs/CharactersTab'
 import EnvironmentsTab from '../../Shared/components/Tabs/EnvironmentsTab'
 import ScenesTab from '../../Shared/components/Tabs/ScenesTab'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useGetShowByIdQuery } from '@/store/apis'
+import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { useState } from 'react'
+
 export default function SeriesDetails() {
     const { id } = useParams<{ id: string }>();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { data: response, isLoading, error } = useGetShowByIdQuery(id || '');
     const show = response?.data;
 
     type TabType = 'Overview' | "Info" | 'Episodes' | 'Characters' | 'Environments' | 'Timelines'
-    const [activeTab, setActiveTab] = useState<TabType>('Overview')
-
+    
     const tabs: TabType[] = ['Overview', 'Info', 'Episodes', 'Characters', 'Environments', 'Timelines']
+    
+    // Get active tab from URL or default to 'Overview'
+    const tabParam = searchParams.get('tab') as TabType
+    const activeTab = tabs.includes(tabParam) ? tabParam : 'Overview'
+
+    const setActiveTab = (tab: TabType) => {
+        setSearchParams({ tab });
+    }
 
     if (isLoading) {
         return (
@@ -48,29 +58,14 @@ export default function SeriesDetails() {
 
     return (
         <div className="space-y-10 pb-20">
-            {/* Top Navigation / Breadcrumbs */}
-            <div className="flex justify-between items-center bg-white/[0.02] border border-white/5 rounded-3xl px-8 py-4">
-                <div className="flex items-center gap-8">
-                    <button className="text-sm font-bold text-accent-cyan border-b-2 border-accent-cyan pb-1">Workspace</button>
-                    <button className="text-sm font-bold text-white/40 hover:text-white transition-colors pb-1">History</button>
-                    <button className="text-sm font-bold text-white/40 hover:text-white transition-colors pb-1">Exports</button>
-                </div>
+            {/* Page Header */}
+            <Breadcrumbs items={[
+                { label: 'Home', path: '/' },
+                { label: 'Series Library', path: '/dashboard/series' },
+                { label: show.title }
+            ]} />
 
-                <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-4">
-                        <button className="glass-card w-10 h-10 rounded-xl flex items-center justify-center border border-white/5">
-                            <span className="material-symbols-outlined text-white/60 text-lg">notifications</span>
-                        </button>
-                        <button className="glass-card w-10 h-10 rounded-xl flex items-center justify-center border border-white/5">
-                            <span className="material-symbols-outlined text-white/60 text-lg">auto_awesome</span>
-                        </button>
-                    </div>
-                    <button className="btn-premium px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm">add</span>
-                        New Production
-                    </button>
-                </div>
-            </div>
+
 
             {/* Hero Section */}
             <SeriesHero show={show} />
@@ -103,14 +98,14 @@ export default function SeriesDetails() {
                 )}
 
                 {activeTab === 'Episodes' && (
-                    <EpisodesTab showId={show.id} initialData={show.episodes} />
+                    <EpisodesTab showId={show.id} />
                 )}
 
                 {activeTab === 'Characters' && (
-                    <CharactersTab showId={show.id} initialData={show.characters} />
+                    <CharactersTab showId={show.id} />
                 )}
                 {activeTab === 'Environments' && (
-                    <EnvironmentsTab showId={show.id} initialData={show.storyEnvironments} />
+                    <EnvironmentsTab showId={show.id} />
                 )}
 
                 {activeTab === 'Timelines' && (

@@ -1,4 +1,12 @@
-export default function CharacterHero() {
+import { Character, Show } from "@/types";
+
+interface CharacterHeroProps {
+    character: Character;
+    show: Show
+}
+export default function CharacterHero({ character, show }: CharacterHeroProps) {
+    const { name, physicalDescription, clothingStyle, personalityTraits, role, insightLevel, voiceId, referenceImageUrl } = character;
+
     return (
         <div className="relative group">
             <div className="glass-card rounded-[3rem] p-12 border border-white/5 relative overflow-hidden flex justify-between items-center min-h-[400px]">
@@ -13,10 +21,10 @@ export default function CharacterHero() {
 
                     <div className="space-y-4">
                         <h1 className="text-6xl font-headline font-bold text-white tracking-tight leading-[0.9]">
-                            Kaelen Voss
+                            {name}
                         </h1>
                         <p className="text-white/60 text-lg leading-relaxed max-w-xl">
-                            Protagonist and lead hacktivist. Kaelen operates from the shadows of Neo-Kyoto, driven by a past erased by the megacorps.
+                            {role}
                         </p>
                     </div>
 
@@ -25,7 +33,7 @@ export default function CharacterHero() {
                             <div>
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white/30 block mb-1">Insight Level</span>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-2xl font-headline font-bold text-white">94</span>
+                                    <span className="text-2xl font-headline font-bold text-white">{insightLevel}</span>
                                     <span className="text-white/20 text-sm font-bold">%</span>
                                 </div>
                             </div>

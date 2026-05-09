@@ -5,6 +5,7 @@ export { mainApi } from './mainApi';
 export * from './storyEngine/shows.api';
 export * from './storyEngine/characters.api';
 export * from './storyEngine/episodes.api';
+export * from './storyEngine/scenes.api';
 export * from './storyEngine/storyEnvironments.api';
 
 // ─── Core ─────────────────────────────────────────────────────────────────────

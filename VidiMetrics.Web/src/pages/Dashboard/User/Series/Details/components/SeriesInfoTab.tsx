@@ -1,6 +1,8 @@
 import { useState } from 'react'
-
+import { toast } from 'sonner'
 import { Show } from '@/types/models/storyEngine';
+import { useUpdateShowMutation } from '@/store/apis/storyEngine/shows.api';
+import { ShowStatus } from '@/types/enums';
 
 interface SeriesInfoTabProps {
     show: Show;
@@ -8,6 +10,7 @@ interface SeriesInfoTabProps {
 
 export default function SeriesInfoTab({ show }: SeriesInfoTabProps) {
     const [isEditing, setIsEditing] = useState(false)
+    const [updateShow, { isLoading: isUpdating }] = useUpdateShowMutation();
 
     // Initial data from props
     const [formData, setFormData] = useState({
@@ -15,12 +18,41 @@ export default function SeriesInfoTab({ show }: SeriesInfoTabProps) {
         synopsis: show.description,
         genre: show.visualStyle,
         targetAudience: show.targetAudience,
-        status: show.status === 0 ? 'Active Production' : 'Inactive'
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setFormData(prev => ({ ...prev, [name]: value }))
+    }
+
+    const handleSave = async () => {
+        try {
+            await updateShow({
+                id: show.id,
+                body: {
+                    title: formData.title,
+                    description: formData.synopsis,
+                    visualStyle: formData.genre,
+                    targetAudience: formData.targetAudience
+                }
+            }).unwrap();
+            
+            toast.success('Series details updated successfully');
+            setIsEditing(false);
+        } catch (error) {
+            toast.error('Failed to update series details');
+            console.error('Update error:', error);
+        }
+    }
+
+    const getStatusLabel = (status: ShowStatus) => {
+        switch (status) {
+            case ShowStatus.Draft: return 'Draft';
+            case ShowStatus.InProduction: return 'In Production';
+            case ShowStatus.Published: return 'Published';
+            case ShowStatus.Archived: return 'Archived';
+            default: return 'Unknown';
+        }
     }
 
     return (
@@ -35,17 +67,18 @@ export default function SeriesInfoTab({ show }: SeriesInfoTabProps) {
                 </div>
                 
                 <button 
-                    onClick={() => setIsEditing(!isEditing)}
+                    onClick={isEditing ? handleSave : () => setIsEditing(true)}
+                    disabled={isUpdating}
                     className={`px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest font-bold flex items-center gap-2 transition-all duration-300 ${
                         isEditing 
                             ? 'bg-accent-cyan text-on-surface shadow-[0_0_15px_rgba(0,242,255,0.4)]' 
                             : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'
-                    }`}
+                    } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                    <span className="material-symbols-outlined text-sm">
-                        {isEditing ? 'save' : 'edit'}
+                    <span className={`material-symbols-outlined text-sm ${isUpdating ? 'animate-spin' : ''}`}>
+                        {isUpdating ? 'sync' : (isEditing ? 'save' : 'edit')}
                     </span>
-                    {isEditing ? 'Save Changes' : 'Edit Details'}
+                    {isUpdating ? 'Saving...' : (isEditing ? 'Save Changes' : 'Edit Details')}
                 </button>
             </div>
 
@@ -124,23 +157,13 @@ export default function SeriesInfoTab({ show }: SeriesInfoTabProps) {
                     </div>
                 </div>
 
-                {/* Status Selection (Only visible in edit mode) */}
-                {isEditing && (
-                    <div className="space-y-2 pt-4 border-t border-white/5">
-                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 pl-2">Production Status</label>
-                        <select 
-                            name="status"
-                            value={formData.status}
-                            onChange={(e: any) => handleChange(e)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-accent-cyan font-bold focus:outline-none focus:border-accent-purple/50 transition-all appearance-none"
-                        >
-                            <option value="Active Production" className="bg-dashboard-bg text-white">Active Production</option>
-                            <option value="In Planning" className="bg-dashboard-bg text-white">In Planning</option>
-                            <option value="Completed" className="bg-dashboard-bg text-white">Completed</option>
-                            <option value="Archived" className="bg-dashboard-bg text-white">Archived</option>
-                        </select>
+                {/* Status (Read Only) */}
+                <div className="space-y-2 pt-4 border-t border-white/5">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 pl-2">Production Status</label>
+                    <div className="w-full bg-black/20 border border-transparent rounded-xl px-4 py-3 text-accent-cyan font-bold">
+                        {getStatusLabel(show.status)}
                     </div>
-                )}
+                </div>
             </div>
         </div>
     )
