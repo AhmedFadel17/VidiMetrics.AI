@@ -34,14 +34,23 @@ namespace VidiMetrics.DataAccess.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(IQueryable<T> query, int page, int pageSize, string? orderBy, string? sortOrder)
+        public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(IQueryable<T> query, int page, int pageSize, string? orderBy, string? sortOrder, int? limit)
         {
 
             int totalCount = await query.CountAsync();
             // Apply sorting
             query = query.ApplyOrdering(orderBy, sortOrder);
-            // Apply pagination
-            query = query.ApplyPagination(page, pageSize);
+
+            // if limit is provided, apply it, otherwise apply pagination
+            if (limit != null)
+            {
+                query = query.Take(limit.Value);
+            }
+            else
+            {
+                // Apply pagination
+                query = query.ApplyPagination(page, pageSize);
+            }
             var items = await query.ToListAsync();
 
             return (items, totalCount);
