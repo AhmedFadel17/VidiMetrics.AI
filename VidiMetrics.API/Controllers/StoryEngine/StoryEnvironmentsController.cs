@@ -21,9 +21,9 @@ namespace VidiMetrics.API.Controllers.StoryEngine
         }
 
         [HttpGet]
-        public async Task<ActionResult<SuccessResponseDto<IEnumerable<StoryEnvironmentResponseDto>>>> GetAll()
+        public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<StoryEnvironmentResponseDto>>>> GetAll([FromQuery] StoryEnvironmentFilterDto filter)
         {
-            var results = await _service.GetAllAsync();
+            var results = await _service.GetAllAsync(filter);
             return Ok(ApiResponseFactory.Success(results, "StoryEnvironments retrieved successfully."));
         }
 

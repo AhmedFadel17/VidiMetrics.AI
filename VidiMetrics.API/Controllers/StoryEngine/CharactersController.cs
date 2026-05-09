@@ -21,9 +21,9 @@ namespace VidiMetrics.API.Controllers.StoryEngine
         }
 
         [HttpGet]
-        public async Task<ActionResult<SuccessResponseDto<IEnumerable<CharacterResponseDto>>>> GetAll()
+        public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<CharacterResponseDto>>>> GetAll([FromQuery] CharacterFilterDto filter)
         {
-            var results = await _service.GetAllAsync();
+            var results = await _service.GetAllAsync(filter);
             return Ok(ApiResponseFactory.Success(results, "Characters retrieved successfully."));
         }
 

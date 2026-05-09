@@ -21,9 +21,9 @@ namespace VidiMetrics.API.Controllers.StoryEngine
         }
 
         [HttpGet]
-        public async Task<ActionResult<SuccessResponseDto<IEnumerable<EpisodeResponseDto>>>> GetAll()
+        public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<EpisodeResponseDto>>>> GetAll([FromQuery] EpisodeFilterDto filter)
         {
-            var results = await _service.GetAllAsync();
+            var results = await _service.GetAllAsync(filter);
             return Ok(ApiResponseFactory.Success(results, "Episodes retrieved successfully."));
         }
 
