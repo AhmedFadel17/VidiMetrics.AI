@@ -19,13 +19,7 @@ export default function Sidebar() {
         </Link>
       </div>
 
-      {/* New Production Button */}
-      <div className="px-8 mb-8">
-        <button className="w-full py-2 btn-premium rounded-2xl flex items-center justify-center gap-3">
-          <span className="material-symbols-outlined text-2xl">add</span>
-          <span className="uppercase tracking-widest text-xs font-black">New Production</span>
-        </button>
-      </div>
+
 
       {/* Navigation */}
       <nav className="flex-1 px-4 space-y">
@@ -57,22 +51,18 @@ export default function Sidebar() {
         <div className="glass-card rounded-3xl p-5 relative overflow-hidden group border border-white/10">
           <div className="absolute top-0 right-0 w-24 h-24 bg-accent-pink/10 blur-3xl -mr-8 -mt-8 group-hover:bg-accent-pink/20 transition-colors"></div>
           <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-accent-pink/20 flex items-center justify-center border border-accent-pink/30">
-                <span className="material-symbols-outlined text-accent-pink text-xl">stars</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-white font-bold text-sm">Pro Producer</span>
-                <span className="text-white/40 text-[10px] font-bold uppercase tracking-widest">{user?.profile.name?.split(' ')[0] || 'User'}</span>
-              </div>
-            </div>
+
 
             <div className="space-y-2">
               <div className="flex justify-between text-[10px] font-black uppercase tracking-tighter">
-                <span className="text-white/40">75% Render Credits used</span>
+                <span className="text-white/40">Render Credits</span>
+                <span className="text-primary">84%</span>
               </div>
               <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-accent-purple to-accent-pink w-[75%] shadow-[0_0_10px_rgba(255,0,127,0.5)]"></div>
+                <div className="h-full bg-gradient-to-r from-accent-purple to-primary w-[84%] shadow-[0_0_10px_rgba(255,0,127,0.5)]"></div>
+              </div>
+              <div className="flex justify-between text-xs font-[500] text-white/40 tracking-tighter">
+                <span className="">12,400 / 15,000 available</span>
               </div>
             </div>
           </div>
