@@ -1,5 +1,6 @@
 using System.Linq;
 using AutoMapper;
+using VidiMetrics.Application.DTOs.Ai.AiImages;
 using VidiMetrics.Application.DTOs.Ai.AiPromptTemplates;
 using VidiMetrics.Application.DTOs.Ai.AiTasks;
 using VidiMetrics.Application.DTOs.Ai.ShortsProjects;
@@ -42,6 +43,10 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<UpdateAiTaskDto, AiTask>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<AiTask, AiTaskResponseDto>();
+
+            CreateMap<UpdateAiImageDto, AiImage>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<AiImage, AiImageResponseDto>();
 
             CreateMap<CreateShortsProjectDto, ShortsProject>();
             CreateMap<UpdateShortsProjectDto, ShortsProject>()
@@ -145,6 +150,12 @@ namespace VidiMetrics.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Scene, SceneResponseDto>()
                 .ForMember(dest => dest.Characters, opt => opt.MapFrom(src => src.SceneCharacters.Select(sc => sc.Character)));
+
+            CreateMap<VidiMetrics.Application.DTOs.Ai.AiScripts.CreateAiScriptDto, AiScript>();
+            CreateMap<VidiMetrics.Application.DTOs.Ai.AiScripts.UpdateAiScriptDto, AiScript>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<AiScript, VidiMetrics.Application.DTOs.Ai.AiScripts.AiScriptResponseDto>();
+            CreateMap<ScriptLine, VidiMetrics.Application.DTOs.Ai.AiScripts.ScriptLineResponseDto>();
         }
     }
 }

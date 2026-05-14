@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.DataAccess.Data;
 using VidiMetrics.DataAccess.Repositories;
-using VidiMetrics.DataAccess.Repositories.Core.Videos;
+using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.Ai.AiPromptTemplates;
 using VidiMetrics.DataAccess.Repositories.Ai.AiTasks;
 using VidiMetrics.DataAccess.Repositories.Ai.ShortsProjects;
@@ -12,6 +12,7 @@ using VidiMetrics.DataAccess.Repositories.Core.Channels;
 using VidiMetrics.DataAccess.Repositories.Core.LocalVideos;
 using VidiMetrics.DataAccess.Repositories.Core.PlaylistItems;
 using VidiMetrics.DataAccess.Repositories.Core.Playlists;
+using VidiMetrics.DataAccess.Repositories.Core.Videos;
 using VidiMetrics.DataAccess.Repositories.Core.YouTubeVideos;
 using VidiMetrics.DataAccess.Repositories.Infra.ApiUsageQuotas;
 using VidiMetrics.DataAccess.Repositories.Infra.UserProfiles;
@@ -21,10 +22,10 @@ using VidiMetrics.DataAccess.Repositories.Seo.Keywords;
 using VidiMetrics.DataAccess.Repositories.Seo.SeoAudits;
 using VidiMetrics.DataAccess.Repositories.Seo.VideoTags;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
-using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 
 namespace VidiMetrics.DataAccess
 {
@@ -37,6 +38,7 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<IVideosRepository, VideosRepository>();
             services.AddScoped<IAiPromptTemplatesRepository, AiPromptTemplatesRepository>();
             services.AddScoped<IAiTasksRepository, AiTasksRepository>();
+            services.AddScoped<IAiImagesRepository, AiImagesRepository>();
             services.AddScoped<IShortsProjectsRepository, ShortsProjectsRepository>();
             services.AddScoped<ITranscriptsRepository, TranscriptsRepository>();
             services.AddScoped<IChannelsRepository, ChannelsRepository>();

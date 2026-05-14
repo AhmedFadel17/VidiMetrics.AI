@@ -20,6 +20,8 @@ namespace VidiMetrics.DataAccess.Data
         // Ai
         public DbSet<AiPromptTemplate> AiPromptTemplates { get; set; }
         public DbSet<AiTask> AiTasks { get; set; }
+        public DbSet<AiImage> AiImages { get; set; }
+        public DbSet<AiScript> AiScripts { get; set; }
         public DbSet<ShortsProject> ShortsProjects { get; set; }
         public DbSet<Transcript> Transcripts { get; set; }
 
@@ -70,11 +72,6 @@ namespace VidiMetrics.DataAccess.Data
                 .HasForeignKey("ShortsProjectId")
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Scene>()
-                .HasOne(s => s.StoryEnvironment)
-                .WithMany(se => se.Scenes)
-                .HasForeignKey(s => s.StoryEnvironmentId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Episode>()
                 .HasOne(e => e.FinalVideo)
@@ -108,6 +105,18 @@ namespace VidiMetrics.DataAccess.Data
                 .HasOne(sc => sc.Character)
                 .WithMany(c => c.SceneCharacters)
                 .HasForeignKey(sc => sc.CharacterId);
+
+            modelBuilder.Entity<Scene>()
+                .HasOne(s => s.AiScript)
+                .WithOne(a => a.Scene)
+                .HasForeignKey<AiScript>(a => a.SceneId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AiScript>()
+                .HasOne(a => a.StoryEnvironment)
+                .WithMany()
+                .HasForeignKey(a => a.StoryEnvironmentId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // UserProfile Configuration
             modelBuilder.Entity<UserProfile>(entity =>

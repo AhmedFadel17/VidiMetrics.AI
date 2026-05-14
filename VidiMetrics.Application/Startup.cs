@@ -1,15 +1,13 @@
+using System;
+using System.Threading.Tasks;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using System.Threading.Tasks;
-using System;
 using VidiMetrics.Application.Interfaces.Ai;
-
 using VidiMetrics.Application.Interfaces.Core;
 using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Interfaces.Seo;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.Application.Services.Ai;
-
 using VidiMetrics.Application.Services.Core;
 using VidiMetrics.Application.Services.Infra;
 using VidiMetrics.Application.Services.Seo;
@@ -32,6 +30,7 @@ namespace VidiMetrics.Application
             services.AddScoped<IVideosService, VideosService>();
             services.AddScoped<IAiPromptTemplatesService, AiPromptTemplatesService>();
             services.AddScoped<IAiTasksService, AiTasksService>();
+            services.AddScoped<IAiImagesService, AiImagesService>();
             services.AddScoped<IApiUsageQuotasService, ApiUsageQuotasService>();
             services.AddScoped<IChannelsService, ChannelsService>();
             services.AddScoped<ICharactersService, CharactersService>();
