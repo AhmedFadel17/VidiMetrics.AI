@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using VidiMetrics.Domain.Models.Ai;
+
 namespace VidiMetrics.Domain.Models.StoryEngine;
 
 public class Character : BaseEntity
@@ -8,9 +11,17 @@ public class Character : BaseEntity
     public string PersonalityTraits { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
     public int InsightLevel { get; set; } = 0;
-    public string? VoiceId { get; set; }
 
-    public string? ReferenceImageUrl { get; set; }
+    public Guid? VoiceProfileId { get; set; }
+
+    [ForeignKey("VoiceProfileId")]
+    public VoiceProfile? VoiceProfile { get; set; }
+
+    public Guid? AiImageId { get; set; }
+    [ForeignKey("AiImageId")]
+    public AiImage? AiImage { get; set; }
+    [NotMapped]
+    public string? ReferenceImageUrl => AiImage?.ImageUrl;
 
     public Guid ShowId { get; set; }
     public Show Show { get; set; } = null!;

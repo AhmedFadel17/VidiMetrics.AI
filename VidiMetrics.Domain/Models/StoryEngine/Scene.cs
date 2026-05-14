@@ -1,16 +1,15 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using VidiMetrics.Domain.Models.Ai;
+
 namespace VidiMetrics.Domain.Models.StoryEngine;
 
 public class Scene : BaseEntity
 {
     public int Order { get; set; }
-    public string Script { get; set; } = string.Empty;
-    public string VisualPrompt { get; set; } = string.Empty;
-
-    public Guid StoryEnvironmentId { get; set; }
-    public StoryEnvironment StoryEnvironment { get; set; } = null!;
 
     public Guid EpisodeId { get; set; }
     public Episode Episode { get; set; } = null!;
 
     public ICollection<SceneCharacter> SceneCharacters { get; set; } = new List<SceneCharacter>();
+    public AiScript? AiScript { get; set; }
 }
