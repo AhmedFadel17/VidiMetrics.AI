@@ -1,12 +1,14 @@
-using AutoMapper;
-using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 using VidiMetrics.Domain.Models.StoryEngine;
 
@@ -15,33 +17,42 @@ namespace VidiMetrics.Application.Services.StoryEngine
     public class StoryEnvironmentsService : IStoryEnvironmentsService
     {
         private readonly IStoryEnvironmentsRepository _repository;
+        private readonly IShowsRepository _showsRepository;
         private readonly IMapper _mapper;
         private readonly IValidator<CreateStoryEnvironmentDto> _createValidator;
         private readonly IValidator<UpdateStoryEnvironmentDto> _updateValidator;
 
         public StoryEnvironmentsService(
-            IStoryEnvironmentsRepository repository, 
+            IStoryEnvironmentsRepository repository,
+
+            IShowsRepository showsRepository,
             IMapper mapper,
             IValidator<CreateStoryEnvironmentDto> createValidator,
             IValidator<UpdateStoryEnvironmentDto> updateValidator)
         {
             _repository = repository;
+            _showsRepository = showsRepository;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
         }
 
-        public async Task<StoryEnvironmentResponseDto> GetByIdAsync(Guid id)
+        public async Task<StoryEnvironmentResponseDto> GetByIdAsync(Guid id, Guid userId)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .Include(x => x.AiImage)
+                .FirstOrDefaultAsync(e => e.Id == id && e.Show.UserId == userId);
             if (entity == null) throw new Exception("StoryEnvironment not found.");
 
             return _mapper.Map<StoryEnvironmentResponseDto>(entity);
         }
 
-        public async Task<PaginationResponseDto<StoryEnvironmentResponseDto>> GetAllAsync(StoryEnvironmentFilterDto filter)
+        public async Task<PaginationResponseDto<StoryEnvironmentResponseDto>> GetAllAsync(StoryEnvironmentFilterDto filter, Guid userId)
         {
-            var query = _repository.Query();
+            IQueryable<StoryEnvironment> query = _repository.Query()
+                .Include(x => x.AiImage);
+
+            query = query.Where(x => x.Show.UserId == userId);
 
             if (filter.ShowId.HasValue)
             {
@@ -50,7 +61,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
             if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
             {
-                query = query.Where(x => x.Name.ToLower().Contains(filter.SearchTerm.ToLower()) || 
+                query = query.Where(x => x.Name.ToLower().Contains(filter.SearchTerm.ToLower()) ||
+
                                        x.VisualDescription.ToLower().Contains(filter.SearchTerm.ToLower()) ||
                                        x.Atmosphere.ToLower().Contains(filter.SearchTerm.ToLower()));
             }
@@ -77,9 +89,36 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<PaginationResponseDto<StoryEnvironmentResponseDto>>(paginationSource);
         }
 
-        public async Task<StoryEnvironmentResponseDto> CreateAsync(CreateStoryEnvironmentDto dto)
+        public async Task<IEnumerable<LookupDto>> GetLookupAsync(Guid userId, Guid? showId = null)
+        {
+            var query = _repository.Query();
+
+            query = query.Where(x => x.Show.UserId == userId);
+
+            if (showId.HasValue)
+            {
+                query = query.Where(x => x.ShowId == showId.Value);
+            }
+
+            return await query
+                .OrderBy(x => x.Name)
+                .Select(x => new LookupDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    ImageUrl = x.ReferenceImageUrl
+                })
+                .ToListAsync();
+        }
+
+        public async Task<StoryEnvironmentResponseDto> CreateAsync(CreateStoryEnvironmentDto dto, Guid userId)
         {
             await _createValidator.ValidateAndThrowAsync(dto);
+
+            var showExists = await _showsRepository.Query()
+                .AnyAsync(s => s.Id == dto.ShowId && s.UserId == userId);
+
+            if (!showExists) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
 
             var entity = _mapper.Map<StoryEnvironment>(dto);
             entity.CreatedAt = DateTime.UtcNow;
@@ -90,11 +129,12 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<StoryEnvironmentResponseDto>(entity);
         }
 
-        public async Task<StoryEnvironmentResponseDto> UpdateAsync(Guid id, UpdateStoryEnvironmentDto dto)
+        public async Task<StoryEnvironmentResponseDto> UpdateAsync(Guid id, UpdateStoryEnvironmentDto dto, Guid userId)
         {
             await _updateValidator.ValidateAndThrowAsync(dto);
 
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
             if (entity == null) throw new Exception("StoryEnvironment not found.");
 
             _mapper.Map(dto, entity);
@@ -106,9 +146,10 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<StoryEnvironmentResponseDto>(entity);
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id, Guid userId)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
             if (entity == null) throw new Exception("StoryEnvironment not found.");
 
             _repository.Remove(entity);

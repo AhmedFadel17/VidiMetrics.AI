@@ -7,9 +7,6 @@ namespace VidiMetrics.Application.Validators.StoryEngine.Scenes
     {
         public CreateSceneValidator()
         {
-            RuleFor(x => x.Script).NotEmpty();
-            RuleFor(x => x.VisualPrompt).NotEmpty();
-            RuleFor(x => x.StoryEnvironmentId).NotEmpty();
             RuleFor(x => x.EpisodeId).NotEmpty();
             RuleFor(x => x.Order).GreaterThanOrEqualTo(0);
         }

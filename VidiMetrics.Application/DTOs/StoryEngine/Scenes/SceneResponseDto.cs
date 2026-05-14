@@ -12,11 +12,8 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Scenes
         public Guid? CreatedBy { get; set; }
         public bool IsDeleted { get; set; }
         public int Order { get; set; }
-        public string Script { get; set; } = string.Empty;
-        public string VisualPrompt { get; set; } = string.Empty;
-        public Guid StoryEnvironmentId { get; set; }
-        public StoryEnvironmentResponseDto StoryEnvironment { get; set; } = null!;
         public Guid EpisodeId { get; set; }
+        public VidiMetrics.Application.DTOs.Ai.AiScripts.AiScriptResponseDto? AiScript { get; set; }
         public ICollection<CharacterResponseDto> Characters { get; set; } = new List<CharacterResponseDto>();
     }
 }

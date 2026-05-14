@@ -1,10 +1,10 @@
-using AutoMapper;
-using FluentValidation;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
@@ -12,6 +12,7 @@ using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -22,6 +23,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly ICharactersRepository _charactersRepository;
         private readonly IEpisodesRepository _episodesRepository;
         private readonly IStoryEnvironmentsRepository _storyEnvironmentsRepository;
+        private readonly IShowsRepository _showsRepository;
         private readonly IMapper _mapper;
         private readonly IValidator<CreateSceneDto> _createValidator;
         private readonly IValidator<UpdateSceneDto> _updateValidator;
@@ -31,6 +33,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             ICharactersRepository charactersRepository,
             IEpisodesRepository episodesRepository,
             IStoryEnvironmentsRepository storyEnvironmentsRepository,
+            IShowsRepository showsRepository,
             IMapper mapper,
             IValidator<CreateSceneDto> createValidator,
             IValidator<UpdateSceneDto> updateValidator)
@@ -39,46 +42,41 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _charactersRepository = charactersRepository;
             _episodesRepository = episodesRepository;
             _storyEnvironmentsRepository = storyEnvironmentsRepository;
+            _showsRepository = showsRepository;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
         }
 
-        public async Task<SceneResponseDto> GetByIdAsync(Guid id)
+        public async Task<SceneResponseDto> GetByIdAsync(Guid id, Guid userId)
         {
             var entity = await _repository.Query()
-                .Include(s => s.StoryEnvironment)
+                .Include(s => s.AiScript)
+                    .ThenInclude(x => x.StoryEnvironment)
                 .Include(s => s.SceneCharacters)
                     .ThenInclude(sc => sc.Character)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id && s.Episode.Show.UserId == userId);
 
             if (entity == null) throw new Exception("Scene not found.");
 
             return _mapper.Map<SceneResponseDto>(entity);
         }
 
-        public async Task<PaginationResponseDto<SceneResponseDto>> GetAllAsync(SceneFilterDto filter)
+        public async Task<PaginationResponseDto<SceneResponseDto>> GetAllAsync(SceneFilterDto filter, Guid userId)
         {
             IQueryable<Scene> query = _repository.Query()
-                .Include(s => s.StoryEnvironment)
+                .Include(s => s.AiScript)
+                    .ThenInclude(x => x.StoryEnvironment)
                 .Include(s => s.SceneCharacters)
                     .ThenInclude(sc => sc.Character);
+
+            query = query.Where(x => x.Episode.Show.UserId == userId);
 
             if (filter.EpisodeId.HasValue)
             {
                 query = query.Where(x => x.EpisodeId == filter.EpisodeId.Value);
             }
 
-            if (filter.StoryEnvironmentId.HasValue)
-            {
-                query = query.Where(x => x.StoryEnvironmentId == filter.StoryEnvironmentId.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-            {
-                query = query.Where(x => x.Script.ToLower().Contains(filter.SearchTerm.ToLower()) || 
-                                       x.VisualPrompt.ToLower().Contains(filter.SearchTerm.ToLower()));
-            }
 
             if (filter.CreatedAfter.HasValue)
             {
@@ -102,17 +100,16 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<PaginationResponseDto<SceneResponseDto>>(paginationSource);
         }
 
-        public async Task<SceneResponseDto> CreateAsync(CreateSceneDto dto)
+        public async Task<SceneResponseDto> CreateAsync(CreateSceneDto dto, Guid userId)
         {
             await _createValidator.ValidateAndThrowAsync(dto);
 
-            // Validation: Show consistency
-            var episode = await _episodesRepository.GetByIdAsync(dto.EpisodeId);
-            if (episode == null) throw new Exception("Episode not found.");
-
-            var environment = await _storyEnvironmentsRepository.GetByIdAsync(dto.StoryEnvironmentId);
-            if (environment == null) throw new Exception("Story environment not found.");
-            if (environment.ShowId != episode.ShowId) throw new Exception("Story environment must belong to the same show as the episode.");
+            // Validation: Show consistency and Authority
+            var episode = await _episodesRepository.Query()
+                .Include(e => e.Show)
+                .FirstOrDefaultAsync(e => e.Id == dto.EpisodeId && e.Show.UserId == userId);
+            
+            if (episode == null) throw new Exception("Episode not found or access denied.");
 
             var entity = _mapper.Map<Scene>(dto);
             entity.CreatedAt = DateTime.UtcNow;
@@ -136,25 +133,23 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
-            return await GetByIdAsync(entity.Id);
+            return await GetByIdAsync(entity.Id, userId);
         }
 
-        public async Task<SceneResponseDto> UpdateAsync(Guid id, UpdateSceneDto dto)
+        public async Task<SceneResponseDto> UpdateAsync(Guid id, UpdateSceneDto dto, Guid userId)
         {
             await _updateValidator.ValidateAndThrowAsync(dto);
 
             var entity = await _repository.Query()
                 .Include(s => s.SceneCharacters)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id && s.Episode.Show.UserId == userId);
 
             if (entity == null) throw new Exception("Scene not found.");
 
             // Validation: Show consistency
-            var episode = await _episodesRepository.GetByIdAsync(entity.EpisodeId);
-            
-            var environment = await _storyEnvironmentsRepository.GetByIdAsync(dto.StoryEnvironmentId);
-            if (environment == null) throw new Exception("Story environment not found.");
-            if (environment.ShowId != episode.ShowId) throw new Exception("Story environment must belong to the same show as the episode.");
+            var episode = await _episodesRepository.Query()
+                .FirstOrDefaultAsync(e => e.Id == entity.EpisodeId);
+            if (episode == null) throw new Exception("Episode not found.");
 
             _mapper.Map(dto, entity);
             entity.UpdatedAt = DateTime.UtcNow;
@@ -178,12 +173,13 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _repository.Update(entity);
             await _repository.SaveChangesAsync();
 
-            return await GetByIdAsync(entity.Id);
+            return await GetByIdAsync(entity.Id, userId);
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id, Guid userId)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(s => s.Id == id && s.Episode.Show.UserId == userId);
             if (entity == null) throw new Exception("Scene not found.");
 
             _repository.Remove(entity);

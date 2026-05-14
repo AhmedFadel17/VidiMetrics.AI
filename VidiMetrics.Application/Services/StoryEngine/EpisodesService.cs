@@ -8,6 +8,8 @@ using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
+using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -15,33 +17,39 @@ namespace VidiMetrics.Application.Services.StoryEngine
     public class EpisodesService : IEpisodesService
     {
         private readonly IEpisodesRepository _repository;
+        private readonly IShowsRepository _showsRepository;
         private readonly IMapper _mapper;
         private readonly IValidator<CreateEpisodeDto> _createValidator;
         private readonly IValidator<UpdateEpisodeDto> _updateValidator;
 
         public EpisodesService(
             IEpisodesRepository repository, 
+            IShowsRepository showsRepository,
             IMapper mapper,
             IValidator<CreateEpisodeDto> createValidator,
             IValidator<UpdateEpisodeDto> updateValidator)
         {
             _repository = repository;
+            _showsRepository = showsRepository;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
         }
 
-        public async Task<EpisodeResponseDto> GetByIdAsync(Guid id)
+        public async Task<EpisodeResponseDto> GetByIdAsync(Guid id, Guid userId)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(e => e.Id == id && e.Show.UserId == userId);
             if (entity == null) throw new Exception("Episode not found.");
 
             return _mapper.Map<EpisodeResponseDto>(entity);
         }
 
-        public async Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(EpisodeFilterDto filter)
+        public async Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(EpisodeFilterDto filter, Guid userId)
         {
             var query = _repository.Query();
+
+            query = query.Where(x => x.Show.UserId == userId);
 
             if (filter.ShowId.HasValue)
             {
@@ -76,9 +84,14 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<PaginationResponseDto<EpisodeResponseDto>>(paginationSource);
         }
 
-        public async Task<EpisodeResponseDto> CreateAsync(CreateEpisodeDto dto)
+        public async Task<EpisodeResponseDto> CreateAsync(CreateEpisodeDto dto, Guid userId)
         {
             await _createValidator.ValidateAndThrowAsync(dto);
+
+            var showExists = await _showsRepository.Query()
+                .AnyAsync(s => s.Id == dto.ShowId && s.UserId == userId);
+
+            if (!showExists) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
 
             var entity = _mapper.Map<Episode>(dto);
             entity.CreatedAt = DateTime.UtcNow;
@@ -89,11 +102,12 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<EpisodeResponseDto>(entity);
         }
 
-        public async Task<EpisodeResponseDto> UpdateAsync(Guid id, UpdateEpisodeDto dto)
+        public async Task<EpisodeResponseDto> UpdateAsync(Guid id, UpdateEpisodeDto dto, Guid userId)
         {
             await _updateValidator.ValidateAndThrowAsync(dto);
 
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
             if (entity == null) throw new Exception("Episode not found.");
 
             _mapper.Map(dto, entity);
@@ -105,9 +119,10 @@ namespace VidiMetrics.Application.Services.StoryEngine
             return _mapper.Map<EpisodeResponseDto>(entity);
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(Guid id, Guid userId)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
             if (entity == null) throw new Exception("Episode not found.");
 
             _repository.Remove(entity);

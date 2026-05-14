@@ -8,9 +8,9 @@ namespace VidiMetrics.Application.Interfaces.StoryEngine;
 
 public interface IEpisodesService
 {
-    Task<EpisodeResponseDto> GetByIdAsync(Guid id);
-    Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(EpisodeFilterDto filter);
-    Task<EpisodeResponseDto> CreateAsync(CreateEpisodeDto dto);
-    Task<EpisodeResponseDto> UpdateAsync(Guid id, UpdateEpisodeDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<EpisodeResponseDto> GetByIdAsync(Guid id, Guid userId);
+    Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(EpisodeFilterDto filter, Guid userId);
+    Task<EpisodeResponseDto> CreateAsync(CreateEpisodeDto dto, Guid userId);
+    Task<EpisodeResponseDto> UpdateAsync(Guid id, UpdateEpisodeDto dto, Guid userId);
+    Task<bool> DeleteAsync(Guid id, Guid userId);
 }

@@ -8,9 +8,10 @@ namespace VidiMetrics.Application.Interfaces.StoryEngine;
 
 public interface ICharactersService
 {
-    Task<CharacterResponseDto> GetByIdAsync(Guid id);
-    Task<PaginationResponseDto<CharacterResponseDto>> GetAllAsync(CharacterFilterDto filter);
-    Task<CharacterResponseDto> CreateAsync(CreateCharacterDto dto);
-    Task<CharacterResponseDto> UpdateAsync(Guid id, UpdateCharacterDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<CharacterResponseDto> GetByIdAsync(Guid id, Guid userId);
+    Task<PaginationResponseDto<CharacterResponseDto>> GetAllAsync(CharacterFilterDto filter, Guid userId);
+    Task<IEnumerable<LookupDto>> GetLookupAsync(Guid userId, Guid? showId = null);
+    Task<CharacterResponseDto> CreateAsync(CreateCharacterDto dto, Guid userId);
+    Task<CharacterResponseDto> UpdateAsync(Guid id, UpdateCharacterDto dto, Guid userId);
+    Task<bool> DeleteAsync(Guid id, Guid userId);
 }
