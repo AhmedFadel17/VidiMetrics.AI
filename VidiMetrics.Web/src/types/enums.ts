@@ -66,3 +66,8 @@ export enum YouTubePrivacyStatus {
   Private = 2,
   Unknown = 3,
 }
+
+export enum ScriptLineType {
+  Character = 0,
+  ActionDescription = 1,
+}

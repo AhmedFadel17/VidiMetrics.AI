@@ -47,7 +47,7 @@ export default function CharacterDetails() {
                 { label: 'Home', path: '/' },
                 { label: 'Series Library', path: '/dashboard/series' },
                 { label: show.title, path: `/dashboard/series/${show.id}` },
-                { label: 'Characters', path: `/dashboard/series/${show.id}/characters` },
+                { label: 'Characters', path: `/dashboard/series/${show.id}?tab=Characters` },
                 { label: character.name },
             ]} />
 

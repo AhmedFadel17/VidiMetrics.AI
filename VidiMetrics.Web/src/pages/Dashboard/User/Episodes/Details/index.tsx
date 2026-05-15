@@ -83,7 +83,7 @@ export default function EpisodeDetails() {
                     <EpisodeInfoTab episode={episode} />
                 )}
                 {activeTab === 'Scenes' && (
-                    <ScenesTab episodeId={episode.id} />
+                    <ScenesTab episodeId={episode.id} showId={show.id} />
                 )}
             </div>
         </div>

@@ -25,3 +25,9 @@ export interface PaginationFilter {
     searchTerm?: string;
     limit?: number;
 }
+
+export interface Lookup {
+    id: string;
+    name: string;
+    imageUrl?: string;
+}

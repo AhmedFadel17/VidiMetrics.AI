@@ -1,5 +1,5 @@
 import { mainApi } from '../mainApi';
-import { ApiResponse, PaginationResponse, PaginationFilter } from '@/types/api';
+import { ApiResponse, PaginationResponse, PaginationFilter, Lookup } from '@/types/api';
 import { StoryEnvironment } from '@/types/models/storyEngine';
 
 export interface CreateStoryEnvironmentRequest {
@@ -69,12 +69,27 @@ export const storyEnvironmentsApi = mainApi.injectEndpoints({
         { type: 'StoryEnvironment', id: 'LIST' },
       ],
     }),
+ 
+    getEnvironmentsLookup: builder.query<ApiResponse<Lookup[]>, string | undefined>({
+      query: (showId) => ({
+        url: '/api/storyenvironments/lookup',
+        params: showId ? { showId } : undefined,
+      }),
+      providesTags: (result) =>
+        result?.data
+          ? [
+              ...result.data.map(({ id }) => ({ type: 'StoryEnvironment' as const, id })),
+              { type: 'StoryEnvironment', id: 'LOOKUP' },
+            ]
+          : [{ type: 'StoryEnvironment', id: 'LOOKUP' }],
+    }),
   }),
 });
 
 export const {
   useGetEnvironmentsQuery,
   useGetEnvironmentByIdQuery,
+  useGetEnvironmentsLookupQuery,
   useCreateEnvironmentMutation,
   useUpdateEnvironmentMutation,
   useDeleteEnvironmentMutation,

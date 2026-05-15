@@ -14,6 +14,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.7.7",
+    "framer-motion": "^12.38.0",
     "jwt-decode": "^4.0.0",
     "oidc-client-ts": "^3.5.0",
     "react": "^18.3.1",

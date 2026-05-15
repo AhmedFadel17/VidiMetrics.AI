@@ -5,30 +5,41 @@ import * as z from 'zod'
 import { toast } from 'sonner'
 import { useCreateSceneMutation } from '@/store/apis/storyEngine/scenes.api'
 import { useGetShowByIdQuery, useGetEpisodeByIdQuery } from '@/store/apis'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import { useGetCharactersLookupQuery } from '@/store/apis/storyEngine/characters.api'
+import { useGetEnvironmentsLookupQuery } from '@/store/apis/storyEngine/storyEnvironments.api'
 import { LoadingScreen, ErrorScreen } from '@/components/ui/Feedback/StatusScreens'
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import ScriptEditor, { ScriptLine, makeId } from './ScriptEditor'
 
 const sceneSchema = z.object({
   order: z.number().min(1, 'Order must be at least 1'),
-  script: z.string().min(10, 'Script must be detailed'),
   visualPrompt: z.string().min(10, 'Visual prompt must be detailed'),
   storyEnvironmentId: z.string().min(1, 'Please select an environment'),
   characterIds: z.array(z.string()).min(1, 'Please select at least one character'),
+  mood: z.string().optional(),
 })
 
 type SceneFormValues = z.infer<typeof sceneSchema>
 
+const MOODS = ['CYBER-NOIR', 'NEON-RETRO', 'BIO-GLITCH', 'VOID-SILENCE', 'TECHNO-DREAM', 'DUST-WAVE']
+
 export default function SceneSetup() {
-  const { showId, episodeId } = useParams<{ showId: string, episodeId: string }>();
+  const { showId, episodeId } = useParams<{ showId: string; episodeId: string }>()
   const navigate = useNavigate()
-  
-  const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId || '');
-  const { data: episodeResponse, isLoading: isEpisodeLoading } = useGetEpisodeByIdQuery(episodeId || '');
+  const [isCharacterPickerOpen, setIsCharacterPickerOpen] = useState(false)
+  const [scriptLines, setScriptLines] = useState<ScriptLine[]>([])
+
+  const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId || '')
+  const { data: episodeResponse, isLoading: isEpisodeLoading } = useGetEpisodeByIdQuery(episodeId || '')
+  const { data: charactersLookupResponse, isLoading: isCharactersLoading } = useGetCharactersLookupQuery(showId)
+  const { data: environmentsLookupResponse, isLoading: isEnvironmentsLoading } = useGetEnvironmentsLookupQuery(showId)
   const [createScene, { isLoading: isCreating }] = useCreateSceneMutation()
 
-  const show = showResponse?.data;
-  const episode = episodeResponse?.data;
+  const show = showResponse?.data
+  const episode = episodeResponse?.data
+  const charactersLookup = charactersLookupResponse?.data || []
+  const environmentsLookup = environmentsLookupResponse?.data || []
 
   const {
     register,
@@ -41,37 +52,72 @@ export default function SceneSetup() {
     defaultValues: {
       order: (episode?.scenes?.length || 0) + 1,
       characterIds: [],
-    }
+      mood: 'CYBER-NOIR',
+      visualPrompt: '',
+    },
   })
 
-  const selectedCharacters = watch('characterIds');
+  const selectedEnvironmentId = watch('storyEnvironmentId')
+  const selectedCharacterIds = watch('characterIds')
+  const selectedMood = watch('mood')
+
+  const selectedEnvironment = useMemo(
+    () => environmentsLookup.find(e => e.id === selectedEnvironmentId),
+    [environmentsLookup, selectedEnvironmentId]
+  )
+  const selectedCharacters = useMemo(
+    () => charactersLookup.filter(c => selectedCharacterIds.includes(c.id)),
+    [charactersLookup, selectedCharacterIds]
+  )
+
+  // Sync env line whenever selected environment changes
+  useEffect(() => {
+    if (!selectedEnvironment) return
+    setScriptLines(prev => {
+      const envIdx = prev.findIndex(l => l.type === 'env')
+      const envLine = { id: envIdx >= 0 ? prev[envIdx].id : makeId(), type: 'env' as const, weather: (prev[envIdx] as any)?.weather ?? '', details: (prev[envIdx] as any)?.details ?? '' }
+      if (envIdx >= 0) {
+        const next = [...prev]
+        next[envIdx] = envLine
+        return next
+      }
+      return [envLine, ...prev]
+    })
+  }, [selectedEnvironmentId])
 
   const toggleCharacter = (charId: string) => {
-    const current = selectedCharacters || [];
+    const current = selectedCharacterIds || []
     if (current.includes(charId)) {
-        setValue('characterIds', current.filter(id => id !== charId));
+      setValue('characterIds', current.filter(id => id !== charId), { shouldValidate: true })
     } else {
-        setValue('characterIds', [...current, charId]);
+      setValue('characterIds', [...current, charId], { shouldValidate: true })
     }
   }
 
   const onSubmit = async (values: SceneFormValues) => {
-    if (!episodeId) return;
+    if (!episodeId) return
+
+    // Validate that at least some script content exists
+    const bodyLines = scriptLines.filter(l => l.type !== 'env')
+    if (bodyLines.length === 0) {
+      toast.error('Script Empty', { description: 'Add at least one character line or direction.' })
+      return
+    }
 
     try {
       await createScene({
         ...values,
-        episodeId: episodeId,
+        episodeId,
+        script: JSON.stringify(scriptLines),
       }).unwrap()
-      
+
       toast.success('Scene Initialized', {
         description: 'Parameters accepted. Neural engine is rendering the storyboard...',
       })
-      
-      setTimeout(() => {
-        navigate(`/dashboard/series/${showId}/episodes/${episodeId}`)
-      }, 1500)
 
+      setTimeout(() => {
+        navigate(`/dashboard/series/${showId}/episodes/${episodeId}?tab=Scenes`)
+      }, 1500)
     } catch (error: any) {
       toast.error('Initialization Failed', {
         description: error.data?.message || 'System failure during scene creation.',
@@ -79,163 +125,225 @@ export default function SceneSetup() {
     }
   }
 
-  if (isShowLoading || isEpisodeLoading) return <LoadingScreen message="Syncing Scene Parameters..." accentColor="cyan" />;
-  if (!show || !episode) return <ErrorScreen title="Context Lost" message="Unable to retrieve episode data for scene placement." />;
+  if (isShowLoading || isEpisodeLoading || isCharactersLoading || isEnvironmentsLoading)
+    return <LoadingScreen message="Syncing Scene Parameters..." accentColor="cyan" />
+
+  if (!show || !episode)
+    return <ErrorScreen title="Context Lost" message="Unable to retrieve episode data for scene placement." />
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in-up pb-20">
+    <main className="w-full min-h-screen pb-20 animate-fade-in">
+      {/* ── Header & Breadcrumbs ─────────────────────────────────────────── */}
       <div className="space-y-4">
-          <Breadcrumbs
-            items={[
-              { label: 'Series Library', path: '/dashboard/series', icon: 'shelves' },
-              { label: show.title, path: `/dashboard/series/${show.id}`, icon: 'movie' },
-              { label: `Ep ${episode.episodeNumber}: ${episode.title}`, path: `/dashboard/series/${show.id}/episodes/${episode.id}`, icon: 'movie_filter' },
-              { label: 'Scene Setup', icon: 'add_to_photos' }
-            ]}
-          />
-          <h1 className="font-headline text-5xl font-bold tracking-tight text-white flex items-center gap-3">
-            <span className="material-symbols-outlined text-accent-cyan text-5xl">add_to_photos</span>
-            Scene <span className="text-accent-cyan">Setup</span>
-          </h1>
-          <p className="text-white/60 font-body text-lg">Define the sequence, environment, and cast for this narrative segment.</p>
+        <Breadcrumbs items={[
+          { label: 'Home', path: '/' },
+          { label: 'Series Library', path: '/dashboard/series' },
+          { label: show.title, path: `/dashboard/series/${show.id}` },
+          { label: 'Episodes', path: `/dashboard/series/${show.id}?tab=episodes` },
+          { label: `E${episode.episodeNumber}. ${episode.title}`, path: `/dashboard/series/${show.id}/episodes/${episode.id}` },
+          { label: 'Scenes', path: `/dashboard/series/${show.id}/episodes/${episode.id}?tab=Scenes` },
+          { label: 'Scene Setup' },
+        ]} />
+        <h1 className="font-headline text-5xl font-bold tracking-tight text-white flex items-center gap-3">
+          <span className="material-symbols-outlined text-accent-cyan text-5xl">add_to_photos</span>
+          Scene <span className="text-accent-cyan">Setup</span>
+        </h1>
+        <p className="text-white/60 font-body text-lg">Define the sequence, environment, and cast for this narrative segment.</p>
       </div>
 
-      <div className="glass-panel p-8 lg:p-12 rounded-[3rem] border border-white/10 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-accent-cyan/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+      <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-12 gap-8 mt-8">
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative z-10">
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Order */}
-            <div className="space-y-3 col-span-1">
-                <label className="block font-label text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">Sequence Order</label>
-                <div className="relative">
-                <input 
-                    {...register('order', { valueAsNumber: true })}
-                    className={`w-full bg-white/5 border border-white/10 rounded-xl py-5 px-6 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all font-bold text-center ${errors.order ? 'ring-2 ring-error/50' : ''}`} 
-                    type="number" 
-                    disabled={isCreating}
-                />
-                </div>
-                {errors.order && <p className="text-error text-[10px] uppercase ml-1 tracking-wider mt-2">{errors.order.message}</p>}
-            </div>
-
-            {/* Environment */}
-            <div className="space-y-3 col-span-3">
-                <label className="block font-label text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">Environment / Location</label>
-                <div className="relative">
-                <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-white/40 text-xl pointer-events-none">location_on</span>
-                <select 
-                  {...register('storyEnvironmentId')}
-                  className={`w-full bg-[#1A1A1A] border border-white/10 rounded-xl py-5 pl-14 pr-10 text-white focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all font-body text-base appearance-none cursor-pointer ${errors.storyEnvironmentId ? 'ring-2 ring-error/50' : ''}`}
-                  disabled={isCreating}
-                  defaultValue=""
-                >
-                  <option value="" disabled className="bg-neutral-900 text-white/20">Select Location...</option>
-                  {show.storyEnvironments?.map(env => (
-                    <option key={env.id} value={env.id} className="bg-neutral-900 text-white py-2">{env.name}</option>
-                  ))}
-                </select>
-                <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-white/40 text-xl pointer-events-none">expand_more</span>
+        {/* ── Script Editor Column ─────────────────────────────────────────── */}
+        <div className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+          <div className="glass-panel ghost-border rounded-lg overflow-hidden flex flex-col min-h-[600px]">
+            {/* Toolbar */}
+            <div className="bg-surface-container-low px-6 py-4 flex justify-between items-center border-b border-white/5">
+              <div className="flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary">edit_note</span>
+                <span className="font-headline text-lg font-medium">Cinematic Script Editor</span>
               </div>
-                {errors.storyEnvironmentId && <p className="text-error text-[10px] uppercase ml-1 tracking-wider mt-2">{errors.storyEnvironmentId.message}</p>}
+              <div className="flex gap-3 items-center">
+                <span className="px-3 py-1 bg-surface-container-highest rounded text-[10px] font-mono text-secondary">
+                  FORMAT: V-SCENE 1.0
+                </span>
+                <span className="px-3 py-1 bg-surface-container-highest rounded text-[10px] font-mono text-on-surface-variant">
+                  {scriptLines.filter(l => l.type !== 'env').length} LINES
+                </span>
+              </div>
             </div>
+
+            {/* Script editor body */}
+            <ScriptEditor
+              lines={scriptLines}
+              environment={selectedEnvironment}
+              characters={charactersLookup}
+              onChange={setScriptLines}
+            />
           </div>
 
-          {/* Visual Prompt */}
-          <div className="space-y-3">
-            <label className="block font-label text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">Visual Directive (Prompt)</label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-5 top-5 text-white/40 text-xl">camera</span>
-              <textarea 
+          {/* AI Prompt Translation */}
+          <section className="glass-panel ghost-border rounded-lg p-8 relative overflow-hidden">
+            <div className="absolute top-0 left-0 h-full light-beam opacity-30" />
+            <div className="flex items-center gap-3 mb-6">
+              <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+              <h2 className="font-headline text-xl font-bold uppercase tracking-widest">AI Prompt Translation</h2>
+            </div>
+            <div className="bg-surface-container-lowest/50 p-6 rounded-md ghost-border">
+              <textarea
                 {...register('visualPrompt')}
-                className={`w-full bg-white/5 border border-white/10 rounded-xl py-5 pl-14 pr-5 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all font-body text-base min-h-[100px] resize-none ${errors.visualPrompt ? 'ring-2 ring-error/50' : ''}`} 
-                placeholder="Cinematic 4K, low angle shot, neon lighting, volumetric fog..." 
-                disabled={isCreating}
+                className="w-full bg-transparent border-none focus:ring-0 font-mono text-sm leading-relaxed text-secondary/80 resize-none min-h-[100px] placeholder:text-white/10"
+                placeholder="Cinematic wide shot, Neo-Kyoto rooftop at night, torrential hyper-realistic rain..."
               />
             </div>
-            {errors.visualPrompt && <p className="text-error text-[10px] uppercase ml-1 tracking-wider mt-2">{errors.visualPrompt.message}</p>}
-          </div>
+            {errors.visualPrompt && <p className="mt-2 text-error text-[10px] uppercase tracking-wider">{errors.visualPrompt.message}</p>}
+          </section>
 
-          {/* Script */}
-          <div className="space-y-3">
-            <label className="block font-label text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">Dialogue & Action (Script)</label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-5 top-5 text-white/40 text-xl">description</span>
-              <textarea 
-                {...register('script')}
-                className={`w-full bg-white/5 border border-white/10 rounded-xl py-5 pl-14 pr-5 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-cyan/50 focus:border-transparent transition-all font-body text-base min-h-[180px] resize-none ${errors.script ? 'ring-2 ring-error/50' : ''}`} 
-                placeholder="SILAS: We don't have much time. The uplink is failing..." 
-                disabled={isCreating}
-              />
-            </div>
-            {errors.script && <p className="text-error text-[10px] uppercase ml-1 tracking-wider mt-2">{errors.script.message}</p>}
-          </div>
-
-          {/* Characters Selection */}
-          <div className="space-y-3">
-            <label className="block font-label text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">Cast Selection</label>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {show.characters?.map(char => {
-                    const isSelected = selectedCharacters.includes(char.id);
-                    return (
-                        <button
-                            key={char.id}
-                            type="button"
-                            onClick={() => toggleCharacter(char.id)}
-                            className={`flex flex-col items-center p-4 rounded-2xl border transition-all duration-300 gap-3 ${
-                                isSelected 
-                                    ? 'bg-accent-cyan/10 border-accent-cyan shadow-[0_0_15px_rgba(0,242,255,0.2)]' 
-                                    : 'bg-white/5 border-white/10 hover:border-white/30'
-                            }`}
-                        >
-                            <div className="w-12 h-12 rounded-full bg-neutral-800 border border-white/10 flex items-center justify-center overflow-hidden">
-                                {char.referenceImageUrl ? (
-                                    <img src={char.referenceImageUrl} alt={char.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="material-symbols-outlined text-white/20">person</span>
-                                )}
-                            </div>
-                            <span className={`text-[10px] font-bold uppercase tracking-wider text-center ${isSelected ? 'text-accent-cyan' : 'text-white/60'}`}>
-                                {char.name}
-                            </span>
-                        </button>
-                    );
-                })}
-            </div>
-            {errors.characterIds && <p className="text-error text-[10px] uppercase ml-1 tracking-wider mt-2">{errors.characterIds.message}</p>}
-          </div>
-
-          <div className="pt-6 flex justify-end gap-6 items-center">
-            <button 
+          {/* Submit */}
+          <div className="flex gap-4">
+            <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-8 py-4 rounded-xl font-bold tracking-widest uppercase text-[10px] text-white/60 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
+              className="flex-1 py-4 rounded-lg font-bold tracking-widest uppercase text-[10px] text-white/60 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
               disabled={isCreating}
             >
-              Abort Setup
+              Abort
             </button>
-            <button 
+            <button
               type="submit"
-              className="px-10 py-4 bg-gradient-to-r from-accent-cyan to-blue-600 rounded-xl font-bold tracking-widest uppercase text-[10px] text-on-surface shadow-lg shadow-accent-cyan/25 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-3 hover:shadow-accent-cyan/40 transition-all border border-white/10"
+              className="flex-[2] py-4 bg-gradient-to-r from-accent-cyan/80 to-secondary rounded-lg font-bold tracking-widest uppercase text-[10px] text-white shadow-lg disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3 hover:shadow-secondary/30 transition-all border border-white/10"
               disabled={isCreating}
             >
               {isCreating ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-base">autorenew</span>
-                  Processing...
-                </>
+                <><span className="material-symbols-outlined animate-spin text-base">autorenew</span> Processing...</>
               ) : (
-                <>
-                  <span className="material-symbols-outlined text-base">rocket_launch</span>
-                  Initialize Scene
-                </>
+                <><span className="material-symbols-outlined text-base">rocket_launch</span> Initialize Scene</>
               )}
             </button>
           </div>
+        </div>
 
-        </form>
-      </div>
-    </div>
+        {/* ── Configuration Panel Column ───────────────────────────────────── */}
+        <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+
+          {/* Environment Config */}
+          <div className="glass-panel ghost-border rounded-lg p-6">
+            <h3 className="font-headline text-label-md uppercase tracking-widest text-on-surface-variant mb-6 flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">landscape</span>
+              Environment Selection
+            </h3>
+            <div className="relative mb-2 group">
+              <div className="w-full h-40 rounded-md overflow-hidden mb-4 ghost-border bg-surface-container-lowest flex items-center justify-center">
+                {selectedEnvironment?.imageUrl
+                  ? <img src={selectedEnvironment.imageUrl} alt={selectedEnvironment.name} className="w-full h-full object-cover" />
+                  : <span className="material-symbols-outlined text-white/10 text-5xl">image</span>
+                }
+              </div>
+              <div className="relative">
+                <select
+                  {...register('storyEnvironmentId')}
+                  className="w-full bg-surface-container-lowest border-none rounded-md text-on-surface py-3 px-4 ghost-border appearance-none focus:ring-2 focus:ring-secondary/20 cursor-pointer"
+                >
+                  <option value="" disabled>Select Location...</option>
+                  {environmentsLookup.map(env => (
+                    <option key={env.id} value={env.id}>{env.name}</option>
+                  ))}
+                </select>
+                <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+              </div>
+            </div>
+            {errors.storyEnvironmentId && <p className="text-error text-[10px] uppercase tracking-wider mt-2">{errors.storyEnvironmentId.message}</p>}
+          </div>
+
+          {/* Characters Config */}
+          <div className="glass-panel ghost-border rounded-lg p-6 flex flex-col gap-4">
+            <h3 className="font-headline text-label-md uppercase tracking-widest text-on-surface-variant mb-2 flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">groups</span>
+              Character Roster ({selectedCharacterIds.length}/{charactersLookup.length})
+            </h3>
+
+            {/* Selected Characters */}
+            <div className="flex flex-col gap-3">
+              {selectedCharacters.map(char => (
+                <div
+                  key={char.id}
+                  draggable
+                  onDragStart={e => e.dataTransfer.setData('characterId', char.id)}
+                  className="flex items-center gap-4 bg-surface-container-low p-3 rounded-md ghost-border group hover:bg-surface-container-high transition-colors cursor-grab active:cursor-grabbing"
+                  title="Drag into the script editor to add a line"
+                >
+                  <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-secondary/50">
+                    {char.imageUrl
+                      ? <img src={char.imageUrl} alt={char.name} className="w-full h-full object-cover" />
+                      : <div className="w-full h-full flex items-center justify-center bg-surface-container-highest">
+                        <span className="material-symbols-outlined text-white/20">person</span>
+                      </div>
+                    }
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-on-surface">{char.name}</p>
+                    <p className="text-[10px] text-secondary uppercase tracking-widest flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[10px]">drag_indicator</span>
+                      Drag to script
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => toggleCharacter(char.id)}
+                    className="material-symbols-outlined text-on-surface-variant hover:text-error transition-colors"
+                  >remove_circle</button>
+                </div>
+              ))}
+            </div>
+
+            {/* Assign characters */}
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => setIsCharacterPickerOpen(!isCharacterPickerOpen)}
+                className="w-full border-2 border-dashed border-outline-variant/30 py-4 rounded-md text-on-surface-variant hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center gap-2 text-sm font-bold"
+              >
+                <span className="material-symbols-outlined">{isCharacterPickerOpen ? 'close' : 'add_circle'}</span>
+                {isCharacterPickerOpen ? 'Done Selecting' : 'Assign New Character'}
+              </button>
+
+              {isCharacterPickerOpen && (
+                <div className="grid grid-cols-4 gap-2 mt-4 p-4 bg-surface-container-lowest rounded-lg ghost-border max-h-60 overflow-y-auto">
+                  {charactersLookup.map(char => {
+                    const isSelected = selectedCharacterIds.includes(char.id)
+                    return (
+                      <button
+                        key={char.id}
+                        type="button"
+                        onClick={() => toggleCharacter(char.id)}
+                        title={char.name}
+                        className={`relative group aspect-square rounded-lg overflow-hidden border-2 transition-all ${isSelected ? 'border-primary shadow-[0_0_10px_rgba(221,183,255,0.4)]' : 'border-white/5 grayscale hover:grayscale-0'}`}
+                      >
+                        {char.imageUrl
+                          ? <img src={char.imageUrl} alt={char.name} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center bg-surface-container-highest">
+                            <span className="material-symbols-outlined text-white/20">person</span>
+                          </div>
+                        }
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-white text-lg">check_circle</span>
+                          </div>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+            {errors.characterIds && <p className="text-error text-[10px] uppercase tracking-wider">{errors.characterIds.message}</p>}
+          </div>
+
+
+
+
+        </div>
+
+      </form>
+    </main>
   )
 }

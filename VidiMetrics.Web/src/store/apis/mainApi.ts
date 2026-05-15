@@ -34,6 +34,8 @@ export const mainApi = createApi({
     'AiPromptTemplate',
     'ShortsProject',
     'Transcript',
+    'AiImage',
+    'AiScript',
     // Seo
     'Keyword',
     'KeywordRanking',

@@ -1,11 +1,14 @@
 import { useGetScenesQuery } from "@/store/apis";
 import { Scene } from "@/types/models/storyEngine";
+import { useNavigate } from "react-router-dom";
 
 interface ScenesTabProps {
     episodeId: string;
+    showId: string;
 }
 
-export default function ScenesTab({ episodeId }: ScenesTabProps) {
+export default function ScenesTab({ episodeId, showId }: ScenesTabProps) {
+    const navigate = useNavigate();
     const { data: response, isLoading, error } = useGetScenesQuery({ episodeId, pageNumber: 1, pageSize: 10 });
     const scenes: Scene[] = response?.data?.items || []
 
@@ -21,7 +24,9 @@ export default function ScenesTab({ episodeId }: ScenesTabProps) {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <button className="border-[1.5px] border-dashed border-white/10 rounded-[2rem] bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-cyan/40 transition-all duration-500 group flex flex-col items-center justify-center p-8 text-center min-h-[280px]">
+                <button
+                    onClick={() => navigate(`/dashboard/series/${showId}/episodes/${episodeId}/scenes/new`)}
+                    className="border-[1.5px] border-dashed border-white/10 rounded-[2rem] bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-cyan/40 transition-all duration-500 group flex flex-col items-center justify-center p-8 text-center min-h-[280px]">
                     <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:bg-accent-cyan/20 transition-all duration-500">
                         <span className="material-symbols-outlined text-white/50 group-hover:text-accent-cyan transition-colors text-2xl">auto_awesome</span>
                     </div>

@@ -1,5 +1,5 @@
 import { mainApi } from '../mainApi';
-import { ApiResponse, PaginationResponse, PaginationFilter } from '@/types/api';
+import { ApiResponse, PaginationResponse, PaginationFilter, Lookup } from '@/types/api';
 import { Character } from '@/types/models/storyEngine';
 
 export interface CreateCharacterRequest {
@@ -8,12 +8,12 @@ export interface CreateCharacterRequest {
   clothingStyle: string;
   personalityTraits: string;
   role: string;
-  voiceId?: string;
-  referenceImageUrl?: string;
+  voiceProfileId?: string;
+  aiImageId: string;
   showId: string;
 }
 
-export interface UpdateCharacterRequest extends Partial<CreateCharacterRequest> {}
+export interface UpdateCharacterRequest extends Partial<CreateCharacterRequest> { }
 
 export interface CharacterFilter extends PaginationFilter {
   showId?: string;
@@ -41,9 +41,9 @@ export const charactersApi = mainApi.injectEndpoints({
       providesTags: (result) =>
         result?.data?.items
           ? [
-              ...result.data.items.map(({ id }) => ({ type: 'Character' as const, id })),
-              { type: 'Character', id: 'LIST' },
-            ]
+            ...result.data.items.map(({ id }) => ({ type: 'Character' as const, id })),
+            { type: 'Character', id: 'LIST' },
+          ]
           : [{ type: 'Character', id: 'LIST' }],
     }),
 
@@ -72,12 +72,27 @@ export const charactersApi = mainApi.injectEndpoints({
         { type: 'Character', id: 'LIST' },
       ],
     }),
+
+    getCharactersLookup: builder.query<ApiResponse<Lookup[]>, string | undefined>({
+      query: (showId) => ({
+        url: '/api/characters/lookup',
+        params: showId ? { showId } : undefined,
+      }),
+      providesTags: (result) =>
+        result?.data
+          ? [
+            ...result.data.map(({ id }) => ({ type: 'Character' as const, id })),
+            { type: 'Character', id: 'LOOKUP' },
+          ]
+          : [{ type: 'Character', id: 'LOOKUP' }],
+    }),
   }),
 });
 
 export const {
   useGetCharactersQuery,
   useGetCharacterByIdQuery,
+  useGetCharactersLookupQuery,
   useCreateCharacterMutation,
   useUpdateCharacterMutation,
   useDeleteCharacterMutation,
