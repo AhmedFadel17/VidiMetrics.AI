@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.Domain.Models.StoryEngine;
@@ -18,6 +19,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
     {
         private readonly ICharactersRepository _repository;
         private readonly IShowsRepository _showsRepository;
+        private readonly IAiImagesRepository _imagesRepository;
         private readonly IMapper _mapper;
         private readonly IValidator<CreateCharacterDto> _createValidator;
         private readonly IValidator<UpdateCharacterDto> _updateValidator;
@@ -25,12 +27,14 @@ namespace VidiMetrics.Application.Services.StoryEngine
         public CharactersService(
             ICharactersRepository repository,
             IShowsRepository showsRepository,
+            IAiImagesRepository imagesRepository,
             IMapper mapper,
             IValidator<CreateCharacterDto> createValidator,
             IValidator<UpdateCharacterDto> updateValidator)
         {
             _showsRepository = showsRepository;
             _repository = repository;
+            _imagesRepository = imagesRepository;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
@@ -115,6 +119,17 @@ namespace VidiMetrics.Application.Services.StoryEngine
                             .AnyAsync(s => s.Id == dto.ShowId && s.UserId == userId);
 
             if (!showExists) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
+
+            var image = await _imagesRepository.Query()
+                            .FirstOrDefaultAsync(s => s.Id == dto.AiImageId && s.UserId == userId);
+            if (image == null) throw new UnauthorizedAccessException("Invalid Image selection or access denied.");
+            image.IsLinked = true;
+            _imagesRepository.Update(image);
+            await _imagesRepository.SaveChangesAsync();
+
+
+
+
             var entity = _mapper.Map<Character>(dto);
             entity.CreatedAt = DateTime.UtcNow;
 

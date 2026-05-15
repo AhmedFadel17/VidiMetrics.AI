@@ -13,8 +13,8 @@ namespace VidiMetrics.Application.Validators.StoryEngine.Characters
             RuleFor(x => x.PersonalityTraits).NotEmpty().WithMessage("PersonalityTraits is required.");
             RuleFor(x => x.Role).NotEmpty().WithMessage("Role is required.");
             RuleFor(x => x.InsightLevel).NotEmpty().WithMessage("InsightLevel is required.");
-            RuleFor(x => x.VoiceId).NotEmpty().WithMessage("VoiceId is required.");
-            RuleFor(x => x.ReferenceImageUrl).NotEmpty().WithMessage("ReferenceImageUrl is required.");
+            // RuleFor(x => x.VoiceProfileId).NotEmpty().WithMessage("VoiceId is required.");
+            RuleFor(x => x.AiImageId).NotEmpty().WithMessage("ImageId is required.");
             RuleFor(x => x.ShowId).NotEmpty().WithMessage("ShowId is required.");
         }
     }
