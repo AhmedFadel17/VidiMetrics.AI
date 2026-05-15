@@ -72,6 +72,8 @@ export default function CharacterSetup() {
 
   // ─── Navigation ─────────────────────────────────────────────────────────────
   const goNext = async () => {
+    if (isLastStep) return;
+
     const step = STEPS[currentStep - 1]
     const valid = step.fields.length === 0 || await trigger(step.fields as any)
     if (!valid) return
@@ -271,6 +273,7 @@ export default function CharacterSetup() {
             {/* Next / Finish */}
             {isLastStep ? (
               <button
+                key="btn-submit"
                 type="submit"
                 disabled={isCreating}
                 className="flex items-center gap-2 px-8 py-3 rounded-xl font-headline font-bold text-sm bg-gradient-to-r from-primary to-secondary text-[#0b1326] shadow-[0_0_30px_rgba(76,215,246,0.25)] hover:brightness-110 active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
@@ -291,6 +294,7 @@ export default function CharacterSetup() {
               </button>
             ) : (
               <button
+                key="btn-next"
                 type="button"
                 onClick={goNext}
                 className="flex items-center gap-2 px-8 py-3 rounded-xl font-headline font-bold text-sm bg-white/10 border border-white/15 text-white hover:bg-white/15 hover:border-secondary/40 hover:text-secondary active:scale-95 transition-all"

@@ -29,6 +29,25 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-accent-purple to-accent-pink;
   }
 
+  .text-gradient-primary {
+    background: linear-gradient(to right, #ddb7ff, #4cd7f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .cinematic-shadow {
+    box-shadow: 0 20px 50px rgba(6, 14, 32, 0.6);
+  }
+
+  /* Premium Toast Styles */
+  .premium-toast {
+    @apply !bg-surface-container-high !backdrop-blur-xl !rounded-xl !p-4 !border !shadow-2xl !font-body;
+  }
+  .premium-toast.success { @apply !border-primary/30 !text-on-surface; }
+  .premium-toast.error { @apply !border-error/30 !text-on-surface; }
+  .premium-toast.warning { @apply !border-yellow-500/30 !text-on-surface; }
+  .premium-toast.info { @apply !border-secondary/30 !text-on-surface; }
+
   .btn-premium {
     @apply bg-gradient-to-br from-accent-purple via-accent-purple to-accent-pink text-white shadow-[0_0_20px_rgba(138,43,226,0.4)] hover:shadow-[0_0_30px_rgba(138,43,226,0.6)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 font-bold;
   }
