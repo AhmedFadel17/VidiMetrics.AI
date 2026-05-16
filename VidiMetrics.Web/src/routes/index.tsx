@@ -34,6 +34,7 @@ import CharacterSetup from "@/pages/Dashboard/User/Characters/CharacterSetup";
 import EnvironmentDetails from "@/pages/Dashboard/User/Environments/Details";
 import SceneSetup from "@/pages/Dashboard/User/Scenes/SceneSetup";
 import SceneDetails from "@/pages/Dashboard/User/Scenes/Details";
+import EnvironmentSetup from "@/pages/Dashboard/User/Environments/EnvironemntSetup";
 
 
 // =============================
@@ -108,9 +109,14 @@ export const AppUserRoutes: AppRoute[] = [
         element: <SceneSetup />,
     },
     {
-        path: "/dashboard/environments/:id",
+        path: "/dashboard/series/:showId/environments/:id",
         label: "Environments",
         element: <EnvironmentDetails />,
+    },
+    {
+        path: "/dashboard/series/:showId/environments/new",
+        label: "Environments",
+        element: <EnvironmentSetup />,
     },
     {
         path: "/dashboard/scenes/:id",

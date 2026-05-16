@@ -1,0 +1,20 @@
+export type CharacterFormValues = {
+    name: string
+    role: string
+    importance: 'Main' | 'Supporting' | 'Extra'
+    personalityTraits: string
+    insightLevel: number
+    physicalDescription: string
+    clothingStyle: string
+    voiceProfileId: string
+    aiImageId: string
+    referenceImageUrl: string
+}
+
+export type EnvironmentFormValues = {
+    name: string
+    visualDescription: string
+    atmosphere: string
+    aiImageId: string
+    referenceImageUrl: string
+}

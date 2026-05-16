@@ -12,7 +12,7 @@ export default function EnvironmentCard({ environment }: EnvironmentCardProps) {
         <div className="relative h-36 rounded-2xl overflow-hidden group cursor-pointer border border-white/5 hover:border-accent-cyan/30 transition-all duration-300">
             <img src={thumbnail} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60" />
             <div className="absolute inset-0 bg-gradient-to-r from-dashboard-bg/80 via-dashboard-bg/20 to-transparent"></div>
-            <Link to={`/dashboard/shows/${showId}/environments/${id}`}>
+            <Link to={`/dashboard/series/${showId}/environments/${id}`}>
                 <div className="absolute inset-0 flex flex-col items-start justify-center px-6">
                     <span className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors mb-4">{name}</span>
                     <span className="text-xs text-gray-200 group-hover:text-accent-cyan transition-colors mb-2">{visualDescription}</span>

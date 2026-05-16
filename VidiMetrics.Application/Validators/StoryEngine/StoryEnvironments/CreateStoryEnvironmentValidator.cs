@@ -10,6 +10,7 @@ namespace VidiMetrics.Application.Validators.StoryEngine.StoryEnvironments
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
             RuleFor(x => x.VisualDescription).NotEmpty().WithMessage("VisualDescription is required.");
             RuleFor(x => x.Atmosphere).NotEmpty().WithMessage("Atmosphere is required.");
+            RuleFor(x => x.AiImageId).NotEmpty().WithMessage("AiImageId is required.");
             RuleFor(x => x.ShowId).NotEmpty().WithMessage("ShowId is required.");
         }
     }

@@ -9,7 +9,7 @@ import { useCreateCharacterMutation } from '@/store/apis/storyEngine/characters.
 import { useGetShowByIdQuery } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { LoadingScreen, ErrorScreen } from '@/components/ui/Feedback/StatusScreens'
-import { CharacterFormValues } from './types'
+import { CharacterFormValues } from '@/types'
 import StepIdentity from './steps/StepIdentity'
 import StepPersonality from './steps/StepPersonality'
 import StepVisuals from './steps/StepVisuals'
@@ -182,10 +182,10 @@ export default function CharacterSetup() {
                     boxShadow: active ? '0 0 20px rgba(76,215,246,0.4)' : 'none',
                   }}
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${done
-                      ? 'bg-gradient-to-br from-primary to-secondary border-transparent'
-                      : active
-                        ? 'border-secondary bg-secondary/10'
-                        : 'border-white/15 bg-white/[0.03]'
+                    ? 'bg-gradient-to-br from-primary to-secondary border-transparent'
+                    : active
+                      ? 'border-secondary bg-secondary/10'
+                      : 'border-white/15 bg-white/[0.03]'
                     }`}
                 >
                   {done ? (
@@ -261,10 +261,10 @@ export default function CharacterSetup() {
                 <div
                   key={s.id}
                   className={`rounded-full transition-all duration-300 ${s.id === currentStep
-                      ? 'w-6 h-2 bg-secondary'
-                      : s.id < currentStep
-                        ? 'w-2 h-2 bg-primary/60'
-                        : 'w-2 h-2 bg-white/15'
+                    ? 'w-6 h-2 bg-secondary'
+                    : s.id < currentStep
+                      ? 'w-2 h-2 bg-primary/60'
+                      : 'w-2 h-2 bg-white/15'
                     }`}
                 />
               ))}
