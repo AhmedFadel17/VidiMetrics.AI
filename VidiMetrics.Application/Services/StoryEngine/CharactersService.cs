@@ -94,7 +94,9 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
         public async Task<IEnumerable<LookupDto>> GetLookupAsync(Guid userId, Guid? showId = null)
         {
-            var query = _repository.Query();
+            IQueryable<Character> query = _repository.Query()
+                .Include(x => x.AiImage);
+
             query = query.Where(x => x.Show.UserId == userId);
             if (showId.HasValue)
             {
