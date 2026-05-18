@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
+using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
-using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -22,6 +24,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IScenesRepository _repository;
         private readonly ICharactersRepository _charactersRepository;
         private readonly IEpisodesRepository _episodesRepository;
+        private readonly IAiScriptsRepository _aiScriptsRepository;
+        private readonly IAiVideosRepository _aiVideosRepository;
         private readonly IStoryEnvironmentsRepository _storyEnvironmentsRepository;
         private readonly IShowsRepository _showsRepository;
         private readonly IMapper _mapper;
@@ -32,6 +36,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
             IScenesRepository repository,
             ICharactersRepository charactersRepository,
             IEpisodesRepository episodesRepository,
+            IAiScriptsRepository aiScriptsRepository,
+            IAiVideosRepository aiVideosRepository,
             IStoryEnvironmentsRepository storyEnvironmentsRepository,
             IShowsRepository showsRepository,
             IMapper mapper,
@@ -41,6 +47,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _repository = repository;
             _charactersRepository = charactersRepository;
             _episodesRepository = episodesRepository;
+            _aiScriptsRepository = aiScriptsRepository;
+            _aiVideosRepository = aiVideosRepository;
             _storyEnvironmentsRepository = storyEnvironmentsRepository;
             _showsRepository = showsRepository;
             _mapper = mapper;
@@ -53,6 +61,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             var entity = await _repository.Query()
                 .Include(s => s.AiScript)
                     .ThenInclude(x => x.StoryEnvironment)
+                .Include(s => s.AiVideo)
                 .Include(s => s.SceneCharacters)
                     .ThenInclude(sc => sc.Character)
                 .FirstOrDefaultAsync(s => s.Id == id && s.Episode.Show.UserId == userId);
@@ -67,6 +76,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             IQueryable<Scene> query = _repository.Query()
                 .Include(s => s.AiScript)
                     .ThenInclude(x => x.StoryEnvironment)
+                .Include(s => s.AiVideo)
                 .Include(s => s.SceneCharacters)
                     .ThenInclude(sc => sc.Character);
 
@@ -76,7 +86,6 @@ namespace VidiMetrics.Application.Services.StoryEngine
             {
                 query = query.Where(x => x.EpisodeId == filter.EpisodeId.Value);
             }
-
 
             if (filter.CreatedAfter.HasValue)
             {
@@ -108,8 +117,23 @@ namespace VidiMetrics.Application.Services.StoryEngine
             var episode = await _episodesRepository.Query()
                 .Include(e => e.Show)
                 .FirstOrDefaultAsync(e => e.Id == dto.EpisodeId && e.Show.UserId == userId);
-            
+
+
             if (episode == null) throw new Exception("Episode not found or access denied.");
+
+            var script = await _aiScriptsRepository.Query()
+                .AnyAsync(e => e.Id == dto.AiScriptId && e.UserId == userId);
+
+
+            if (!script) throw new Exception("Script not found or access denied.");
+
+
+            var video = await _aiVideosRepository.Query()
+                .AnyAsync(e => e.Id == dto.AiVideoId && e.UserId == userId);
+
+
+            if (!video) throw new Exception("Video not found or access denied.");
+
 
             var entity = _mapper.Map<Scene>(dto);
             entity.CreatedAt = DateTime.UtcNow;

@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
-using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
+using VidiMetrics.Application.DTOs.Ai.AiScripts;
+using VidiMetrics.Application.DTOs.Ai.AiVideos;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Scenes
 {
@@ -13,7 +14,8 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Scenes
         public bool IsDeleted { get; set; }
         public int Order { get; set; }
         public Guid EpisodeId { get; set; }
-        public VidiMetrics.Application.DTOs.Ai.AiScripts.AiScriptResponseDto? AiScript { get; set; }
+        public AiScriptResponseDto? AiScript { get; set; }
+        public AiVideoResponseDto? AiVideo { get; set; }
         public ICollection<CharacterResponseDto> Characters { get; set; } = new List<CharacterResponseDto>();
     }
 }

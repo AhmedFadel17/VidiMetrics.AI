@@ -3,7 +3,7 @@ using AutoMapper;
 using VidiMetrics.Application.DTOs.Ai.AiImages;
 using VidiMetrics.Application.DTOs.Ai.AiPromptTemplates;
 using VidiMetrics.Application.DTOs.Ai.AiTasks;
-using VidiMetrics.Application.DTOs.Ai.ShortsProjects;
+using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.DTOs.Ai.Transcripts;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.Channels;
@@ -48,10 +48,9 @@ namespace VidiMetrics.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<AiImage, AiImageResponseDto>();
 
-            CreateMap<CreateShortsProjectDto, ShortsProject>();
-            CreateMap<UpdateShortsProjectDto, ShortsProject>()
+            CreateMap<UpdateAiVideoDto, AiVideo>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<ShortsProject, ShortsProjectResponseDto>();
+            CreateMap<AiVideo, AiVideoResponseDto>();
 
             CreateMap<CreateTranscriptDto, Transcript>();
             CreateMap<UpdateTranscriptDto, Transcript>()
@@ -156,6 +155,7 @@ namespace VidiMetrics.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<AiScript, VidiMetrics.Application.DTOs.Ai.AiScripts.AiScriptResponseDto>();
             CreateMap<ScriptLine, VidiMetrics.Application.DTOs.Ai.AiScripts.ScriptLineResponseDto>();
+            CreateMap<VidiMetrics.Application.DTOs.Ai.ScriptLines.ScriptLineDto, ScriptLine>();
         }
     }
 }

@@ -8,7 +8,9 @@ namespace VidiMetrics.Application.Validators.Ai.AiScripts
         public CreateAiScriptValidator()
         {
             RuleFor(x => x.StoryEnvironmentId).NotEmpty();
-            RuleFor(x => x.SceneId).NotEmpty();
+            RuleFor(x => x.Weather).NotEmpty();
+            RuleFor(x => x.EnvironmentDescription).NotEmpty();
+            RuleFor(x => x.ScriptLines).NotEmpty().WithMessage("At least one script line is required.");
         }
     }
 }

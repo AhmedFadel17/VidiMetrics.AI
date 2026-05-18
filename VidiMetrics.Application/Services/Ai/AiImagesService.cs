@@ -1,14 +1,15 @@
 using System.Net.Http;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Retry;
 using VidiMetrics.Application.DTOs.Ai.AiImages;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
+using VidiMetrics.Application.Providers.ImageProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.Domain.Models.Ai;
-using Microsoft.EntityFrameworkCore;
 
 namespace VidiMetrics.Application.Services.Ai;
 
@@ -18,16 +19,18 @@ public class AiImagesService : IAiImagesService
     private readonly AsyncRetryPolicy _retryPolicy;
     private readonly IMapper _mapper;
     private readonly IAiImagesRepository _repo;
+    private readonly IImageProvider _imageProvider;
     private readonly IValidator<UpdateAiImageDto> _updateValidator;
     private readonly IValidator<CreateCharacterImageDto> _createCharacterValidator;
     private readonly IValidator<CreateEnvironmentImageDto> _createEnvironmentValidator;
 
 
-    public AiImagesService(HttpClient httpClient, IMapper mapper, IAiImagesRepository repo, IValidator<UpdateAiImageDto> updateValidator, IValidator<CreateCharacterImageDto> createCharacterValidator, IValidator<CreateEnvironmentImageDto> createEnvironmentValidator)
+    public AiImagesService(HttpClient httpClient, IMapper mapper, IAiImagesRepository repo, IValidator<UpdateAiImageDto> updateValidator, IValidator<CreateCharacterImageDto> createCharacterValidator, IValidator<CreateEnvironmentImageDto> createEnvironmentValidator, IImageProvider imageProvider)
     {
         _httpClient = httpClient;
         _mapper = mapper;
         _repo = repo;
+        _imageProvider = imageProvider;
         _updateValidator = updateValidator;
         _createCharacterValidator = createCharacterValidator;
         _createEnvironmentValidator = createEnvironmentValidator;
@@ -51,7 +54,7 @@ public class AiImagesService : IAiImagesService
                              $"Traits: {dto.PersonalityTraits}. " +
                              $"Maintain identical facial features, 8k, photorealistic, unreal engine 5, character reference sheet style.";
         var seed = new Random().Next(1, 999999);
-        string imageUrl = await GenerateImageAsync(masterPrompt, seed);
+        string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
         var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
         return _mapper.Map<AiImageResponseDto>(img);
     }
@@ -70,7 +73,7 @@ public class AiImagesService : IAiImagesService
                      $"volumetric lighting, shot on 35mm lens, Unreal Engine 5 render, " +
                      $"highly detailed textures, masterpiece, no people.";
         var seed = new Random().Next(1, 999999);
-        string imageUrl = await GenerateImageAsync(masterPrompt, seed);
+        string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
         var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
         return _mapper.Map<AiImageResponseDto>(img);
     }
@@ -128,24 +131,6 @@ public class AiImagesService : IAiImagesService
         await _repo.SaveChangesAsync();
 
         return _mapper.Map<AiImageResponseDto>(entity);
-    }
-
-    private async Task<string> GenerateImageAsync(string prompt, int seed)
-    {
-        string encodedPrompt = Uri.EscapeDataString(prompt);
-        string imageUrl = $"https://image.pollinations.ai/prompt/{encodedPrompt}?width=1024&height=1024&nologo=true&seed={seed}";
-
-        await _retryPolicy.ExecuteAsync(async () =>
-        {
-            var response = await _httpClient.GetAsync(imageUrl);
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new HttpRequestException("Image provider is currently unavailable.");
-            }
-            return response;
-        });
-
-        return imageUrl;
     }
 
     private async Task<AiImage> SaveAiImage(string prompt, string imageUrl, int seed, Guid userId)

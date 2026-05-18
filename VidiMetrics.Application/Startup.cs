@@ -7,6 +7,9 @@ using VidiMetrics.Application.Interfaces.Core;
 using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Interfaces.Seo;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.ImageProviders;
+using VidiMetrics.Application.Providers.StorageProviders;
+using VidiMetrics.Application.Providers.VideoProviders;
 using VidiMetrics.Application.Services.Ai;
 using VidiMetrics.Application.Services.Core;
 using VidiMetrics.Application.Services.Infra;
@@ -31,6 +34,8 @@ namespace VidiMetrics.Application
             services.AddScoped<IAiPromptTemplatesService, AiPromptTemplatesService>();
             services.AddScoped<IAiTasksService, AiTasksService>();
             services.AddScoped<IAiImagesService, AiImagesService>();
+            services.AddScoped<IAiScriptsService, AiScriptsService>();
+            services.AddScoped<IAiVideosService, AiVideosService>();
             services.AddScoped<IApiUsageQuotasService, ApiUsageQuotasService>();
             services.AddScoped<IChannelsService, ChannelsService>();
             services.AddScoped<ICharactersService, CharactersService>();
@@ -43,7 +48,6 @@ namespace VidiMetrics.Application
             services.AddScoped<IPlaylistsService, PlaylistsService>();
             services.AddScoped<ISeoAuditsService, SeoAuditsService>();
 
-            services.AddScoped<IShortsProjectsService, ShortsProjectsService>();
             services.AddScoped<IShowsService, ShowsService>();
             services.AddScoped<IScenesService, ScenesService>();
             services.AddScoped<IStoryEnvironmentsService, StoryEnvironmentsService>();
@@ -51,6 +55,10 @@ namespace VidiMetrics.Application
             services.AddScoped<IUserProfilesService, UserProfilesService>();
             services.AddScoped<IVideoTagsService, VideoTagsService>();
             services.AddScoped<IYouTubeVideosService, YouTubeVideosService>();
+
+            services.AddScoped<IImageProvider, PollinationsImageProvider>();
+            services.AddScoped<IVideoProvider, PollinationsVideoProvider>();
+            services.AddScoped<IStorageProvider, CloudinaryStorageProvider>();
 
             return Task.FromResult(services);
         }
