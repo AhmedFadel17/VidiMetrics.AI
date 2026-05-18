@@ -6,7 +6,8 @@ using VidiMetrics.DataAccess.Repositories;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.Ai.AiPromptTemplates;
 using VidiMetrics.DataAccess.Repositories.Ai.AiTasks;
-using VidiMetrics.DataAccess.Repositories.Ai.ShortsProjects;
+using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
+using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
 using VidiMetrics.DataAccess.Repositories.Ai.Transcripts;
 using VidiMetrics.DataAccess.Repositories.Core.Channels;
 using VidiMetrics.DataAccess.Repositories.Core.LocalVideos;
@@ -39,7 +40,8 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<IAiPromptTemplatesRepository, AiPromptTemplatesRepository>();
             services.AddScoped<IAiTasksRepository, AiTasksRepository>();
             services.AddScoped<IAiImagesRepository, AiImagesRepository>();
-            services.AddScoped<IShortsProjectsRepository, ShortsProjectsRepository>();
+            services.AddScoped<IAiScriptsRepository, AiScriptsRepository>();
+            services.AddScoped<IAiVideosRepository, AiVideosRepository>();
             services.AddScoped<ITranscriptsRepository, TranscriptsRepository>();
             services.AddScoped<IChannelsRepository, ChannelsRepository>();
             services.AddScoped<ILocalVideosRepository, LocalVideosRepository>();
@@ -62,4 +64,3 @@ namespace VidiMetrics.DataAccess
         }
     }
 }
-

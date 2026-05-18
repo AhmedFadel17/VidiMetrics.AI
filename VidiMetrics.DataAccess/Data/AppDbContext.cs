@@ -22,7 +22,7 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<AiTask> AiTasks { get; set; }
         public DbSet<AiImage> AiImages { get; set; }
         public DbSet<AiScript> AiScripts { get; set; }
-        public DbSet<ShortsProject> ShortsProjects { get; set; }
+        public DbSet<AiVideo> AiVideos { get; set; }
         public DbSet<Transcript> Transcripts { get; set; }
 
         // Infra
@@ -60,26 +60,11 @@ namespace VidiMetrics.DataAccess.Data
                     .HasValue<LocalVideo>("Local")
                     .HasValue<YouTubeVideo>("YouTube");
 
-            modelBuilder.Entity<ShortsProject>()
-                .HasOne(s => s.OriginalVideo)
-                .WithMany()
-                .HasForeignKey(s => s.OriginalVideoId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<LocalVideo>()
-                .HasOne<ShortsProject>()
-                .WithMany(s => s.GeneratedClips)
-                .HasForeignKey("ShortsProjectId")
-                .OnDelete(DeleteBehavior.Cascade);
-
-
             modelBuilder.Entity<Episode>()
                 .HasOne(e => e.FinalVideo)
                 .WithMany()
                 .HasForeignKey(e => e.FinalVideoId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             modelBuilder.Entity<Character>()
                 .HasOne(c => c.Show)
@@ -108,8 +93,14 @@ namespace VidiMetrics.DataAccess.Data
 
             modelBuilder.Entity<Scene>()
                 .HasOne(s => s.AiScript)
-                .WithOne(a => a.Scene)
-                .HasForeignKey<AiScript>(a => a.SceneId)
+                .WithOne()
+                .HasForeignKey<Scene>(s => s.AiScriptId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Scene>()
+                .HasOne(s => s.AiVideo)
+                .WithOne()
+                .HasForeignKey<Scene>(s => s.AiVideoId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<AiScript>()
