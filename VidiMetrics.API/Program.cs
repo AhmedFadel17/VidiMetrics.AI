@@ -11,6 +11,7 @@ using VidiMetrics.Domain.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 await builder.Services.AddDataAccessServices(builder.Configuration);
 await builder.Services.AddApplicationServices();
@@ -51,9 +52,9 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
-
+builder.Services.Configure<PollinationsApiSettings>(builder.Configuration.GetSection("PollinationsApiSettings"));
+builder.Services.Configure<CloudinaryApiSettings>(builder.Configuration.GetSection("CloudinaryApiSettings"));
 builder.Services.Configure<SubscriptionSettings>(builder.Configuration.GetSection("SubscriptionSettings"));
-
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserRegisteredConsumer>();
