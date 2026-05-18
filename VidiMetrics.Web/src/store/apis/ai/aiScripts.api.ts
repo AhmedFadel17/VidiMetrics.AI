@@ -7,7 +7,6 @@ export interface CreateAiScriptDto {
   environmentDescription: string;
   visualPrompt: string;
   storyEnvironmentId: string;
-  sceneId: string;
 }
 
 export interface UpdateAiScriptDto {

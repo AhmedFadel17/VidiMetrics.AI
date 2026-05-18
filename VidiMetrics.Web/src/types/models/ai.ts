@@ -18,7 +18,6 @@ export interface AiScript extends BaseEntity {
   visualPrompt: string;
   storyEnvironmentId: string;
   storyEnvironment?: StoryEnvironment;
-  sceneId: string;
   scriptLines?: ScriptLine[];
 }
 
@@ -51,12 +50,14 @@ export interface AiTask extends BaseEntity {
   videoId: string;
 }
 
-// ─── ShortsProject ────────────────────────────────────────────────────────────
-export interface ShortsProject extends BaseEntity {
-  projectName: string;
-  targetPlatform: TargetPlatform;
-  expectedClipCount: number;
-  originalVideoId: string;
+// ─── AiVideo ──────────────────────────────────────────────────────────────────
+export interface AiVideo extends BaseEntity {
+  videoUrl?: string;
+  thumbnailUrl?: string;
+  duration?: number;
+  seed: number;
+  isLinked: boolean;
+  userId: string;
 }
 
 // ─── Transcript ───────────────────────────────────────────────────────────────

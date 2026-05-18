@@ -19,7 +19,9 @@ export * from './core/youtubeVideos.api';
 // ─── Ai ───────────────────────────────────────────────────────────────────────
 export * from './ai/aiPromptTemplates.api';
 export * from './ai/aiTasks.api';
-export * from './ai/shortsProjects.api';
+export * from './ai/aiImages.api';
+export * from './ai/aiScripts.api';
+export * from './ai/aiVideos.api';
 export * from './ai/transcripts.api';
 
 // ─── Seo ──────────────────────────────────────────────────────────────────────

@@ -32,7 +32,7 @@ export const mainApi = createApi({
     // Ai
     'AiTask',
     'AiPromptTemplate',
-    'ShortsProject',
+    'AiVideo',
     'Transcript',
     'AiImage',
     'AiScript',

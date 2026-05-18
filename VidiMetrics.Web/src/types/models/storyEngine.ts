@@ -1,6 +1,6 @@
 import { BaseEntity } from "./base";
 import { ShowStatus } from "../enums";
-import { AiScript } from "./ai";
+import { AiScript, AiVideo } from "./ai";
 
 // ─── Show ─────────────────────────────────────────────────────────────────────
 export interface Show extends BaseEntity {
@@ -46,7 +46,10 @@ export interface Episode extends BaseEntity {
 export interface Scene extends BaseEntity {
   order: number;
   episodeId: string;
+  aiScriptId?: string;
   aiScript?: AiScript;
+  aiVideoId?: string;
+  aiVideo?: AiVideo;
   characters?: Character[];
 }
 

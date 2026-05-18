@@ -4,11 +4,10 @@ import { Scene } from '@/types/models/storyEngine';
 
 export interface CreateSceneRequest {
   order: number;
-  script: string;
-  visualPrompt: string;
-  storyEnvironmentId: string;
   episodeId: string;
   characterIds?: string[];
+  aiScriptId?: string;
+  aiVideoId?: string;
 }
 
 export interface UpdateSceneRequest extends Partial<CreateSceneRequest> { }
