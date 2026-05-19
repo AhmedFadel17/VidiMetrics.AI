@@ -7,8 +7,9 @@ namespace VidiMetrics.Application.Validators.StoryEngine.Scenes
     {
         public CreateSceneValidator()
         {
-            RuleFor(x => x.EpisodeId).NotEmpty();
-            RuleFor(x => x.Order).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.EpisodeId).NotEmpty().WithMessage("EpisodeId is required.");
+            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
+            RuleFor(x => x.Order).GreaterThanOrEqualTo(0).WithMessage("Order must be greater than or equal to 0.");
         }
     }
 }

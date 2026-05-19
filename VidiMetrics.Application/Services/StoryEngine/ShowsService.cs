@@ -5,10 +5,13 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
+using VidiMetrics.Domain.Models.Ai;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -17,17 +20,20 @@ namespace VidiMetrics.Application.Services.StoryEngine
     {
         private readonly IShowsRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IAiImagesRepository _imagesRepository;
         private readonly IValidator<CreateShowDto> _createValidator;
         private readonly IValidator<UpdateShowDto> _updateValidator;
 
         public ShowsService(
             IShowsRepository repository,
             IMapper mapper,
+            IAiImagesRepository imagesRepository,
             IValidator<CreateShowDto> createValidator,
             IValidator<UpdateShowDto> updateValidator)
         {
             _repository = repository;
             _mapper = mapper;
+            _imagesRepository = imagesRepository;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
         }
@@ -107,6 +113,12 @@ namespace VidiMetrics.Application.Services.StoryEngine
         public async Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId, bool isAdmin = false)
         {
             await _createValidator.ValidateAndThrowAsync(dto);
+
+            var image = await _imagesRepository.Query()
+                            .FirstOrDefaultAsync(s => s.Id == dto.AiImageId && s.UserId == userId);
+            if (image == null) throw new UnauthorizedAccessException("Invalid Image selection or access denied.");
+            image.IsLinked = true;
+            _imagesRepository.Update(image);
 
             var entity = _mapper.Map<Show>(dto);
             entity.UserId = userId;

@@ -80,6 +80,7 @@ namespace VidiMetrics.Application.Services.Ai
             var script = _mapper.Map<AiScript>(dto);
             script.CreatedAt = DateTime.UtcNow;
             script.UserId = userId;
+            script.StoryEnvironmentId = environment.Id;
             script.VisualPrompt = visualPrompt;
 
             await _repo.AddAsync(script);

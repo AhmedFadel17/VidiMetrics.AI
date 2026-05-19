@@ -9,10 +9,10 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Episodes
         public string? CreatedBy { get; set; }
         public bool IsDeleted { get; set; }
         public int EpisodeNumber { get; set; }
-        public string Title { get; set; }
-        public string PlotSummary { get; set; }
-        public string ThumbnailUrl { get; set; }
+        public required string Title { get; set; }
+        public required string PlotSummary { get; set; }
         public Guid ShowId { get; set; }
-        public Guid VideoId { get; set; }
+        public string? ThumbnailUrl { get; set; }
+        public string? VideoUrl { get; set; }
     }
 }

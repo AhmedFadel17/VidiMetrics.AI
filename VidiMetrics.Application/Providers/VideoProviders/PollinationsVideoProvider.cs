@@ -61,9 +61,6 @@ public class PollinationsVideoProvider : IVideoProvider
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("video/mp4"));
 
-                // 🔥 التعديل الجوهري: 
-                // نمرر HttpCompletionOption.ResponseContentRead لإجبار السي شارب على الانتظار
-                // حتى يكتمل بث الـ Body بالكامل (الـ 27 ثانية الظاهرة في الصورة) قبل معالجة السطر التالي.
                 var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
 
                 if (!response.IsSuccessStatusCode)
@@ -72,10 +69,8 @@ public class PollinationsVideoProvider : IVideoProvider
                     throw new HttpRequestException($"AI Video provider failed: {response.StatusCode} - {errorContent}");
                 }
 
-                // قراءة البايتات كاملة بعد اكتمال التحميل الآمن من الشبكة
                 byte[] videoBytes = await response.Content.ReadAsByteArrayAsync();
 
-                // التحقق من حجم الملف لضمان استلام فيديو حقيقي متحرك
                 if (videoBytes.Length < 100000)
 
                 {
@@ -84,12 +79,11 @@ public class PollinationsVideoProvider : IVideoProvider
 
                 string fileName = $"video_{seed}_{Guid.NewGuid().ToString().Substring(0, 8)}.mp4";
 
-                // الرفع المباشر إلى كلويديناري
                 string cloudVideoUrl = await _storageProvider.UploadVideoAsync(videoBytes, fileName);
 
                 result.VideoUrl = cloudVideoUrl;
                 result.ThumbnailUrl = cloudVideoUrl.Replace(".mp4", ".jpg");
-                result.Duration = TimeSpan.FromSeconds(5); // بناءً على مسطرة المشغل الظاهرة في صورتك (0:05)
+                result.Duration = TimeSpan.FromSeconds(5);
 
                 return response;
             });

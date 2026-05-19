@@ -23,9 +23,18 @@ public class AiImagesService : IAiImagesService
     private readonly IValidator<UpdateAiImageDto> _updateValidator;
     private readonly IValidator<CreateCharacterImageDto> _createCharacterValidator;
     private readonly IValidator<CreateEnvironmentImageDto> _createEnvironmentValidator;
+    private readonly IValidator<CreateShowImageDto> _createShowValidator;
 
 
-    public AiImagesService(HttpClient httpClient, IMapper mapper, IAiImagesRepository repo, IValidator<UpdateAiImageDto> updateValidator, IValidator<CreateCharacterImageDto> createCharacterValidator, IValidator<CreateEnvironmentImageDto> createEnvironmentValidator, IImageProvider imageProvider)
+    public AiImagesService(
+        HttpClient httpClient,
+        IMapper mapper,
+        IAiImagesRepository repo,
+        IValidator<UpdateAiImageDto> updateValidator,
+        IValidator<CreateCharacterImageDto> createCharacterValidator,
+        IValidator<CreateEnvironmentImageDto> createEnvironmentValidator,
+        IValidator<CreateShowImageDto> createShowValidator,
+        IImageProvider imageProvider)
     {
         _httpClient = httpClient;
         _mapper = mapper;
@@ -34,6 +43,7 @@ public class AiImagesService : IAiImagesService
         _updateValidator = updateValidator;
         _createCharacterValidator = createCharacterValidator;
         _createEnvironmentValidator = createEnvironmentValidator;
+        _createShowValidator = createShowValidator;
 
         _retryPolicy = Policy
             .Handle<HttpRequestException>()
@@ -77,6 +87,22 @@ public class AiImagesService : IAiImagesService
         var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
         return _mapper.Map<AiImageResponseDto>(img);
     }
+
+    public async Task<AiImageResponseDto> CreateShowImageAsync(CreateShowImageDto dto, Guid userId)
+    {
+        await _createShowValidator.ValidateAndThrowAsync(dto);
+
+        string masterPrompt = $"A high-end cinematic show thumbnail poster titled '{dto.Title}'. " +
+                                  $"Subject: {dto.Description}. " +
+                                  $"Visual Art Style: {dto.VisualStyle}. " +
+                                  $"Atmosphere tailored for {dto.TargetAudience} audience. " +
+                                  $"Dramatic cinematic lighting, 8k resolution, highly detailed, photorealistic, depth of field, striking composition, trending on artstation, epic movie poster vibe. " +
+                                  $"--no text, words, typography, logo, watermark, blurry"; var seed = new Random().Next(1, 999999);
+        string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+        var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
+        return _mapper.Map<AiImageResponseDto>(img);
+    }
+
 
 
 

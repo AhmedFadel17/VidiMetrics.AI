@@ -9,6 +9,7 @@ public interface IAiImagesService
     Task<PaginationResponseDto<AiImageResponseDto>> GetAllAsync(AiImageFilterDto filter, Guid userId);
     Task<AiImageResponseDto> CreateCharacterImageAsync(CreateCharacterImageDto dto, Guid userId);
     Task<AiImageResponseDto> CreateEnvironmentImageAsync(CreateEnvironmentImageDto dto, Guid userId);
+    Task<AiImageResponseDto> CreateShowImageAsync(CreateShowImageDto dto, Guid userId);
     Task<AiImageResponseDto> UpdateAsync(Guid id, UpdateAiImageDto dto, Guid userId);
     Task<bool> DeleteAsync(Guid id, Guid userId);
 }
