@@ -1,15 +1,15 @@
-using AutoMapper;
-using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
-using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -23,7 +23,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IValidator<UpdateEpisodeDto> _updateValidator;
 
         public EpisodesService(
-            IEpisodesRepository repository, 
+            IEpisodesRepository repository,
+
             IShowsRepository showsRepository,
             IMapper mapper,
             IValidator<CreateEpisodeDto> createValidator,
@@ -58,7 +59,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
             if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
             {
-                query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) || 
+                query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) ||
+
                                        x.PlotSummary.ToLower().Contains(filter.SearchTerm.ToLower()));
             }
 
@@ -88,10 +90,11 @@ namespace VidiMetrics.Application.Services.StoryEngine
         {
             await _createValidator.ValidateAndThrowAsync(dto);
 
-            var showExists = await _showsRepository.Query()
-                .AnyAsync(s => s.Id == dto.ShowId && s.UserId == userId);
+            var show = await _showsRepository.Query()
+                .FirstOrDefaultAsync(s => s.Id == dto.ShowId && s.UserId == userId);
 
-            if (!showExists) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
+            if (show == null) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
+            if (dto.EpisodeNumber != show.TotalEpisodes + 1) throw new Exception("Invalid Episode Number");
 
             var entity = _mapper.Map<Episode>(dto);
             entity.CreatedAt = DateTime.UtcNow;

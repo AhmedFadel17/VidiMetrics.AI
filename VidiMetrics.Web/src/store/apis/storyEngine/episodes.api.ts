@@ -7,8 +7,6 @@ export interface CreateEpisodeRequest {
   title: string;
   plotSummary: string;
   showId: string;
-  thumbnailUrl?: string;
-  finalVideoId?: string;
 }
 
 export interface UpdateEpisodeRequest extends Partial<CreateEpisodeRequest> {}

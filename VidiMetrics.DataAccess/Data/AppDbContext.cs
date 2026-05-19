@@ -66,11 +66,6 @@ namespace VidiMetrics.DataAccess.Data
                 .HasForeignKey(e => e.AiVideoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Episode>()
-                .HasOne(e => e.AiImage)
-                .WithMany()
-                .HasForeignKey(e => e.AiImageId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Character>()
                 .HasOne(c => c.Show)

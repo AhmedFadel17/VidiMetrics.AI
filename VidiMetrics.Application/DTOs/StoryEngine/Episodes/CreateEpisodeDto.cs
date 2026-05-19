@@ -7,7 +7,6 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Episodes
         public int EpisodeNumber { get; set; }
         public required string Title { get; set; }
         public required string PlotSummary { get; set; }
-        public Guid? AiImageId { get; set; }
         public Guid ShowId { get; set; }
         public Guid? AiVideoId { get; set; }
     }

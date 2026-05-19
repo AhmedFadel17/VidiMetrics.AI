@@ -9,12 +9,6 @@ public class Episode : BaseEntity
     public string Title { get; set; } = string.Empty;
     public string PlotSummary { get; set; } = string.Empty;
 
-    public Guid? AiImageId { get; set; }
-    [ForeignKey("AiImageId")]
-    public AiImage? AiImage { get; set; }
-    [NotMapped]
-    public string? ThumbnailUrl => AiImage?.ImageUrl;
-
     public Guid ShowId { get; set; }
     public Show Show { get; set; } = null!;
 
@@ -23,6 +17,7 @@ public class Episode : BaseEntity
     public AiVideo? AiVideo { get; set; }
     [NotMapped]
     public string? VideoUrl => AiVideo?.VideoUrl;
-
+    [NotMapped]
+    public string? ThumbnailUrl => AiVideo?.ThumbnailUrl;
     public ICollection<Scene> Scenes { get; set; } = new List<Scene>();
 }
