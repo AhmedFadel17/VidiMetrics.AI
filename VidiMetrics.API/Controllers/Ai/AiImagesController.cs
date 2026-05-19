@@ -32,6 +32,13 @@ public class AiImagesController : ApiBaseController
         return Ok(ApiResponseFactory.Success(image, "Environment image created successfully.", 201));
     }
 
+    [HttpPost("show")]
+    public async Task<ActionResult<SuccessResponseDto<AiImageResponseDto>>> CreateShowImage([FromBody] CreateShowImageDto dto)
+    {
+        var image = await _aiImagesService.CreateShowImageAsync(dto, CurrentUserGuid);
+        return Ok(ApiResponseFactory.Success(image, "Series image created successfully.", 201));
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<SuccessResponseDto<AiImageResponseDto>>> GetById(Guid id)
     {
