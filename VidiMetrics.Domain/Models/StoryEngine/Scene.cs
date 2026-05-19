@@ -7,6 +7,7 @@ namespace VidiMetrics.Domain.Models.StoryEngine
     public class Scene : BaseEntity
     {
         public int Order { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public Guid EpisodeId { get; set; }
         public Episode Episode { get; set; } = null!;

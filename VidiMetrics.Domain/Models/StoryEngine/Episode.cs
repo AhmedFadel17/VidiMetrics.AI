@@ -9,17 +9,20 @@ public class Episode : BaseEntity
     public string Title { get; set; } = string.Empty;
     public string PlotSummary { get; set; } = string.Empty;
 
-    public Guid? ThumbnailImageId { get; set; }
-    [ForeignKey("ThumbnailImageId")]
-    public AiImage? ThumbnailImage { get; set; }
+    public Guid? AiImageId { get; set; }
+    [ForeignKey("AiImageId")]
+    public AiImage? AiImage { get; set; }
     [NotMapped]
-    public string? ThumbnailUrl => ThumbnailImage?.ImageUrl;
+    public string? ThumbnailUrl => AiImage?.ImageUrl;
 
     public Guid ShowId { get; set; }
     public Show Show { get; set; } = null!;
 
-    public Guid? FinalVideoId { get; set; }
-    public Video? FinalVideo { get; set; }
+    public Guid? AiVideoId { get; set; }
+    [ForeignKey("AiVideoId")]
+    public AiVideo? AiVideo { get; set; }
+    [NotMapped]
+    public string? VideoUrl => AiVideo?.VideoUrl;
 
     public ICollection<Scene> Scenes { get; set; } = new List<Scene>();
 }

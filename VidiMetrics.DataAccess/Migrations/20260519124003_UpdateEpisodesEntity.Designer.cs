@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260519124003_UpdateEpisodesEntity")]
+    partial class UpdateEpisodesEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1059,9 +1062,6 @@ namespace VidiMetrics.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("AiImageId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -1070,6 +1070,9 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExternalReferenceId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
@@ -1097,8 +1100,6 @@ namespace VidiMetrics.DataAccess.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AiImageId");
 
                     b.HasIndex("UserId");
 
@@ -1482,17 +1483,11 @@ namespace VidiMetrics.DataAccess.Migrations
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Show", b =>
                 {
-                    b.HasOne("VidiMetrics.Domain.Models.Ai.AiImage", "AiImage")
-                        .WithMany()
-                        .HasForeignKey("AiImageId");
-
                     b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AiImage");
 
                     b.Navigation("UserProfile");
                 });

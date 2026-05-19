@@ -61,9 +61,15 @@ namespace VidiMetrics.DataAccess.Data
                     .HasValue<YouTubeVideo>("YouTube");
 
             modelBuilder.Entity<Episode>()
-                .HasOne(e => e.FinalVideo)
+                .HasOne(e => e.AiVideo)
                 .WithMany()
-                .HasForeignKey(e => e.FinalVideoId)
+                .HasForeignKey(e => e.AiVideoId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Episode>()
+                .HasOne(e => e.AiImage)
+                .WithMany()
+                .HasForeignKey(e => e.AiImageId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Character>()
