@@ -1,253 +1,217 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
+import { AnimatePresence, motion } from 'framer-motion'
+import { SeriesFormValues } from '@/types'
 import { useCreateShowMutation } from '@/store/apis/storyEngine/shows.api'
+import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import StepSeriesDetails from './steps/StepSeriesDetails'
+import StepImagePreview from './steps/StepImagePreview'
 
-const AUDIENCE_OPTIONS = [
-  'Gen Z (Teens & Young Adults)',
-  'Millennials (25-40)',
-  'Generation Alpha (Kids)',
-  'Professional / Corporate',
-  'Global Tech/Sci-Fi Enthusiasts',
-  'Luxury & Lifestyle High-End',
-  'Other (Custom Input)'
-]
-
-const STYLE_OPTIONS = [
-  'Cinematic Photorealistic',
-  'Cyberpunk Noir / Neon Drift',
-  'Minimalist Abstract / Zen',
-  'Retro 80s Synthwave',
-  'Ultra-Modern High-Fidelity 3D',
-  'Hand-Drawn Artistic Illustration',
-  'Gritty Industrial / Brutalist',
-  'Dreamy Surrealist / Ethereal',
-  'Other (Custom Engine)'
-]
-
-const seriesSchema = z.object({
+// ─── Schema ───────────────────────────────────────────────────────────────────
+const schema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  visualStyle: z.string().min(2, 'Visual style must be defined'),
-  visualStyleCustom: z.string().optional(),
-  targetAudience: z.string().min(5, 'Target audience must be specified'),
-  targetAudienceCustom: z.string().optional(),
-}).refine((data) => {
-  if (data.visualStyle === 'Other (Custom Engine)' && (!data.visualStyleCustom || data.visualStyleCustom.length < 2)) {
-    return false;
-  }
-  if (data.targetAudience === 'Other (Custom Input)' && (!data.targetAudienceCustom || data.targetAudienceCustom.length < 2)) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Custom values must be at least 2 characters",
-  path: ["visualStyleCustom"], // This is a bit tricky for nested refinement, but simplifies for now
+  description: z.string().min(5, 'Description is required'),
+  visualStyle: z.string().min(2, 'Visual style must be specified'),
+  targetAudience: z.string().min(2, 'Target audience must be specified'),
+  aiImageId: z.string().optional(),
+  referenceImageUrl: z.string().optional(),
 })
 
-type SeriesFormValues = z.infer<typeof seriesSchema>
+// ─── Steps config ─────────────────────────────────────────────────────────────
+const STEPS = [
+  { id: 1, label: 'Series Details', icon: 'edit_note' },
+  { id: 2, label: 'Thumbnail Preview', icon: 'image_search' },
+]
 
+// ─── Motion variants ──────────────────────────────────────────────────────────
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
+  center: { x: 0, opacity: 1, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] } },
+  exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0, transition: { duration: 0.2 } }),
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function SeriesSetup() {
   const navigate = useNavigate()
-  const [createShow, { isLoading }] = useCreateShowMutation()
+  const [createShow, { isLoading: isCreating }] = useCreateShowMutation()
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<SeriesFormValues>({
-    resolver: zodResolver(seriesSchema),
+  const [currentStep, setCurrentStep] = useState(1)
+  const [direction, setDirection] = useState(1)
+
+  const form = useForm<SeriesFormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      title: '',
+      description: '',
+      visualStyle: '',
+      targetAudience: '',
+      aiImageId: '',
+      referenceImageUrl: '',
+    },
+    mode: 'onChange',
   })
 
-  const selectedStyle = watch('visualStyle')
-  const selectedAudience = watch('targetAudience')
+  const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = form
 
-  const onSubmit = async (values: SeriesFormValues) => {
+  // ─── Navigation ──────────────────────────────────────────────────────────────
+  const goToStep2 = () => {
+    setDirection(1)
+    setCurrentStep(2)
+  }
+
+  const goBackToStep1 = () => {
+    setDirection(-1)
+    setCurrentStep(1)
+  }
+
+  // ─── Submit ──────────────────────────────────────────────────────────────────
+  const onSubmit = async () => {
+    const values = form.getValues()
     try {
-      const data = {
-        ...values,
-        visualStyle: values.visualStyle === 'Other (Custom Engine)' ? values.visualStyleCustom : values.visualStyle,
-        targetAudience: values.targetAudience === 'Other (Custom Input)' ? values.targetAudienceCustom : values.targetAudience,
-      }
-      
-      await createShow(data as any).unwrap()
-      toast.success('Series Initialized', {
-        description: 'Parameters accepted. Creating new cinematic universe...',
+      const result = await createShow({
+        title: values.title,
+        description: values.description,
+        visualStyle: values.visualStyle,
+        targetAudience: values.targetAudience,
+        aiImageId: values.aiImageId || undefined,
+      }).unwrap()
+
+      toast.success('Series Launched', {
+        description: 'Your production series has been initialized and is ready for episodes.',
       })
-      
-      setTimeout(() => {
-        navigate('/dashboard/series')
-      }, 1500)
 
+      const newShowId = result.data?.id
+      setTimeout(() => navigate(newShowId ? `/dashboard/series/${newShowId}` : '/dashboard/series'), 1400)
     } catch (error: any) {
-      let errorMessage = 'System failure during series creation. Please check your inputs and try again.';
-      
-      if (error.response && error.response.data) {
-        // Handle structured API errors if available
-        const apiError = error.response.data;
-        errorMessage = apiError.message || (typeof apiError.description === 'string' ? apiError.description : errorMessage);
-      } else if (error.message) {
-        // Handle general Axios/network errors
-        errorMessage = error.message;
-      }
-
-      toast.error('Initialization Failed', {
-        description: errorMessage,
+      toast.error('Launch Failed', {
+        description: error.data?.message ?? 'An error occurred while creating the series.',
       })
     }
   }
 
+  // ─── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8 animate-fade-in-up pb-20">
-      <div className="space-y-4">
-        <span className="text-accent-purple font-label text-xs tracking-[0.3em] uppercase">New Project</span>
-        <h1 className="font-headline text-5xl font-bold tracking-tight text-white flex items-center gap-3">
-          <span className="material-symbols-outlined text-gradient-purple text-5xl">movie</span>
-          Series Parameter <span className="text-gradient-purple">Setup</span>
-        </h1>
-        <p className="text-white/60 font-body text-lg">Define the core attributes and visual engine parameters for your new production.</p>
+    <main className="w-full min-h-screen pb-20 animate-fade-in">
+      <style>{`
+        .wizard-glass {
+          background: rgba(23, 31, 51, 0.6);
+          backdrop-filter: blur(24px);
+          border: 1px solid rgba(255,255,255,0.06);
+        }
+        .step-connector { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+        .step-connector.done { background: linear-gradient(to right, #22d3ee, #ddb7ff); }
+      `}</style>
+
+      {/* ── Breadcrumbs + Header ── */}
+      <div className="space-y-3 mb-10">
+        <Breadcrumbs items={[
+          { label: 'Home', path: '/' },
+          { label: 'Series Library', path: '/dashboard/series' },
+          { label: 'New Series' },
+        ]} />
+
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="font-display text-4xl font-black tracking-tight text-white">
+              Series <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-secondary">Setup</span>
+            </h1>
+            <p className="text-white/40 font-body text-sm mt-1">
+              Step {currentStep} of {STEPS.length} — {STEPS[currentStep - 1].label}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/series')}
+            className="text-white/30 hover:text-white/70 text-[10px] uppercase tracking-widest font-label flex items-center gap-1.5 transition-colors"
+          >
+            <span className="material-symbols-outlined text-base">close</span>
+            Cancel
+          </button>
+        </div>
       </div>
 
-      <div className="glass-panel p-8 lg:p-12 rounded-2xl border border-white/10 relative overflow-hidden">
-        {/* Glow effect */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-accent-purple/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 relative z-10">
-          
-          {/* Title */}
-          <div className="space-y-3">
-            <label className="block font-label text-xs uppercase tracking-widest text-white/60 ml-1">Series Title</label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-white/40 text-xl">title</span>
-              <input 
-                {...register('title')}
-                className={`w-full bg-white/5 border border-white/10 rounded-xl py-5 pl-14 pr-5 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-purple/50 focus:border-transparent transition-all font-body text-base ${errors.title ? 'ring-2 ring-error/50' : ''}`} 
-                placeholder="E.g. The Quantum Paradox" 
-                type="text" 
-                disabled={isLoading}
-              />
-            </div>
-            {errors.title && <p className="text-error text-xs uppercase ml-1 tracking-wider mt-2">{errors.title.message}</p>}
-          </div>
-
-          {/* Description */}
-          <div className="space-y-3">
-            <label className="block font-label text-xs uppercase tracking-widest text-white/60 ml-1">Narrative Logline (Description)</label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-5 top-5 text-white/40 text-xl">description</span>
-              <textarea 
-                {...register('description')}
-                className={`w-full bg-white/5 border border-white/10 rounded-xl py-5 pl-14 pr-5 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-purple/50 focus:border-transparent transition-all font-body text-base min-h-[140px] resize-none ${errors.description ? 'ring-2 ring-error/50' : ''}`} 
-                placeholder="A brief summary of the overarching plot and themes..." 
-                disabled={isLoading}
-              />
-            </div>
-            {errors.description && <p className="text-error text-xs uppercase ml-1 tracking-wider mt-2">{errors.description.message}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Visual Style */}
-            <div className="space-y-3">
-              <label className="block font-label text-xs uppercase tracking-widest text-white/60 ml-1">Visual Style Engine</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-white/40 text-xl pointer-events-none">palette</span>
-                <select 
-                  {...register('visualStyle')}
-                  className={`w-full bg-[#1A1A1A] border border-white/10 rounded-xl py-5 pl-14 pr-10 text-white focus:ring-2 focus:ring-accent-purple/50 focus:border-transparent transition-all font-body text-base appearance-none cursor-pointer ${errors.visualStyle ? 'ring-2 ring-error/50' : ''}`}
-                  disabled={isLoading}
-                  defaultValue=""
+      {/* ── Stepper ── */}
+      <div className="flex items-center gap-0 mb-10 select-none">
+        {STEPS.map((step, idx) => {
+          const done = currentStep > step.id
+          const active = currentStep === step.id
+          return (
+            <div key={step.id} className="flex items-center flex-1 last:flex-none">
+              <div className="flex flex-col items-center gap-2 flex-shrink-0">
+                <motion.div
+                  animate={{
+                    scale: active ? 1.1 : 1,
+                    boxShadow: active ? '0 0 20px rgba(34,211,238,0.35)' : 'none',
+                  }}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${done
+                      ? 'bg-gradient-to-br from-accent-cyan to-secondary border-transparent'
+                      : active
+                        ? 'border-accent-cyan bg-accent-cyan/10'
+                        : 'border-white/15 bg-white/[0.03]'
+                    }`}
                 >
-                  <option value="" disabled className="bg-neutral-900">Select Visual Style...</option>
-                  {STYLE_OPTIONS.map(option => (
-                    <option key={option} value={option} className="bg-neutral-900 text-white py-2">{option}</option>
-                  ))}
-                </select>
-                <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-white/40 text-xl pointer-events-none">expand_more</span>
+                  {done ? (
+                    <span className="material-symbols-outlined text-[#0b1326] text-base" style={{ fontVariationSettings: "'FILL' 1, 'wght' 700" }}>
+                      check
+                    </span>
+                  ) : (
+                    <span className={`material-symbols-outlined text-base ${active ? 'text-accent-cyan' : 'text-white/25'}`}>
+                      {step.icon}
+                    </span>
+                  )}
+                </motion.div>
+                <span className={`text-[9px] uppercase tracking-widest font-label whitespace-nowrap transition-colors ${active ? 'text-accent-cyan font-bold' : done ? 'text-white/50' : 'text-white/25'
+                  }`}>
+                  {step.label}
+                </span>
               </div>
-              {errors.visualStyle && <p className="text-error text-xs uppercase ml-1 tracking-wider mt-2">{errors.visualStyle.message}</p>}
-              
-              {selectedStyle === 'Other (Custom Engine)' && (
-                <div className="relative mt-3 animate-slide-in-bottom">
-                  <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-accent-purple/60 text-xl">auto_fix_high</span>
-                  <input 
-                    {...register('visualStyleCustom')}
-                    className={`w-full bg-white/5 border border-accent-purple/30 rounded-xl py-4 pl-14 pr-5 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-purple/50 focus:border-transparent transition-all font-body text-sm`} 
-                    placeholder="Enter custom visual style..." 
-                    type="text" 
-                    autoFocus
-                  />
-                </div>
+
+              {idx < STEPS.length - 1 && (
+                <div className={`step-connector mx-3 mb-5 ${done ? 'done' : ''}`} />
               )}
             </div>
-
-            {/* Target Audience */}
-            <div className="space-y-3">
-              <label className="block font-label text-xs uppercase tracking-widest text-white/60 ml-1">Target Audience</label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-white/40 text-xl pointer-events-none">groups</span>
-                <select 
-                  {...register('targetAudience')}
-                  className={`w-full bg-[#1A1A1A] border border-white/10 rounded-xl py-5 pl-14 pr-10 text-white focus:ring-2 focus:ring-accent-purple/50 focus:border-transparent transition-all font-body text-base appearance-none cursor-pointer ${errors.targetAudience ? 'ring-2 ring-error/50' : ''}`}
-                  disabled={isLoading}
-                  defaultValue=""
-                >
-                  <option value="" disabled className="bg-neutral-900">Select Target Audience...</option>
-                  {AUDIENCE_OPTIONS.map(option => (
-                    <option key={option} value={option} className="bg-neutral-900 text-white py-2">{option}</option>
-                  ))}
-                </select>
-                <span className="material-symbols-outlined absolute right-5 top-1/2 -translate-y-1/2 text-white/40 text-xl pointer-events-none">expand_more</span>
-              </div>
-              {errors.targetAudience && <p className="text-error text-xs uppercase ml-1 tracking-wider mt-2">{errors.targetAudience.message}</p>}
-
-              {selectedAudience === 'Other (Custom Input)' && (
-                <div className="relative mt-3 animate-slide-in-bottom">
-                  <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-accent-purple/60 text-xl">edit_note</span>
-                  <input 
-                    {...register('targetAudienceCustom')}
-                    className={`w-full bg-white/5 border border-accent-purple/30 rounded-xl py-4 pl-14 pr-5 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-purple/50 focus:border-transparent transition-all font-body text-sm`} 
-                    placeholder="E.g. Urban Explorers, 24-29" 
-                    type="text" 
-                    autoFocus
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="pt-6 flex justify-end gap-6 items-center">
-            <button 
-              type="button"
-              onClick={() => navigate('/dashboard/series')}
-              className="px-8 py-4 rounded-xl font-bold tracking-widest uppercase text-xs text-white/60 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/10 transition-all"
-              disabled={isLoading}
-            >
-              Abort Setup
-            </button>
-            <button 
-              type="submit"
-              className="px-10 py-4 bg-gradient-to-r from-accent-purple to-purple-600 rounded-xl font-bold tracking-widest uppercase text-xs text-white shadow-lg shadow-accent-purple/25 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-3 hover:shadow-accent-purple/40 transition-all border border-white/10"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <span className="material-symbols-outlined animate-spin text-base">autorenew</span>
-                  Compiling...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-base">rocket_launch</span>
-                  Initialize Series
-                </>
-              )}
-            </button>
-          </div>
-
-        </form>
+          )
+        })}
       </div>
-    </div>
+
+      {/* ── Step Panel ── */}
+      <div className="wizard-glass rounded-2xl overflow-hidden">
+        <div className="p-8 min-h-[480px] relative overflow-hidden">
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={currentStep}
+              custom={direction}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+            >
+              {currentStep === 1 && (
+                <StepSeriesDetails
+                  register={register}
+                  errors={errors}
+                  watch={watch}
+                  setValue={setValue}
+                  onNext={goToStep2}
+                  isSubmitting={isCreating}
+                />
+              )}
+              {currentStep === 2 && (
+                <StepImagePreview
+                  watch={watch}
+                  onBack={goBackToStep1}
+                  onSubmit={onSubmit}
+                  isSubmitting={isCreating}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </main>
   )
 }

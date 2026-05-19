@@ -11,6 +11,15 @@ export type CharacterFormValues = {
     referenceImageUrl: string
 }
 
+export type SeriesFormValues = {
+    title: string
+    description: string
+    visualStyle: string
+    targetAudience: string
+    aiImageId: string
+    referenceImageUrl: string
+}
+
 export type EnvironmentFormValues = {
     name: string
     visualDescription: string

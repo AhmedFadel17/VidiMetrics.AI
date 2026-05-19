@@ -8,6 +8,7 @@ export interface CreateShowRequest {
   description: string;
   visualStyle: string;
   targetAudience: string;
+  aiImageId?: string;
 }
 
 export interface UpdateShowRequest {

@@ -20,6 +20,13 @@ export interface CreateCharacterImageDto {
   role: string;
 }
 
+export interface CreateSeriesImageDto {
+  title: string;
+  description: string;
+  visualStyle: string;
+  targetAudience: string;
+}
+
 export interface UpdateAiImageDto {
   imageUrl?: string;
   prompt?: string;
@@ -54,6 +61,10 @@ export const aiImagesApi = mainApi.injectEndpoints({
       query: (body) => ({ url: '/api/ai/images/character', method: 'POST', body }),
       invalidatesTags: [{ type: 'AiImage', id: 'LIST' }],
     }),
+    createSeriesImage: builder.mutation<ApiResponse<AiImage>, CreateSeriesImageDto>({
+      query: (body) => ({ url: '/api/ai/images/show', method: 'POST', body }),
+      invalidatesTags: [{ type: 'AiImage', id: 'LIST' }],
+    }),
     updateAiImage: builder.mutation<ApiResponse<AiImage>, { id: string; body: UpdateAiImageDto }>({
       query: ({ id, body }) => ({ url: `/api/ai/images/${id}`, method: 'PUT', body }),
       invalidatesTags: (_result, _err, { id }) => [
@@ -76,6 +87,7 @@ export const {
   useGetAiImageByIdQuery,
   useCreateEnvironmentImageMutation,
   useCreateCharacterImageMutation,
+  useCreateSeriesImageMutation,
   useUpdateAiImageMutation,
   useDeleteAiImageMutation,
 } = aiImagesApi;
