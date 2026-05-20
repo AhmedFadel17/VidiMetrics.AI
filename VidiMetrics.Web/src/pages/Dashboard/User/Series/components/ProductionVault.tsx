@@ -1,4 +1,4 @@
-import SearchInput from '@/components/ui/SearchInput'
+import SearchInput from '@/components/ui/Inputs/SearchInput'
 import FilterDropdown from '@/components/ui/FilterDropdown'
 import ProductionCard from './ProductionCard'
 import CreateSeriesCard from './CreateSeriesCard'
@@ -49,20 +49,20 @@ export default function ProductionVault() {
 
                 <div className="flex flex-wrap items-center gap-4">
                     {/* Search Bar */}
-                    <SearchInput 
-                        value={searchTerm} 
+                    <SearchInput
+                        value={searchTerm}
                         onChange={(val) => {
                             setSearchTerm(val);
                             setPage(1);
-                        }} 
+                        }}
                         placeholder="Search series..."
                         className="w-48 md:w-64"
                     />
 
                     {/* Status Dropdown */}
-                    <FilterDropdown 
-                        value={status === undefined ? 'all' : status} 
-                        onChange={(opt) => handleStatusChange(opt.value.toString())} 
+                    <FilterDropdown
+                        value={status === undefined ? 'all' : status}
+                        onChange={(opt) => handleStatusChange(opt.value.toString())}
                         options={statusOptions}
                         className="w-48"
                     />

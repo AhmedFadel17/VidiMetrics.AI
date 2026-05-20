@@ -1,7 +1,7 @@
 import CharacterCard from "@/components/ui/Cards/CharacterCard";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import Pagination from "@/components/ui/Pagination";
-import SearchInput from "@/components/ui/SearchInput";
+import SearchInput from "@/components/ui/Inputs/SearchInput";
 import { useGetCharactersQuery } from "@/store/apis";
 import { FilterOption } from "@/types";
 import { Character } from "@/types/models/storyEngine";

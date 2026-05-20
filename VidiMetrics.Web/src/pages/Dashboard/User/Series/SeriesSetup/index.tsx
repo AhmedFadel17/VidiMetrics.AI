@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { SeriesFormValues } from '@/types'
 import { useCreateShowMutation } from '@/store/apis/storyEngine/shows.api'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
@@ -28,7 +28,7 @@ const STEPS = [
 ]
 
 // ─── Motion variants ──────────────────────────────────────────────────────────
-const slideVariants = {
+const slideVariants: Variants = {
   enter: (dir: number) => ({ x: dir > 0 ? 60 : -60, opacity: 0 }),
   center: { x: 0, opacity: 1, transition: { duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] } },
   exit: (dir: number) => ({ x: dir > 0 ? -60 : 60, opacity: 0, transition: { duration: 0.2 } }),
@@ -41,7 +41,6 @@ export default function SeriesSetup() {
 
   const [currentStep, setCurrentStep] = useState(1)
   const [direction, setDirection] = useState(1)
-
   const form = useForm<SeriesFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -49,8 +48,8 @@ export default function SeriesSetup() {
       description: '',
       visualStyle: '',
       targetAudience: '',
-      aiImageId: '',
-      referenceImageUrl: '',
+      aiImageId: null as any,
+      referenceImageUrl: null as any,
     },
     mode: 'onChange',
   })
@@ -97,11 +96,7 @@ export default function SeriesSetup() {
   return (
     <main className="w-full min-h-screen pb-20 animate-fade-in">
       <style>{`
-        .wizard-glass {
-          background: rgba(23, 31, 51, 0.6);
-          backdrop-filter: blur(24px);
-          border: 1px solid rgba(255,255,255,0.06);
-        }
+        
         .step-connector { flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
         .step-connector.done { background: linear-gradient(to right, #22d3ee, #ddb7ff); }
       `}</style>
@@ -148,10 +143,10 @@ export default function SeriesSetup() {
                     boxShadow: active ? '0 0 20px rgba(34,211,238,0.35)' : 'none',
                   }}
                   className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${done
-                      ? 'bg-gradient-to-br from-accent-cyan to-secondary border-transparent'
-                      : active
-                        ? 'border-accent-cyan bg-accent-cyan/10'
-                        : 'border-white/15 bg-white/[0.03]'
+                    ? 'bg-gradient-to-br from-accent-cyan to-secondary border-transparent'
+                    : active
+                      ? 'border-accent-cyan bg-accent-cyan/10'
+                      : 'border-white/15 bg-white/[0.03]'
                     }`}
                 >
                   {done ? (
@@ -179,7 +174,7 @@ export default function SeriesSetup() {
       </div>
 
       {/* ── Step Panel ── */}
-      <div className="wizard-glass rounded-2xl overflow-hidden">
+      <div className="bg-surface-container-low/60 backdrop-blur-[24px] border-[1px] border-white/10 rounded-2xl overflow-hidden">
         <div className="p-8 min-h-[480px] relative overflow-hidden">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div

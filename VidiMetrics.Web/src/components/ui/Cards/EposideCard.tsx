@@ -10,11 +10,23 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
     const { id, title, plotSummary, thumbnailUrl, episodeNumber, showId, createdAt } = episode;
     const code = `E${episodeNumber}`
     return (
-        <Link to={`/dashboard/series/${showId}/episodes/${id}`}>
-            <div className="glass-card rounded-[2rem] p-4 border border-white/5 group hover:border-white/20 transition-all duration-500">
-                <div className="relative h-44 rounded-2xl overflow-hidden mb-5">
-                    <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-dashboard-bg/90 to-transparent"></div>
+        <Link to={`/dashboard/series/${showId}/episodes/${id}`} className="flex flex-col h-full">
+            <div className="glass-card rounded-[2rem] p-4 border border-white/5 group hover:border-white/20 transition-all duration-500 flex flex-col h-full">
+                <div className="relative h-44 rounded-2xl overflow-hidden mb-5 flex-shrink-0">
+                    {thumbnailUrl ? (
+                        <>
+                            <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-dashboard-bg/90 to-transparent"></div>
+                        </>
+                    ) : (
+                        <div className="w-full h-full bg-white/[0.01] border border-dashed border-white/10 flex flex-col items-center justify-center p-4 text-center group-hover:bg-white/[0.03] transition-all duration-500">
+                            <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-2 group-hover:bg-accent-cyan/10 transition-all duration-500">
+                                <span className="material-symbols-outlined text-white/30 group-hover:text-accent-cyan transition-colors text-lg animate-pulse">movie_edit</span>
+                            </div>
+                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Unfinished</span>
+                            <p className="text-[9px] text-white/30 max-w-[160px] leading-tight">Scene combination is in progress</p>
+                        </div>
+                    )}
 
                     <div className="absolute bottom-1 right-2">
                         <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-md bg-primary/60 text-on-surface font-bold`}>
@@ -24,12 +36,12 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
                     </div>
                 </div>
 
-                <div className="space-y-3">
-                    <div className="flex justify-between items-start">
+                <div className="space-y-3 flex flex-col flex-grow">
+                    <div className="flex justify-between items-start flex-shrink-0">
                         <h4 className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors">{code}: {title}</h4>
                     </div>
-                    <div className="flex justify-between items-start">
-                        <h4 className="text-xs text-gray-400 group-hover:text-accent-cyan transition-colors">{plotSummary}</h4>
+                    <div className="flex justify-between items-start flex-grow">
+                        <p className="text-xs text-gray-400 group-hover:text-accent-cyan transition-colors line-clamp-3">{plotSummary}</p>
                     </div>
 
 

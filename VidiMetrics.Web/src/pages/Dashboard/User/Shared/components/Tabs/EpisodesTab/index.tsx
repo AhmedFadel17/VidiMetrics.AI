@@ -1,6 +1,6 @@
 import EpisodeCard from "@/components/ui/Cards/EposideCard"
 import Pagination from "@/components/ui/Pagination";
-import SearchInput from "@/components/ui/SearchInput";
+import SearchInput from "@/components/ui/Inputs/SearchInput";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import { useGetEpisodesQuery } from "@/store/apis";
 import { Episode } from "@/types/models/storyEngine"

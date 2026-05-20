@@ -8,6 +8,9 @@ import { useCreateEpisodeMutation } from '@/store/apis/storyEngine/episodes.api'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { useGetShowByIdQuery } from '@/store/apis'
 import { LoadingScreen, ErrorScreen } from '@/components/ui/Feedback/StatusScreens'
+import { InputField } from '@/components/ui/Inputs/InputField'
+import { TextAreaField } from '@/components/ui/Inputs/TextareaField'
+import { Button } from '@/components/ui/Button'
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 const episodeSchema = z.object({
@@ -68,17 +71,6 @@ export default function EpisodeSetup() {
       })
     }
   }
-  const inputClass = (hasError: boolean) =>
-    `w-full bg-white/5 border rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20
-     focus:ring-2 focus:ring-accent-cyan/40 focus:border-accent-cyan/40 focus:outline-none
-     transition-all font-body ${hasError ? 'border-red-500/60 ring-2 ring-red-500/20' : 'border-white/10'}`
-
-  const textareaClass = (hasError: boolean) =>
-    `w-full bg-white/5 border rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20
-     focus:ring-2 focus:ring-accent-cyan/40 focus:border-accent-cyan/40 focus:outline-none
-     transition-all font-body resize-none min-h-[100px]
-     ${hasError ? 'border-red-500/60 ring-2 ring-red-500/20' : 'border-white/10'}`
-
 
   // ─── Guards ──────────────────────────────────────────────────────────────────
   if (isShowLoading) return <LoadingScreen message="Accessing Series Parameters..." accentColor="cyan" />
@@ -87,13 +79,6 @@ export default function EpisodeSetup() {
   // ─── Render ──────────────────────────────────────────────────────────────────
   return (
     <main className="w-full min-h-screen pb-20 animate-fade-in">
-      <style>{`
-        .wizard-glass {
-          background: rgba(23, 31, 51, 0.6);
-          backdrop-filter: blur(24px);
-          border: 1px solid rgba(255,255,255,0.06);
-        }
-      `}</style>
 
       {/* ── Breadcrumbs + Header ── */}
       <div className="space-y-3 mb-10">
@@ -125,7 +110,7 @@ export default function EpisodeSetup() {
       </div>
 
       {/* ── Form Panel ── */}
-      <div className="wizard-glass rounded-2xl overflow-hidden">
+      <div className="bg-surface-container-low/60 backdrop-blur-[24px] border-[1px] border-white/10 rounded-2xl overflow-hidden">
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-8 space-y-8">
 
@@ -166,47 +151,29 @@ export default function EpisodeSetup() {
 
               {/* Title */}
               <div className="col-span-3 space-y-2">
-                <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
-                  Episode Title
-                </label>
-                <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-accent-cyan transition-colors text-xl">
-                    title
-                  </span>
-                  <input
-                    {...register('title')}
-                    type="text"
-                    placeholder="e.g. The Awakening"
-                    disabled={isCreating}
-                    className={inputClass(!!errors.title)}
-                  />
-                </div>
-                {errors.title && (
-                  <p className="text-red-400 text-[10px] uppercase tracking-wider ml-1">{errors.title.message}</p>
-                )}
+                <InputField
+                  {...register('title')}
+                  label="Episode Title"
+                  icon="title"
+                  placeholder='The Story of...'
+                  error={errors.title?.message}
+                  disabled={isCreating}
+                />
               </div>
             </div>
 
             {/* ── Plot Summary ── */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
-                Narrative Summary
-              </label>
-              <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-4 text-white/30 group-focus-within:text-accent-cyan transition-colors text-xl">
-                  auto_stories
-                </span>
-                <textarea
-                  {...register('plotSummary')}
-                  placeholder="Describe the main events and character arcs for this episode..."
-                  disabled={isCreating}
-                  rows={6}
-                  className={textareaClass(!!errors.plotSummary)}
-                />
-              </div>
-              {errors.plotSummary && (
-                <p className="text-red-400 text-[10px] uppercase tracking-wider ml-1">{errors.plotSummary.message}</p>
-              )}
+              <TextAreaField
+                {...register('plotSummary')}
+                label="Narrative Summary"
+                icon="auto_stories"
+                placeholder='Describe the main events and character arcs for this episode...'
+                error={errors.plotSummary?.message}
+                disabled={isCreating}
+                rows={6}
+              />
+
             </div>
 
             {/* ── Series context badge ── */}
@@ -242,29 +209,18 @@ export default function EpisodeSetup() {
             <div className="flex gap-1.5">
               <div className="w-6 h-2 bg-accent-cyan rounded-full" />
             </div>
-
-            <button
+            <Button
+              variant="launch"
+              size="lg"
               type="submit"
               disabled={isCreating}
-              className="flex items-center gap-2 px-8 py-3 rounded-xl font-headline font-bold text-sm
-                bg-gradient-to-r from-accent-cyan/80 to-secondary text-white
-                shadow-[0_0_30px_rgba(34,211,238,0.2)] hover:brightness-110
-                active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
+              isLoading={isCreating}
+              loadingText="Initializing..."
+              icon={<span className="material-symbols-outlined text-base">rocket_launch</span>}
             >
-              {isCreating ? (
-                <>
-                  <span className="material-symbols-outlined text-base animate-spin">autorenew</span>
-                  Initializing...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    rocket_launch
-                  </span>
-                  Launch Episode
-                </>
-              )}
-            </button>
+              Launch Episode
+            </Button>
+
           </div>
         </form>
       </div>

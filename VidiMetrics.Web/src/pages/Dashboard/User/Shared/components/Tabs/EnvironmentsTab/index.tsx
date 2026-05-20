@@ -1,7 +1,7 @@
 import EnvironmentCard from "@/components/ui/Cards/EnvironmentCard";
 import FilterDropdown from "@/components/ui/FilterDropdown";
 import Pagination from "@/components/ui/Pagination";
-import SearchInput from "@/components/ui/SearchInput";
+import SearchInput from "@/components/ui/Inputs/SearchInput";
 import { useGetEnvironmentsQuery } from "@/store/apis";
 import { FilterOption } from "@/types";
 import { StoryEnvironment } from "@/types/models/storyEngine";

@@ -30,22 +30,33 @@ export default function CharactersSection({ showId }: CharactersSectionProps) {
             </div>
 
             <div className="grid grid-cols-3 gap-6">
+                {characters.length < 3 && (
+                    <button
+                        onClick={() => navigate(`/dashboard/series/${showId}/characters/new`)}
+                        className={`col-span-${3 - characters.length} relative group overflow-hidden rounded-[2rem] border border-white/5 bg-gradient-to-br from-white/[0.01] to-white/[0.03] hover:from-white/[0.03] hover:to-white/[0.06] transition-all duration-500 flex flex-col items-center justify-center p-8 text-center min-h-[380px]`}
+                    >
+                        <div className="absolute -inset-y-12 -inset-x-12 bg-gradient-to-r from-accent-purple/0 via-accent-purple/5 to-accent-purple/0 group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
+                        <div className="relative space-y-4 z-10 flex flex-col items-center">
+                            <div className="w-16 h-16 rounded-full bg-accent-purple/5 border border-accent-purple/10 flex items-center justify-center group-hover:scale-110 group-hover:border-accent-purple/30 group-hover:shadow-[0_0_20px_rgba(138,43,226,0.15)] transition-all duration-500 animate-bounce [animation-duration:3s]">
+                                <span className="material-symbols-outlined text-accent-purple text-3xl">groups</span>
+                            </div>
+                            <div className="space-y-2">
+                                <h4 className="text-lg font-bold text-white group-hover:text-accent-purple transition-colors">Create New Character</h4>
+                                <p className="text-xs text-white/40 max-w-[280px] leading-relaxed">
+                                    Your universe needs characters. Click here to start your journey and craft your new cast member!
+                                </p>
+                            </div>
+                        </div>
+                    </button>
+                )}
 
                 {characters.map((char, index) => (
-                    <div className="col-span-1">
-                        <CharacterCard key={index} character={char} />
+                    <div className="col-span-1" key={index}>
+                        <CharacterCard character={char} />
                     </div>
                 ))}
 
-                {/* New Character Action */}
-                <button
-                    onClick={() => navigate(`/dashboard/series/${showId}/characters/new`)}
-                    className="col-span-1 shrink-0 border-[1.5px] border-dashed border-white/10 rounded-[2rem] bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-purple/40 transition-all duration-500 group flex flex-col items-center justify-center p-8 text-center min-h-[380px]">
-                    <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-4 group-hover:bg-accent-purple/20 transition-all duration-500">
-                        <span className="material-symbols-outlined text-white group-hover:scale-125 transition-transform duration-500">person_add</span>
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/60">New Character</span>
-                </button>
+                
             </div>
         </div>
     )
