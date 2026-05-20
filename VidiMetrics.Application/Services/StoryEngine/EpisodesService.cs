@@ -39,8 +39,10 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
         public async Task<EpisodeResponseDto> GetByIdAsync(Guid id, Guid userId)
         {
-            var entity = await _repository.Query()
-                .FirstOrDefaultAsync(e => e.Id == id && e.Show.UserId == userId);
+            IQueryable<Episode> query = _repository.Query()
+            .Include(x => x.AiVideo);
+
+            var entity = await query.FirstOrDefaultAsync(e => e.Id == id && e.Show.UserId == userId);
             if (entity == null) throw new Exception("Episode not found.");
 
             return _mapper.Map<EpisodeResponseDto>(entity);
@@ -48,7 +50,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
         public async Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(EpisodeFilterDto filter, Guid userId)
         {
-            var query = _repository.Query();
+            IQueryable<Episode> query = _repository.Query()
+            .Include(x => x.AiVideo);
 
             query = query.Where(x => x.Show.UserId == userId);
 
