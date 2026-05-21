@@ -5,5 +5,6 @@ export const SidebarRoutes = [
     { label: 'Social Links', path: '/dashboard/social', icon: 'share' },
     { label: 'Automation', path: '/dashboard/automation', icon: 'bolt' },
     { label: 'Analytics', path: '/dashboard/analytics', icon: 'bar_chart' },
-    { label: 'Settings', path: '/dashboard/settings', icon: 'settings' },
+    { label: 'Account', path: '/dashboard/account', icon: 'person' },
+
 ]
