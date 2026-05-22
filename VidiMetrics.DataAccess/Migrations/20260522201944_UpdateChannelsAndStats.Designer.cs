@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260522201944_UpdateChannelsAndStats")]
+    partial class UpdateChannelsAndStats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -525,6 +528,83 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.ToTable("ChannelStats");
                 });
 
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Playlist", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChannelId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("YouTubePlaylistId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChannelId");
+
+                    b.ToTable("Playlists");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.PlaylistItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PlaylistId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("VideoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlaylistId");
+
+                    b.HasIndex("VideoId");
+
+                    b.ToTable("PlaylistItems");
+                });
+
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Video", b =>
                 {
                     b.Property<Guid>("Id")
@@ -565,11 +645,20 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("VideoType")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ChannelId");
 
                     b.ToTable("Videos");
+
+                    b.HasDiscriminator<string>("VideoType").HasValue("Video");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.ApiUsageQuota", b =>
@@ -1187,6 +1276,53 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.ToTable("StoryEnvironments");
                 });
 
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.LocalVideo", b =>
+                {
+                    b.HasBaseType("VidiMetrics.Domain.Models.Core.Video");
+
+                    b.Property<string>("FileExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("FileSizeInBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsProcessedByAi")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ProcessingError")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StorageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("Local");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.YouTubeVideo", b =>
+                {
+                    b.HasBaseType("VidiMetrics.Domain.Models.Core.Video");
+
+                    b.Property<long>("LikeCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("PrivacyStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ViewCount")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("YouTubeVideoId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasDiscriminator().HasValue("YouTube");
+                });
+
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiScript", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", "StoryEnvironment")
@@ -1268,6 +1404,36 @@ namespace VidiMetrics.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Playlist", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Channel", "Channel")
+                        .WithMany()
+                        .HasForeignKey("ChannelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Channel");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.PlaylistItem", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Playlist", "Playlist")
+                        .WithMany("PlaylistItems")
+                        .HasForeignKey("PlaylistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
+                        .WithMany("PlaylistItems")
+                        .HasForeignKey("VideoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Playlist");
+
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Video", b =>
@@ -1511,6 +1677,16 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Navigation("ChannelStat")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Playlist", b =>
+                {
+                    b.Navigation("PlaylistItems");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Video", b =>
+                {
+                    b.Navigation("PlaylistItems");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.SubscriptionPlan", b =>

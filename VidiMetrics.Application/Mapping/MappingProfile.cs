@@ -6,12 +6,8 @@ using VidiMetrics.Application.DTOs.Ai.AiTasks;
 using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.DTOs.Ai.Transcripts;
 using VidiMetrics.Application.DTOs.Common;
+using VidiMetrics.Application.DTOs.Core.ChannelPosts;
 using VidiMetrics.Application.DTOs.Core.Channels;
-using VidiMetrics.Application.DTOs.Core.LocalVideos;
-using VidiMetrics.Application.DTOs.Core.PlaylistItems;
-using VidiMetrics.Application.DTOs.Core.Playlists;
-using VidiMetrics.Application.DTOs.Core.Videos;
-using VidiMetrics.Application.DTOs.Core.YouTubeVideos;
 using VidiMetrics.Application.DTOs.Infra.ApiUsageQuotas;
 using VidiMetrics.Application.DTOs.Infra.UserProfiles;
 using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
@@ -62,30 +58,10 @@ namespace VidiMetrics.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Channel, ChannelResponseDto>();
 
-            CreateMap<CreateLocalVideoDto, LocalVideo>();
-            CreateMap<UpdateLocalVideoDto, LocalVideo>()
+            CreateMap<CreateChannelPostDto, ChannelPost>();
+            CreateMap<UpdateChannelPostDto, ChannelPost>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<LocalVideo, LocalVideoResponseDto>();
-
-            CreateMap<CreatePlaylistItemDto, PlaylistItem>();
-            CreateMap<UpdatePlaylistItemDto, PlaylistItem>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<PlaylistItem, PlaylistItemResponseDto>();
-
-            CreateMap<CreatePlaylistDto, Playlist>();
-            CreateMap<UpdatePlaylistDto, Playlist>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<Playlist, PlaylistResponseDto>();
-
-            CreateMap<CreateVideoDto, Video>();
-            CreateMap<UpdateVideoDto, Video>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<Video, VideoResponseDto>();
-
-            CreateMap<CreateYouTubeVideoDto, YouTubeVideo>();
-            CreateMap<UpdateYouTubeVideoDto, YouTubeVideo>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<YouTubeVideo, YouTubeVideoResponseDto>();
+            CreateMap<ChannelPost, ChannelPostResponseDto>();
 
             CreateMap<CreateApiUsageQuotaDto, ApiUsageQuota>();
             CreateMap<UpdateApiUsageQuotaDto, ApiUsageQuota>()

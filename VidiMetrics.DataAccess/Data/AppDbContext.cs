@@ -10,12 +10,10 @@ namespace VidiMetrics.DataAccess.Data
     public class AppDbContext : DbContext
     {
         // Core
-        public DbSet<Video> Videos { get; set; }
         public DbSet<Channel> Channels { get; set; }
-        public DbSet<Playlist> Playlists { get; set; }
-        public DbSet<PlaylistItem> PlaylistItems { get; set; }
-        public DbSet<LocalVideo> LocalVideos { get; set; }
-        public DbSet<YouTubeVideo> YouTubeVideos { get; set; }
+        public DbSet<ChannelPost> ChannelPosts { get; set; }
+        public DbSet<ChannelStat> ChannelStats { get; set; }
+        public DbSet<Video> Videos { get; set; }
 
         // Ai
         public DbSet<AiPromptTemplate> AiPromptTemplates { get; set; }
@@ -55,11 +53,18 @@ namespace VidiMetrics.DataAccess.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Video>()
-                    .HasDiscriminator<string>("VideoType")
-                    .HasValue<LocalVideo>("Local")
-                    .HasValue<YouTubeVideo>("YouTube");
 
+            modelBuilder.Entity<Channel>()
+                        .HasOne(c => c.ChannelStat)
+                        .WithOne(s => s.Channel)
+                        .HasForeignKey<ChannelStat>(s => s.ChannelId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ChannelPost>()
+                .HasOne(p => p.Channel)
+                .WithMany(c => c.ChannelPosts)
+                .HasForeignKey(p => p.ChannelId)
+                .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Episode>()
                 .HasOne(e => e.AiVideo)
                 .WithMany()
@@ -71,12 +76,6 @@ namespace VidiMetrics.DataAccess.Data
                 .HasOne(c => c.Show)
                 .WithMany(s => s.Characters)
                 .HasForeignKey(c => c.ShowId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<PlaylistItem>()
-                .HasOne(p => p.Video)
-                .WithMany(v => v.PlaylistItems)
-                .HasForeignKey(p => p.VideoId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<SceneCharacter>()
@@ -150,6 +149,10 @@ namespace VidiMetrics.DataAccess.Data
                       .HasConversion<string>()
                       .HasMaxLength(20);
             });
+
+
+
+
         }
     }
 }

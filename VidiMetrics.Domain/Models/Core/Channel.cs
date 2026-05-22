@@ -1,12 +1,28 @@
-﻿namespace VidiMetrics.Domain.Models.Core;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Models.Infra;
+
+namespace VidiMetrics.Domain.Models.Core;
 
 public class Channel : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
-    public string? YouTubeChannelId { get; set; } 
-    public string? Description { get; set; }
-    public string? CustomUrl { get; set; } 
+    public string AvatarUrl { get; set; } = string.Empty;
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? ExpiresAt { get; set; }
+    public bool IsActive { get; set; } = true;
+    public bool IsConnected { get; set; } = true;
+    public bool SyncAnalytics { get; set; } = true;
+    public bool AutoPost { get; set; } = false;
+    public Guid UserId { get; set; }
+    [ForeignKey("UserId")]
+    public UserProfile UserProfile { get; set; } = null!;
 
-    public ICollection<Video> Videos { get; set; } = new List<Video>();
-    public ICollection<Playlist> Playlists { get; set; } = new List<Playlist>();
+    public TargetPlatform Platform { get; set; }
+    public string PlatformChannelId { get; set; } = string.Empty;
+
+    // Relationships
+    public ICollection<ChannelPost> ChannelPosts { get; set; } = new List<ChannelPost>();
+    public virtual ChannelStat ChannelStat { get; set; } = null!;
 }

@@ -7,10 +7,39 @@ namespace VidiMetrics.Application.Validators.Core.Channels
     {
         public UpdateChannelValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name cannot be empty.").When(x => x.Name != null);
-            RuleFor(x => x.YouTubeChannelId).NotEmpty().WithMessage("YouTubeChannelId cannot be empty.").When(x => x.YouTubeChannelId != null);
-            RuleFor(x => x.Description).NotEmpty().WithMessage("Description cannot be empty.").When(x => x.Description != null);
-            RuleFor(x => x.CustomUrl).NotEmpty().WithMessage("CustomUrl cannot be empty.").When(x => x.CustomUrl != null);
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("Name cannot be empty.")
+                .MaximumLength(100).WithMessage("Name cannot exceed 100 characters.")
+                .When(x => x.Name != null);
+
+            RuleFor(x => x.AvatarUrl)
+                .NotEmpty().WithMessage("Avatar URL cannot be empty.")
+                .Must(BeAValidUrl).WithMessage("Avatar URL must be a valid absolute URI path.")
+                .When(x => x.AvatarUrl != null);
+
+            RuleFor(x => x.AccessToken)
+                .NotEmpty().WithMessage("Access Token cannot be an empty string value.")
+                .When(x => x.AccessToken != null);
+
+            RuleFor(x => x.ExpiresAt)
+                .GreaterThan(DateTime.UtcNow).WithMessage("The updated token expiration timestamp must be in the future.")
+                .When(x => x.ExpiresAt != null);
+
+            RuleFor(x => x.Platform)
+                .IsInEnum().WithMessage("The selected target platform is invalid.")
+                .When(x => x.Platform != null);
+
+            RuleFor(x => x.PlatformChannelId)
+                .NotEmpty().WithMessage("Platform Channel ID cannot be empty.")
+                .When(x => x.PlatformChannelId != null);
+        }
+
+        private bool BeAValidUrl(string? url)
+        {
+            if (string.IsNullOrEmpty(url)) return false;
+            return Uri.TryCreate(url, UriKind.Absolute, out var uriResult)
+
+                   && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
         }
     }
 }

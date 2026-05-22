@@ -15,7 +15,7 @@ using VidiMetrics.Application.Services.Core;
 using VidiMetrics.Application.Services.Infra;
 using VidiMetrics.Application.Services.Seo;
 using VidiMetrics.Application.Services.StoryEngine;
-using VidiMetrics.Application.Validators.Core.Videos;
+using VidiMetrics.Application.Validators.Core.Channels;
 
 namespace VidiMetrics.Application
 {
@@ -27,10 +27,9 @@ namespace VidiMetrics.Application
             services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
             // Automatic Validator Registration
-            services.AddValidatorsFromAssemblyContaining<CreateVideoValidator>();
+            services.AddValidatorsFromAssemblyContaining<CreateChannelValidator>();
 
             // Service Registration
-            services.AddScoped<IVideosService, VideosService>();
             services.AddScoped<IAiPromptTemplatesService, AiPromptTemplatesService>();
             services.AddScoped<IAiTasksService, AiTasksService>();
             services.AddScoped<IAiImagesService, AiImagesService>();
@@ -43,9 +42,6 @@ namespace VidiMetrics.Application
             services.AddScoped<IEpisodesService, EpisodesService>();
             services.AddScoped<IKeywordRankingsService, KeywordRankingsService>();
             services.AddScoped<IKeywordsService, KeywordsService>();
-            services.AddScoped<ILocalVideosService, LocalVideosService>();
-            services.AddScoped<IPlaylistItemsService, PlaylistItemsService>();
-            services.AddScoped<IPlaylistsService, PlaylistsService>();
             services.AddScoped<ISeoAuditsService, SeoAuditsService>();
 
             services.AddScoped<IShowsService, ShowsService>();
@@ -54,7 +50,6 @@ namespace VidiMetrics.Application
             services.AddScoped<ITranscriptsService, TranscriptsService>();
             services.AddScoped<IUserProfilesService, UserProfilesService>();
             services.AddScoped<IVideoTagsService, VideoTagsService>();
-            services.AddScoped<IYouTubeVideosService, YouTubeVideosService>();
 
             services.AddScoped<IImageProvider, PollinationsImageProvider>();
             services.AddScoped<IVideoProvider, PollinationsVideoProvider>();

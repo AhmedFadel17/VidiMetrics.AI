@@ -1,6 +1,6 @@
 ﻿namespace VidiMetrics.Domain.Models.Core;
 
-public abstract class Video : BaseEntity
+public class Video : BaseEntity
 {
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
@@ -15,5 +15,4 @@ public abstract class Video : BaseEntity
     public Guid ChannelId { get; set; }
     public Channel Channel { get; set; } = null!;
 
-    public ICollection<PlaylistItem> PlaylistItems { get; set; } = new List<PlaylistItem>();
 }
