@@ -1,15 +1,12 @@
 using System;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.ChannelStats;
 using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Core.Channels
 {
-    public class ChannelResponseDto
+    public record ChannelResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public bool IsDeleted { get; set; }
         public string Name { get; set; } = string.Empty;
         public string AvatarUrl { get; set; } = string.Empty;
         public string? AccessToken { get; set; }
@@ -19,8 +16,9 @@ namespace VidiMetrics.Application.DTOs.Core.Channels
         public bool IsConnected { get; set; }
         public bool SyncAnalytics { get; set; }
         public bool AutoPost { get; set; }
-        public TargetPlatform Platform { get; set; }
+        public TargetPlatform? Platform { get; set; }
+
         public string PlatformChannelId { get; set; } = string.Empty;
-        public ChannelStatResponseDto? Stats { get; set; }
+        public ChannelStatResponseDto? ChannelStat { get; set; }
     }
 }

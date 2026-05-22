@@ -1,11 +1,11 @@
 using System;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Core.ChannelPosts
 {
-    public class ChannelPostResponseDto
+    public record ChannelPostResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string ThumbnailUrl { get; set; } = string.Empty;
@@ -13,7 +13,8 @@ namespace VidiMetrics.Application.DTOs.Core.ChannelPosts
         public DateTime? PublishedAt { get; set; }
         public DateTime? ScheduledAt { get; set; }
         public string? ExternalPostId { get; set; }
-        public string Status { get; set; } = string.Empty;
+        public PostStatus? Status { get; set; }
+
         public string? ErrorMessage { get; set; }
         public Guid ChannelId { get; set; }
     }

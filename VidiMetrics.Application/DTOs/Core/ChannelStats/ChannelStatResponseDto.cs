@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Core.ChannelStats
 {
-    public class ChannelStatResponseDto
+    public record ChannelStatResponseDto
     {
         public int TotalViews { get; set; }
         public int TotalVideos { get; set; }
