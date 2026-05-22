@@ -25,10 +25,7 @@ export const mainApi = createApi({
     // Core
     'Channel',
     'Video',
-    'LocalVideo',
-    'YouTubeVideo',
-    'Playlist',
-    'PlaylistItem',
+    'ChannelPost',
     // Ai
     'AiTask',
     'AiPromptTemplate',

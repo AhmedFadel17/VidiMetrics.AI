@@ -1,58 +1,55 @@
+import { ChannelPlatform, ChannelPostStatus } from "../enums";
 import { BaseEntity } from "./base";
-import { YouTubePrivacyStatus } from "../enums";
 
 // ─── Video (abstract base) ───────────────────────────────────────────────────
 export interface Video extends BaseEntity {
   title: string;
   description?: string;
-  duration: string; // TimeSpan serialised as "hh:mm:ss"
+  duration: string;
   thumbnailUrl?: string;
   currentRank: number;
   lastRankCheck?: string;
   channelId: string;
 }
 
-// ─── YouTubeVideo ─────────────────────────────────────────────────────────────
-export interface YouTubeVideo extends Video {
-  youTubeVideoId: string;
-  viewCount: number;
-  likeCount: number;
-  publishedAt: string;
-  privacyStatus?: YouTubePrivacyStatus;
-}
-
-// ─── LocalVideo ───────────────────────────────────────────────────────────────
-export interface LocalVideo extends Video {
-  storageUrl: string;
-  fileExtension: string;
-  fileSizeInBytes: number;
-  isProcessedByAi: boolean;
-  processingError?: string;
-}
 
 // ─── Channel ──────────────────────────────────────────────────────────────────
 export interface Channel extends BaseEntity {
   name: string;
-  youTubeChannelId?: string;
-  description?: string;
-  customUrl?: string;
-  videos?: Video[];
-  playlists?: Playlist[];
+  avatarUrl: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: string;
+  isActive: boolean;
+  isConnected: boolean;
+  syncAnalytics: boolean;
+  autoPost: boolean;
+  platform?: ChannelPlatform;
+  platformChannelId: string;
+  channelPosts?: ChannelPost[];
+  channelStat?: ChannelStat;
 }
 
-// ─── Playlist ─────────────────────────────────────────────────────────────────
-export interface Playlist extends BaseEntity {
+// ─── ChannelPost ─────────────────────────────────────────────────────────────────
+export interface ChannelPost extends BaseEntity {
   title: string;
   description?: string;
-  youTubePlaylistId?: string;
+  thumbnailUrl?: string;
+  videoUrl?: string;
+  publishedAt?: string;
+  scheduledAt?: string;
+  externalPostId?: string;
+  status?: ChannelPostStatus;
+  errorMessage?: string;
   channelId: string;
-  playlistItems?: PlaylistItem[];
 }
 
-// ─── PlaylistItem ─────────────────────────────────────────────────────────────
-export interface PlaylistItem extends BaseEntity {
-  position: number;
-  note?: string;
-  playlistId: string;
-  videoId: string;
+// ─── ChannelStat ─────────────────────────────────────────────────────────────────
+export interface ChannelStat extends BaseEntity {
+  totalViews: number;
+  totalSubscribers: number;
+  totalLikes: number;
+  totalVideos: number;
+  channelId: string;
 }
+

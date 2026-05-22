@@ -33,10 +33,9 @@ import CharacterSetup from "@/pages/Dashboard/User/Characters/CharacterSetup";
 import EnvironmentDetails from "@/pages/Dashboard/User/Environments/Details";
 import SceneSetup from "@/pages/Dashboard/User/Scenes/SceneSetup";
 import EnvironmentSetup from "@/pages/Dashboard/User/Environments/EnvironemntSetup";
-import ProfileSettingsPage from "@/pages/Dashboard/User/ProfileSettings";
 import SceneDetails from "@/pages/Dashboard/User/Scenes/Details";
-import Profile from "@/pages/Dashboard/User/Profile";
 import AccountPage from "@/pages/Dashboard/User/Account";
+import SocialLinksPage from "@/pages/Dashboard/User/SocialLinks";
 
 // =============================
 // 🚀 MAIN ROUTES
@@ -127,6 +126,11 @@ export const AppUserRoutes: AppRoute[] = [
     path: "/dashboard/series/:showId/episodes/:episodeId/scenes/:id",
     label: "Scenes",
     element: <SceneDetails />,
+  },
+  {
+    path: "/dashboard/social-links",
+    label: "Social Links",
+    element: <SocialLinksPage />,
   },
   {
     path: "/dashboard/account",

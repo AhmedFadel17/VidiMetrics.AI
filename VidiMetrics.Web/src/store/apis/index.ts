@@ -11,10 +11,7 @@ export * from './storyEngine/storyEnvironments.api';
 // ─── Core ─────────────────────────────────────────────────────────────────────
 export * from './core/channels.api';
 export * from './core/videos.api';
-export * from './core/playlists.api';
-export * from './core/playlistItems.api';
-export * from './core/localVideos.api';
-export * from './core/youtubeVideos.api';
+export * from './core/channelPosts.api';
 
 // ─── Ai ───────────────────────────────────────────────────────────────────────
 export * from './ai/aiPromptTemplates.api';
