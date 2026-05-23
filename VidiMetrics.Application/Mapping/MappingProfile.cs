@@ -8,6 +8,7 @@ using VidiMetrics.Application.DTOs.Ai.Transcripts;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.ChannelPosts;
 using VidiMetrics.Application.DTOs.Core.Channels;
+using VidiMetrics.Application.DTOs.Core.ChannelStats;
 using VidiMetrics.Application.DTOs.Infra.ApiUsageQuotas;
 using VidiMetrics.Application.DTOs.Infra.UserProfiles;
 using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
@@ -62,6 +63,8 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<UpdateChannelPostDto, ChannelPost>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ChannelPost, ChannelPostResponseDto>();
+
+            CreateMap<ChannelStat, ChannelStatResponseDto>();
 
             CreateMap<CreateApiUsageQuotaDto, ApiUsageQuota>();
             CreateMap<UpdateApiUsageQuotaDto, ApiUsageQuota>()

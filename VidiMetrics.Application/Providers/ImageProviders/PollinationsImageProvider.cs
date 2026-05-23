@@ -7,6 +7,7 @@ public class PollinationsImageProvider : IImageProvider
 {
     private readonly HttpClient _httpClient;
     private readonly AsyncRetryPolicy _retryPolicy;
+    
     const string BaseUrl = "https://image.pollinations.ai/prompt";
     public PollinationsImageProvider(HttpClient httpClient)
     {

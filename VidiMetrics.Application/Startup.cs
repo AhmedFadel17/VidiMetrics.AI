@@ -7,6 +7,7 @@ using VidiMetrics.Application.Interfaces.Core;
 using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Interfaces.Seo;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.ChannelPlatformProviders;
 using VidiMetrics.Application.Providers.ImageProviders;
 using VidiMetrics.Application.Providers.StorageProviders;
 using VidiMetrics.Application.Providers.VideoProviders;
@@ -54,6 +55,8 @@ namespace VidiMetrics.Application
             services.AddScoped<IImageProvider, PollinationsImageProvider>();
             services.AddScoped<IVideoProvider, PollinationsVideoProvider>();
             services.AddScoped<IStorageProvider, CloudinaryStorageProvider>();
+            services.AddScoped<IChannelPlatformProvider, YouTubePlatformProvider>();
+            services.AddScoped<IChannelPlatformProvider, TikTokPlatformProvider>();
 
             return Task.FromResult(services);
         }

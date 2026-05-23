@@ -6,7 +6,9 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.Interfaces.Core;
+using VidiMetrics.Application.Providers.ChannelPlatformProviders;
 using VidiMetrics.DataAccess.Repositories.Core.Channels;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Core;
 
 namespace VidiMetrics.Application.Services.Core
@@ -17,18 +19,21 @@ namespace VidiMetrics.Application.Services.Core
         private readonly IMapper _mapper;
         private readonly IValidator<CreateChannelDto> _createValidator;
         private readonly IValidator<UpdateChannelDto> _updateValidator;
-
+        private readonly Dictionary<TargetPlatform, IChannelPlatformProvider> _providers;
         public ChannelsService(
             IChannelsRepository repository,
 
             IMapper mapper,
             IValidator<CreateChannelDto> createValidator,
-            IValidator<UpdateChannelDto> updateValidator)
+            IValidator<UpdateChannelDto> updateValidator,
+            IEnumerable<IChannelPlatformProvider> providers
+            )
         {
             _repository = repository;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _providers = providers.ToDictionary(p => p.Platform);
         }
 
         public async Task<ChannelResponseDto> GetByIdAsync(Guid id, Guid userId)
@@ -95,6 +100,84 @@ namespace VidiMetrics.Application.Services.Core
 
             _repository.Remove(entity);
             return await _repository.SaveChangesAsync();
+        }
+
+        public async Task<ChannelResponseDto> ConnectChannelAsync(TargetPlatform platform, Guid userId, string authorizationCode, string redirectUri)
+        {
+            var provider = GetProvider(platform);
+            var channel = await provider.AuthenticateAndCreateChannelAsync(userId, authorizationCode, redirectUri);
+
+            // Audit fields
+            channel.UserId = userId;
+            channel.CreatedBy = userId;
+            channel.CreatedAt = DateTime.UtcNow;
+            channel.UpdatedAt = DateTime.UtcNow;
+
+            if (channel.ChannelStat != null)
+            {
+                channel.ChannelStat.CreatedBy = userId;
+                channel.ChannelStat.CreatedAt = DateTime.UtcNow;
+                channel.ChannelStat.UpdatedAt = DateTime.UtcNow;
+            }
+
+            // Check if the channel already exists for this user, platform and platform channel ID
+            var existingChannel = await _repository.Query()
+                .Include(c => c.ChannelStat)
+                .FirstOrDefaultAsync(c => c.Platform == platform && c.PlatformChannelId == channel.PlatformChannelId && c.UserId == userId);
+
+            if (existingChannel != null)
+            {
+                existingChannel.Name = channel.Name;
+                existingChannel.AvatarUrl = channel.AvatarUrl;
+                existingChannel.AccessToken = channel.AccessToken;
+                existingChannel.RefreshToken = channel.RefreshToken ?? existingChannel.RefreshToken;
+                existingChannel.ExpiresAt = channel.ExpiresAt;
+                existingChannel.IsConnected = true;
+                existingChannel.IsActive = true;
+                existingChannel.UpdatedAt = DateTime.UtcNow;
+
+                if (channel.ChannelStat != null)
+                {
+                    if (existingChannel.ChannelStat != null)
+                    {
+                        existingChannel.ChannelStat.TotalFollowers = channel.ChannelStat.TotalFollowers;
+                        existingChannel.ChannelStat.TotalViews = channel.ChannelStat.TotalViews;
+                        existingChannel.ChannelStat.TotalVideos = channel.ChannelStat.TotalVideos;
+                        existingChannel.ChannelStat.UpdatedAt = DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        existingChannel.ChannelStat = channel.ChannelStat;
+                    }
+                }
+
+                _repository.Update(existingChannel);
+                await _repository.SaveChangesAsync();
+
+                return _mapper.Map<ChannelResponseDto>(existingChannel);
+            }
+
+            await _repository.AddAsync(channel);
+            await _repository.SaveChangesAsync();
+
+            return _mapper.Map<ChannelResponseDto>(channel);
+        }
+
+        public async Task SyncChannelMetricsAsync(TargetPlatform platform, Guid channelId, Guid userId)
+        {
+            var entity = await _repository.Query()
+                .FirstOrDefaultAsync(s => s.Id == channelId && s.UserId == userId);
+            if (entity == null) throw new UnauthorizedAccessException("Invalid Channel selection or access denied.");
+            var provider = GetProvider(platform);
+            await provider.SyncMetricsAsync(entity);
+        }
+        private IChannelPlatformProvider GetProvider(TargetPlatform platform)
+        {
+            if (!_providers.TryGetValue(platform, out var provider))
+            {
+                throw new NotSupportedException($"The social platform integration '{platform}' is not currently supported.");
+            }
+            return provider;
         }
     }
 }

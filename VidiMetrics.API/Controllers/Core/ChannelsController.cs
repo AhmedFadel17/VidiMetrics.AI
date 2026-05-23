@@ -6,6 +6,7 @@ using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.Interfaces.Core;
+using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.API.Controllers.Core
 {
@@ -60,6 +61,20 @@ namespace VidiMetrics.API.Controllers.Core
         {
             await _service.DeleteAsync(id, CurrentUserGuid);
             return Ok(ApiResponseFactory.Success<object?>(null, "Channel deleted successfully."));
+        }
+
+
+
+
+
+        [HttpPost("sync/{platform}/{channelId}")]
+        public async Task<IActionResult> SyncChannelMetrics(
+        [FromRoute] TargetPlatform platform,
+
+        [FromRoute] Guid channelId)
+        {
+            await _service.SyncChannelMetricsAsync(platform, channelId, CurrentUserGuid);
+            return Ok(ApiResponseFactory.Success<object?>(null, "Channel metrics synced successfully."));
         }
     }
 }

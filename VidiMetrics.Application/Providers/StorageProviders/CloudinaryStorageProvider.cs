@@ -8,14 +8,14 @@ namespace VidiMetrics.Application.Providers.StorageProviders;
 public class CloudinaryStorageProvider : IStorageProvider
 {
     private readonly Cloudinary _cloudinary;
-    private readonly CloudinaryApiSettings _settings;
-    public CloudinaryStorageProvider(IOptions<CloudinaryApiSettings> options)
+    private readonly ApiSettings _settings;
+    public CloudinaryStorageProvider(IOptions<ApisSettings> options)
     {
-        _settings = options.Value;
+        _settings = options.Value.Cloudinary;
         var account = new Account(
-            _settings.CloudName,
+            _settings.Name,
             _settings.ApiKey,
-            _settings.ApiSecret
+            _settings.ClientSecret
         );
         _cloudinary = new Cloudinary(account);
     }

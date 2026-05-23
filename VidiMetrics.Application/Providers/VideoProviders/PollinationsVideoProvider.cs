@@ -8,6 +8,7 @@ using Polly;
 using Polly.Retry;
 using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.Providers.StorageProviders;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Settings;
 
 namespace VidiMetrics.Application.Providers.VideoProviders;
@@ -16,17 +17,16 @@ public class PollinationsVideoProvider : IVideoProvider
 {
     private readonly HttpClient _httpClient;
     private readonly AsyncRetryPolicy _retryPolicy;
-    private readonly PollinationsApiSettings _settings;
+    private readonly ApiSettings _settings;
     private readonly IStorageProvider _storageProvider;
-    private const string BaseUrl = "https://gen.pollinations.ai/video";
 
     public PollinationsVideoProvider(
         HttpClient httpClient,
-        IOptions<PollinationsApiSettings> options,
+        IOptions<ApisSettings> options,
         IStorageProvider storageProvider)
     {
         _httpClient = httpClient;
-        _settings = options.Value;
+        _settings = options.Value.Pollinations;
         _storageProvider = storageProvider;
 
         if (string.IsNullOrWhiteSpace(_settings.ApiKey))
@@ -34,7 +34,6 @@ public class PollinationsVideoProvider : IVideoProvider
             throw new ArgumentNullException(nameof(_settings.ApiKey), "Pollinations API Key is missing.");
         }
 
-        // نرفع الـ Timeout الخاص بالـ HttpClient ليعطي السيرفر وقته الكامل في الرندرة السينمائية
         _httpClient.Timeout = TimeSpan.FromMinutes(3);
 
         _retryPolicy = Policy
@@ -49,7 +48,7 @@ public class PollinationsVideoProvider : IVideoProvider
             throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
 
         string encodedPrompt = Uri.EscapeDataString(prompt);
-        string targetUrl = $"{BaseUrl}/{encodedPrompt}?seed={seed}&width={width}&height={height}&model=ltx-2&audio=true";
+        string targetUrl = $"{_settings.BaseUrl}video/{encodedPrompt}?seed={seed}&width={width}&height={height}&model=ltx-2&audio=true";
 
         var result = new VideoGenerationResult();
 

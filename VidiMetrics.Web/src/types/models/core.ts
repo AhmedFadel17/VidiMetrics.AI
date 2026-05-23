@@ -47,7 +47,7 @@ export interface ChannelPost extends BaseEntity {
 // ─── ChannelStat ─────────────────────────────────────────────────────────────────
 export interface ChannelStat extends BaseEntity {
   totalViews: number;
-  totalSubscribers: number;
+  totalFollowers: number;
   totalLikes: number;
   totalVideos: number;
   channelId: string;

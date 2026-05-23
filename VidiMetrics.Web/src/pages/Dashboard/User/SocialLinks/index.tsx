@@ -9,6 +9,8 @@ import {
 import { ErrorScreen, LoadingScreen } from "@/components/ui/Feedback/StatusScreens";
 import { Channel, ChannelPlatform } from "@/types";
 import { toast } from "sonner";
+import { useAuth } from "react-oidc-context";
+import { getChannelAuthUrl, isPlatformAuthImplemented } from "@/utils/channelAuth";
 
 export interface ChannelData {
   id: string;
@@ -99,17 +101,9 @@ const PLATFORM_CONFIGS: Record<ChannelPlatform, PlatformConfig> = {
   },
 };
 
-const PLATFORM_REDIRECT_URLS: Record<ChannelPlatform, string> = {
-  [ChannelPlatform.YouTube]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/youtube/connect`,
-  [ChannelPlatform.TikTok]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/tiktok/connect`,
-  [ChannelPlatform.Instagram]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/instagram/connect`,
-  [ChannelPlatform.Facebook]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/facebook/connect`,
-  [ChannelPlatform.LinkedIn]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/linkedin/connect`,
-  [ChannelPlatform.X]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/x/connect`,
-  [ChannelPlatform.Federated]: `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/auth/federated/connect`,
-};
-
 export default function SocialLinksPage() {
+  const auth = useAuth()
+  const userId = auth?.user?.profile.sub || "";
   const { data, isLoading, error } = useGetMyChannelsQuery();
   const [updateChannel] = useUpdateChannelMutation();
   const [deleteChannel] = useDeleteChannelMutation();
@@ -168,7 +162,12 @@ export default function SocialLinksPage() {
   };
 
   const handleRedirectToConnect = (platform: ChannelPlatform) => {
-    const redirectUrl = PLATFORM_REDIRECT_URLS[platform];
+    if (!isPlatformAuthImplemented(platform)) {
+      toast.info(`${PLATFORM_CONFIGS[platform].name} integration is coming soon!`);
+      return;
+    }
+
+    const redirectUrl = getChannelAuthUrl(platform, userId);
     if (redirectUrl) {
       toast.info(`Redirecting to ${PLATFORM_CONFIGS[platform].name} connection gateway...`);
       setTimeout(() => {
@@ -182,19 +181,19 @@ export default function SocialLinksPage() {
   const mapChannelToChannelData = (channel: Channel): ChannelData => {
     const platform = channel.platform ?? ChannelPlatform.YouTube;
     const config = PLATFORM_CONFIGS[platform];
-    
+
     let statsMetric = config.defaultMetric;
     if (channel.channelStat) {
       if (platform === ChannelPlatform.YouTube) {
-        statsMetric = `${channel.channelStat.totalSubscribers.toLocaleString()} Subscribers • ${channel.channelStat.totalVideos} Videos`;
+        statsMetric = `${channel.channelStat.totalFollowers.toLocaleString()} Subscribers • ${channel.channelStat.totalVideos} Videos`;
       } else if (platform === ChannelPlatform.TikTok) {
-        statsMetric = `${channel.channelStat.totalSubscribers.toLocaleString()} Followers • ${channel.channelStat.totalLikes.toLocaleString()} Likes`;
+        statsMetric = `${channel.channelStat.totalFollowers.toLocaleString()} Followers • ${channel.channelStat.totalLikes.toLocaleString()} Likes`;
       } else if (platform === ChannelPlatform.Instagram) {
-        statsMetric = `${channel.channelStat.totalSubscribers.toLocaleString()} Followers • ${channel.channelStat.totalVideos} Posts`;
+        statsMetric = `${channel.channelStat.totalFollowers.toLocaleString()} Followers • ${channel.channelStat.totalVideos} Posts`;
       } else if (platform === ChannelPlatform.Facebook) {
-        statsMetric = `${channel.channelStat.totalSubscribers.toLocaleString()} Followers • ${channel.channelStat.totalLikes.toLocaleString()} Likes`;
+        statsMetric = `${channel.channelStat.totalFollowers.toLocaleString()} Followers • ${channel.channelStat.totalLikes.toLocaleString()} Likes`;
       } else if (platform === ChannelPlatform.LinkedIn) {
-        statsMetric = `${channel.channelStat.totalSubscribers.toLocaleString()} Connections • ${channel.channelStat.totalVideos} Posts`;
+        statsMetric = `${channel.channelStat.totalFollowers.toLocaleString()} Connections • ${channel.channelStat.totalVideos} Posts`;
       } else {
         statsMetric = `${channel.channelStat.totalViews.toLocaleString()} Views`;
       }
