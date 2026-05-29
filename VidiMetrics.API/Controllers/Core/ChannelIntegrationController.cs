@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using VidiMetrics.API.Factories;
-using VidiMetrics.Application.Interfaces;
 using VidiMetrics.Application.Interfaces.Core;
 using VidiMetrics.Domain.Enums;
 
@@ -32,7 +30,11 @@ public class ChannelIntegrationController : ControllerBase
 
         var userId = Guid.Parse(stateSegments[0]);
         string targetFrontendUrl = stateSegments[1];
-        string currentBackendRedirectUri = $"{Request.Scheme}://{Request.Host}{Request.Path}";
+
+        string scheme = Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? Request.Scheme;
+        string host = Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? Request.Host.Value;
+
+        string currentBackendRedirectUri = $"{scheme}://{host}{Request.Path}";
 
         await _service.ConnectChannelAsync(platform, userId, code, currentBackendRedirectUri);
 

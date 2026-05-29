@@ -282,7 +282,7 @@ export default function SocialLinksPage() {
                           </div>
                           <div>
                             <h3 className="text-2xl font-bold font-display tracking-tight">
-                              {channel.name}
+                              {config.name}
                             </h3>
                             <div className="flex items-center gap-2 mt-1">
                               <span
@@ -329,7 +329,7 @@ export default function SocialLinksPage() {
                           )}
                           <div>
                             <p className="font-bold text-on-surface">
-                              {channel.platformChannelId || channel.name}
+                              {channel.name}
                             </p>
                             <p className="text-xs text-on-surface-variant">
                               {mapChannelToChannelData(channel).statsMetric}

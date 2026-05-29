@@ -10,7 +10,8 @@ import { ChannelPlatform } from "@/types";
  * @returns The connection URL or a placeholder string if not implemented
  */
 export function getChannelAuthUrl(platform: ChannelPlatform, userId: string): string {
-  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const apiUrl = import.meta.env.VITE_API_URL || "https://localhost:7264";
+  const ngrokUrl = import.meta.env.VITE_API_NGROK_URL || "https://truantly-toothiest-shenita.ngrok-free.dev";
   const currentFrontendUrl = window.location.href;
   const compositeState = `${userId}|${currentFrontendUrl}`;
   switch (platform) {
@@ -32,10 +33,24 @@ export function getChannelAuthUrl(platform: ChannelPlatform, userId: string): st
       return `${googleAuthUrl}?${queryString}`;
     }
 
-    // Placeholders for other platforms: "only implement google auth for now and placeholder for other"
-    case ChannelPlatform.TikTok:
-      // PLACEHOLDER: TikTok connection redirect endpoint (to be implemented)
-      return `${apiUrl}/api/auth/tiktok/connect-placeholder`;
+    case ChannelPlatform.TikTok: {
+      const tiktokAuthUrl = "https://www.tiktok.com/v2/auth/authorize/";
+      const params = {
+        client_key: import.meta.env.VITE_TIKTOK_CLIENT_KEY || "",
+        redirect_uri: `${ngrokUrl}/api/integrations/callback/tiktok`,
+        response_type: "code",
+        scope: [
+          "user.info.basic",
+          "user.info.profile",
+          "user.info.stats",
+          "video.list",
+          "video.upload"
+        ].join(","),
+        state: compositeState,
+      };
+      const queryString = new URLSearchParams(params).toString();
+      return `${tiktokAuthUrl}?${queryString}`;
+    }
 
     case ChannelPlatform.Instagram:
       // PLACEHOLDER: Instagram connection redirect endpoint (to be implemented)
@@ -70,5 +85,5 @@ export function getChannelAuthUrl(platform: ChannelPlatform, userId: string): st
  * @returns boolean indicating if the integration is fully active
  */
 export function isPlatformAuthImplemented(platform: ChannelPlatform): boolean {
-  return platform === ChannelPlatform.YouTube;
+  return platform === ChannelPlatform.YouTube || platform === ChannelPlatform.TikTok;
 }
