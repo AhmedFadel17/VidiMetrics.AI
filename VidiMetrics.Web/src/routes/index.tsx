@@ -1,14 +1,14 @@
 import { AppRoute } from "@/types/ui";
-
-import Register from "@/pages/Auth/Register";
-import Recovery from "@/pages/Auth/Recovery";
 import LoginError from "@/pages/Auth/LoginError";
 import UserHome from "@/pages/Dashboard/User/Home";
 import Home from "@/pages/Main/Home";
+import Planner from "@/pages/Dashboard/User/Planner";
+import MediaLibrary from "@/pages/Dashboard/User/Media";
 import AIInsights from "@/pages/Main/AIInsights";
 
 import Features from "@/pages/Main/Features";
 import Storyboarder from "@/pages/Main/Storyboarder";
+import UserStoryboarder from "@/pages/Dashboard/User/Storyboarder";
 import PricingPage from "@/pages/Main/Pricing";
 import API from "@/pages/Main/API";
 import Documentation from "@/pages/Main/Documentation";
@@ -128,6 +128,11 @@ export const AppUserRoutes: AppRoute[] = [
     element: <SceneDetails />,
   },
   {
+    path: "/dashboard/storyboarder",
+    label: "Storyboarder",
+    element: <UserStoryboarder />,
+  },
+  {
     path: "/dashboard/social-links",
     label: "Social Links",
     element: <SocialLinksPage />,
@@ -136,6 +141,16 @@ export const AppUserRoutes: AppRoute[] = [
     path: "/dashboard/account",
     label: "Account",
     element: <AccountPage />,
+  },
+  {
+    path: "/dashboard/planner",
+    label: "Planner",
+    element: <Planner />,
+  },
+  {
+    path: "/dashboard/media",
+    label: "Media Library",
+    element: <MediaLibrary />,
   },
 ];
 // =============================

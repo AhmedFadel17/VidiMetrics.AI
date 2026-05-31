@@ -3,8 +3,8 @@ export const SidebarRoutes = [
     { label: 'Series', path: '/dashboard/series', icon: 'play_circle' },
     { label: 'Storyboarder', path: '/dashboard/storyboarder', icon: 'movie_edit' },
     { label: 'Social Links', path: '/dashboard/social-links', icon: 'share' },
-    { label: 'Automation', path: '/dashboard/automation', icon: 'bolt' },
-    { label: 'Analytics', path: '/dashboard/analytics', icon: 'bar_chart' },
+    { label: 'Planner', path: '/dashboard/planner', icon: 'edit_calendar' },
+    { label: 'Media', path: '/dashboard/media', icon: 'video_library' },
     { label: 'Account', path: '/dashboard/account', icon: 'person' },
 
 ]
