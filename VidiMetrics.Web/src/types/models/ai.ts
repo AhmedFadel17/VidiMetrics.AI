@@ -1,12 +1,14 @@
 import { BaseEntity } from "./base";
-import { AiTaskStatus, ModelTarget, TargetPlatform, ScriptLineType } from "../enums";
+import { AiTaskStatus, ModelTarget, ScriptLineType, AssetType } from "../enums";
 import { StoryEnvironment } from "./storyEngine";
 
 // ─── AiImage ──────────────────────────────────────────────────────────────────
 export interface AiImage extends BaseEntity {
-  imageUrl?: string;
+  imageUrl: string;
   prompt?: string;
   seed: number;
+  size: number;
+  assetType: AssetType;
   isLinked: boolean;
   userId: string;
 }
@@ -19,6 +21,7 @@ export interface AiScript extends BaseEntity {
   storyEnvironmentId: string;
   storyEnvironment?: StoryEnvironment;
   scriptLines?: ScriptLine[];
+  isLinked: boolean;
 }
 
 // ─── ScriptLine ───────────────────────────────────────────────────────────────
@@ -52,10 +55,12 @@ export interface AiTask extends BaseEntity {
 
 // ─── AiVideo ──────────────────────────────────────────────────────────────────
 export interface AiVideo extends BaseEntity {
-  videoUrl?: string;
+  videoUrl: string;
   thumbnailUrl?: string;
   duration?: number;
   seed: number;
+  size: number;
+  assetType: AssetType;
   isLinked: boolean;
   userId: string;
 }

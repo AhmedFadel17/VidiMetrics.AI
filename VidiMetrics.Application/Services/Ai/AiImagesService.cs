@@ -9,6 +9,7 @@ using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
 using VidiMetrics.Application.Providers.ImageProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Ai;
 
 namespace VidiMetrics.Application.Services.Ai;
@@ -65,7 +66,7 @@ public class AiImagesService : IAiImagesService
                              $"Maintain identical facial features, 8k, photorealistic, unreal engine 5, character reference sheet style.";
         var seed = new Random().Next(1, 999999);
         string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-        var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
+        var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Character, userId);
         return _mapper.Map<AiImageResponseDto>(img);
     }
 
@@ -84,7 +85,7 @@ public class AiImagesService : IAiImagesService
                      $"highly detailed textures, masterpiece, no people.";
         var seed = new Random().Next(1, 999999);
         string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-        var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
+        var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Environment, userId);
         return _mapper.Map<AiImageResponseDto>(img);
     }
 
@@ -99,7 +100,7 @@ public class AiImagesService : IAiImagesService
                                   $"Dramatic cinematic lighting, 8k resolution, highly detailed, photorealistic, depth of field, striking composition, trending on artstation, epic movie poster vibe. " +
                                   $"--no text, words, typography, logo, watermark, blurry"; var seed = new Random().Next(1, 999999);
         string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-        var img = await SaveAiImage(masterPrompt, imageUrl, seed, userId);
+        var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Show, userId);
         return _mapper.Map<AiImageResponseDto>(img);
     }
 
@@ -122,7 +123,17 @@ public class AiImagesService : IAiImagesService
         IQueryable<AiImage> query = _repo.Query();
 
         query = query.Where(x => x.UserId == userId);
-
+        if (filter.AssetType.HasValue)
+        {
+            if (filter.AssetType.Value == AssetType.Unlinked)
+            {
+                query = query.Where(x => !x.IsLinked);
+            }
+            else
+            {
+                query = query.Where(x => x.AssetType == filter.AssetType.Value);
+            }
+        }
         var (entities, totalCount) = await _repo.GetAllWithPaginationAsync(
                 query,
                 filter.PageNumber,
@@ -159,7 +170,7 @@ public class AiImagesService : IAiImagesService
         return _mapper.Map<AiImageResponseDto>(entity);
     }
 
-    private async Task<AiImage> SaveAiImage(string prompt, string imageUrl, int seed, Guid userId)
+    private async Task<AiImage> SaveAiImage(string prompt, string imageUrl, int seed, AssetType type, Guid userId)
     {
         var img = new AiImage
         {
@@ -167,7 +178,7 @@ public class AiImagesService : IAiImagesService
             ImageUrl = imageUrl,
             Seed = seed,
             UserId = userId,
-            IsLinked = false
+            AssetType = type
         };
 
         await _repo.AddAsync(img);

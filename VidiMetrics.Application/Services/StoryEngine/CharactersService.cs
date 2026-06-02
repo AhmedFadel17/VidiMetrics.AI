@@ -11,6 +11,7 @@ using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -125,7 +126,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             var image = await _imagesRepository.Query()
                             .FirstOrDefaultAsync(s => s.Id == dto.AiImageId && s.UserId == userId);
             if (image == null) throw new UnauthorizedAccessException("Invalid Image selection or access denied.");
-            image.IsLinked = true;
+            image.AssetType = AssetType.Character;
             _imagesRepository.Update(image);
             await _imagesRepository.SaveChangesAsync();
 

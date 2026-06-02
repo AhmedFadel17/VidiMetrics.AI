@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Ai.AiImages;
@@ -9,6 +10,8 @@ namespace VidiMetrics.API.Controllers.Ai;
 
 [ApiController]
 [Route("api/ai/images")]
+[Authorize]
+
 public class AiImagesController : ApiBaseController
 {
     private readonly IAiImagesService _aiImagesService;
@@ -16,6 +19,13 @@ public class AiImagesController : ApiBaseController
     public AiImagesController(IAiImagesService aiImagesService)
     {
         _aiImagesService = aiImagesService;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<AiImageResponseDto>>>> GetAllImages([FromQuery] AiImageFilterDto filter)
+    {
+        var results = await _aiImagesService.GetAllAsync(filter, CurrentUserGuid);
+        return Ok(ApiResponseFactory.Success(results, "Images retrieved successfully."));
     }
 
     [HttpPost("character")]

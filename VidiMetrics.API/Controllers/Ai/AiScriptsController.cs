@@ -23,9 +23,9 @@ namespace VidiMetrics.API.Controllers.Ai
         }
 
         [HttpGet]
-        public async Task<ActionResult<SuccessResponseDto<IEnumerable<AiScriptResponseDto>>>> GetAll()
+        public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<AiScriptResponseDto>>>> GetAll([FromQuery] AiScriptFilterDto filter)
         {
-            var results = await _service.GetAllAsync(CurrentUserGuid);
+            var results = await _service.GetAllAsync(filter, CurrentUserGuid);
             return Ok(ApiResponseFactory.Success(results, "Scripts retrieved successfully."));
         }
 

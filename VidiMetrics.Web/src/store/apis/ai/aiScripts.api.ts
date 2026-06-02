@@ -1,7 +1,10 @@
 import { mainApi } from '../mainApi';
-import { ApiResponse } from '@/types/api';
+import { ApiResponse, PaginationFilter, PaginationResponse } from '@/types/api';
 import { AiScript } from '@/types/models/ai';
 
+export interface AiScriptFilterDto extends PaginationFilter {
+  isLinked?: boolean | null;
+}
 export interface CreateAiScriptDto {
   weather: string;
   environmentDescription: string;
@@ -18,12 +21,25 @@ export interface UpdateAiScriptDto {
 
 export const aiScriptsApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAiScripts: builder.query<ApiResponse<AiScript[]>, void>({
-      query: () => '/api/ai/scripts',
+    getAiScripts: builder.query<ApiResponse<PaginationResponse<AiScript>>, AiScriptFilterDto>({
+      query: (filter) => {
+        const params = new URLSearchParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: '/api/ai/scripts',
+          params: params,
+        };
+      },
       providesTags: (result) =>
         result?.data
           ? [
-            ...result.data.map(({ id }) => ({ type: 'AiScript' as const, id })),
+            ...result.data.items.map(({ id }) => ({ type: 'AiScript' as const, id })),
             { type: 'AiScript', id: 'LIST' },
           ]
           : [{ type: 'AiScript', id: 'LIST' }],

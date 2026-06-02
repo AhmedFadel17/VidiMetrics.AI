@@ -20,6 +20,12 @@ namespace VidiMetrics.API.Controllers.Ai
         {
             _aiVideosService = aiVideosService;
         }
+        [HttpGet]
+        public async Task<ActionResult<SuccessResponseDto<PaginationResponseDto<AiVideoResponseDto>>>> GetAllVideos([FromQuery] AiVideoFilterDto filter)
+        {
+            var results = await _aiVideosService.GetAllAsync(filter, CurrentUserGuid);
+            return Ok(ApiResponseFactory.Success(results, "Videos retrieved successfully."));
+        }
 
         [HttpPost("scene")]
         public async Task<ActionResult<SuccessResponseDto<AiVideoResponseDto>>> CreateSceneVideo([FromBody] CreateSceneVideoDto dto)

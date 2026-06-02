@@ -6,6 +6,7 @@ using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Ai.AiScripts;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
@@ -99,15 +100,28 @@ namespace VidiMetrics.Application.Services.Ai
             return await _repo.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<AiScriptResponseDto>> GetAllAsync(Guid userId)
+        public async Task<PaginationResponseDto<AiScriptResponseDto>> GetAllAsync(AiScriptFilterDto filter, Guid userId)
         {
-            var entities = await _repo.Query()
-                .Include(x => x.StoryEnvironment)
-                .Include(x => x.ScriptLines)
-                .Where(x => x.UserId == userId)
-                .ToListAsync();
+            IQueryable<AiScript> query = _repo.Query();
+            query = query.Where(x => x.UserId == userId);
+            if (filter.IsLinked.HasValue)
+            {
+                query = query.Where(x => x.IsLinked == filter.IsLinked.Value);
+            }
+            query = query
+                .Include(x => x.StoryEnvironment).
+                ThenInclude(x => x.AiImage)
+                .Include(x => x.ScriptLines);
+            var (entities, totalCount) = await _repo.GetAllWithPaginationAsync(
+                query,
+                filter.PageNumber,
+                filter.PageSize,
+                filter.OrderBy,
+                filter.SortOrder,
+                filter.Limit);
+            var paginationSource = new PaginationSource<AiScript>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
 
-            return _mapper.Map<IEnumerable<AiScriptResponseDto>>(entities);
+            return _mapper.Map<PaginationResponseDto<AiScriptResponseDto>>(paginationSource);
         }
 
         public async Task<AiScriptResponseDto> GetByIdAsync(Guid id, Guid userId)

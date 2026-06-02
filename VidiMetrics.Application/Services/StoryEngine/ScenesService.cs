@@ -15,6 +15,7 @@ using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -122,18 +123,21 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (episode == null) throw new Exception("Episode not found or access denied.");
 
             var script = await _aiScriptsRepository.Query()
-                .AnyAsync(e => e.Id == dto.AiScriptId && e.UserId == userId);
+                .FirstOrDefaultAsync(e => e.Id == dto.AiScriptId && e.UserId == userId);
 
 
-            if (!script) throw new Exception("Script not found or access denied.");
-
+            if (script == null) throw new Exception("Script not found or access denied.");
+            script.IsLinked = true;
+            _aiScriptsRepository.Update(script);
 
             var video = await _aiVideosRepository.Query()
-                .AnyAsync(e => e.Id == dto.AiVideoId && e.UserId == userId);
+                .FirstOrDefaultAsync(e => e.Id == dto.AiVideoId && e.UserId == userId);
 
 
-            if (!video) throw new Exception("Video not found or access denied.");
-
+            if (video == null) throw new Exception("Video not found or access denied.");
+            video.IsLinked = true;
+            video.AssetType = AssetType.Scene;
+            _aiVideosRepository.Update(video);
 
             var entity = _mapper.Map<Scene>(dto);
             entity.CreatedAt = DateTime.UtcNow;

@@ -1,9 +1,10 @@
+import { AssetType } from '@/types';
 import { mainApi } from '../mainApi';
-import { ApiResponse, PaginationFilter } from '@/types/api';
+import { ApiResponse, PaginationFilter, PaginationResponse } from '@/types/api';
 import { AiImage } from '@/types/models/ai';
 
 export interface AiImageFilterDto extends PaginationFilter {
-
+  assetType?: AssetType | null;
 }
 
 export interface CreateEnvironmentImageDto {
@@ -36,15 +37,25 @@ export interface UpdateAiImageDto {
 
 export const aiImagesApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAiImages: builder.query<ApiResponse<AiImage[]>, AiImageFilterDto | void>({
-      query: (params) => ({
-        url: '/api/ai/images',
-        params: params || undefined,
-      }),
+    getAiImages: builder.query<ApiResponse<PaginationResponse<AiImage>>, AiImageFilterDto>({
+      query: (filter) => {
+        const params = new URLSearchParams();
+
+        Object.entries(filter).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            params.append(key, value.toString());
+          }
+        });
+
+        return {
+          url: '/api/ai/images',
+          params: params,
+        };
+      },
       providesTags: (result) =>
         result?.data
           ? [
-            ...result.data.map(({ id }) => ({ type: 'AiImage' as const, id })),
+            ...result.data.items.map(({ id }) => ({ type: 'AiImage' as const, id })),
             { type: 'AiImage', id: 'LIST' },
           ]
           : [{ type: 'AiImage', id: 'LIST' }],

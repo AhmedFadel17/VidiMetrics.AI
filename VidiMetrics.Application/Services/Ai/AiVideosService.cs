@@ -10,6 +10,7 @@ using VidiMetrics.Application.Interfaces.Ai;
 using VidiMetrics.Application.Providers.VideoProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Ai;
 
 namespace VidiMetrics.Application.Services.Ai
@@ -55,9 +56,9 @@ namespace VidiMetrics.Application.Services.Ai
                 VideoUrl = providerResult.VideoUrl,
                 ThumbnailUrl = providerResult.ThumbnailUrl,
                 Duration = providerResult.Duration,
+                Size = providerResult.SizeInBytes,
                 Seed = seed,
                 UserId = userId,
-                IsLinked = false
             };
 
             await _repo.AddAsync(video);
@@ -80,7 +81,17 @@ namespace VidiMetrics.Application.Services.Ai
         {
             IQueryable<AiVideo> query = _repo.Query();
             query = query.Where(x => x.UserId == userId);
-
+            if (filter.AssetType.HasValue)
+            {
+                if (filter.AssetType.Value == AssetType.Unlinked)
+                {
+                    query = query.Where(x => !x.IsLinked);
+                }
+                else
+                {
+                    query = query.Where(x => x.AssetType == filter.AssetType.Value);
+                }
+            }
             var (entities, totalCount) = await _repo.GetAllWithPaginationAsync(
                 query,
                 filter.PageNumber,

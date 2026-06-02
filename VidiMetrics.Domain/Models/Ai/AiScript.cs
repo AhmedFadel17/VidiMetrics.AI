@@ -7,6 +7,7 @@ namespace VidiMetrics.Domain.Models.Ai
         public string Weather { get; set; } = string.Empty;
         public string EnvironmentDescription { get; set; } = string.Empty;
         public string VisualPrompt { get; set; } = string.Empty;
+        public bool IsLinked { get; set; } = false;
 
         public Guid StoryEnvironmentId { get; set; }
         public StoryEnvironment StoryEnvironment { get; set; } = null!;
