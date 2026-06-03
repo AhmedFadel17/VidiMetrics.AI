@@ -21,7 +21,7 @@ namespace VidiMetrics.DataAccess.Seeds
                     Description = freePlanSettings.Description,
                     MonthlyPrice = freePlanSettings.MonthlyPrice,
                     MaxChannelsAllowed = freePlanSettings.MaxChannelsAllowed,
-                    DailyApiQuotaLimit = freePlanSettings.DailyApiQuotaLimit,
+                    BaseMonthlyCredits = freePlanSettings.BaseMonthlyCredits,
                     IsActive = freePlanSettings.IsActive
                 });
             }

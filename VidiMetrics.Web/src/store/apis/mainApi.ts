@@ -16,6 +16,10 @@ export const mainApi = createApi({
     // Infra
     'User',
     'Admin',
+    'Credits',
+    'Subscription',
+    'SubscriptionPlan',
+
     // StoryEngine
     'Show',
     'Character',

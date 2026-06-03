@@ -1,4 +1,4 @@
-import { ApiType, SubscriptionStatus } from "../enums";
+import { CreditActionType, SubscriptionStatus } from "../enums";
 
 // ─── SubscriptionPlan ─────────────────────────────────────────────────────────
 export interface SubscriptionPlan {
@@ -7,7 +7,8 @@ export interface SubscriptionPlan {
   description: string;
   monthlyPrice: number;
   maxChannelsAllowed: number;
-  dailyApiQuotaLimit: number;
+  baseMonthlyCredits: number;
+  stripePriceId?: string;
   isActive: boolean;
 }
 
@@ -33,18 +34,41 @@ export interface UserSubscription {
   planId: string;
   subscriptionPlan?: SubscriptionPlan;
   startDate: string;
-  endDate?: string;
+  cancelledAt?: string;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  stripeSubscriptionId?: string;
   status: SubscriptionStatus;
 }
 
-// ─── ApiUsageQuota ────────────────────────────────────────────────────────────
-export interface ApiUsageQuota {
+
+
+// ─── UserCreditWallet ─────────────────────────────────────────────────────────
+export interface UserCreditWallet {
   id: string;
   userId: string;
-  apiType: ApiType;
-  monthlyLimit: number;
-  currentUsage: number;
-  periodStart: string;
-  periodEnd: string;
-  canCallApi: boolean;
+  totalCreditsAvailable: number;
+  creditsUsed: number;
+  lastResetDate: string;
+  nextResetDate: string;
+  remainingCredits: number;
+  hasBalanceForAction: boolean;
+}
+
+// ─── CreditCostRule ─────────────────────────────────────────────────────────
+export interface CreditCostRule {
+  id: string;
+  actionKey: CreditActionType;
+  creditCost: number;
+  isEnabled: boolean;
+}
+
+// ─── CreditTransactionLedger ─────────────────────────────────────────────────────────
+export interface CreditTransactionLedger {
+  id: string;
+  userId: string;
+  actionType: CreditActionType;
+  amountDeducted: number;
+  description: string;
+  timestamp: string;
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603192607_AddInfraTables")]
+    partial class AddInfraTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -704,10 +707,12 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("UserProfileUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserProfileUserId");
 
                     b.ToTable("UserCreditWallets");
                 });
@@ -1351,8 +1356,8 @@ namespace VidiMetrics.DataAccess.Migrations
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserCreditWallet", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
-                        .WithOne()
-                        .HasForeignKey("VidiMetrics.Domain.Models.Infra.UserCreditWallet", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserProfileUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

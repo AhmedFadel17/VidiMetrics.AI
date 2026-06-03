@@ -13,7 +13,8 @@ namespace VidiMetrics.Domain.Settings
         public string Description { get; set; } = string.Empty;
         public decimal MonthlyPrice { get; set; }
         public int MaxChannelsAllowed { get; set; }
-        public int DailyApiQuotaLimit { get; set; }
+        public int BaseMonthlyCredits { get; set; } = 1000;
+        public string StripePriceId { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
     }
 }

@@ -13,8 +13,12 @@ using VidiMetrics.DataAccess.Repositories.Core.Channels;
 using VidiMetrics.DataAccess.Repositories.Core.ChannelsPosts;
 using VidiMetrics.DataAccess.Repositories.Core.ChannelStats;
 using VidiMetrics.DataAccess.Repositories.Core.Videos;
-using VidiMetrics.DataAccess.Repositories.Infra.ApiUsageQuotas;
+using VidiMetrics.DataAccess.Repositories.Infra.CreditCostRules;
+using VidiMetrics.DataAccess.Repositories.Infra.CreditTransactionLedgers;
+using VidiMetrics.DataAccess.Repositories.Infra.SubscriptionPlans;
+using VidiMetrics.DataAccess.Repositories.Infra.UserCreditWallets;
 using VidiMetrics.DataAccess.Repositories.Infra.UserProfiles;
+using VidiMetrics.DataAccess.Repositories.Infra.UserSubscriptions;
 using VidiMetrics.DataAccess.Repositories.Seo.CompetitorVideos;
 using VidiMetrics.DataAccess.Repositories.Seo.KeywordRankings;
 using VidiMetrics.DataAccess.Repositories.Seo.Keywords;
@@ -45,8 +49,13 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<IChannelStatsRepository, ChannelStatsRepository>();
             services.AddScoped<IVideosRepository, VideosRepository>();
 
-            services.AddScoped<IApiUsageQuotasRepository, ApiUsageQuotasRepository>();
             services.AddScoped<IUserProfilesRepository, UserProfilesRepository>();
+            services.AddScoped<ISubscriptionPlansRepository, SubscriptionPlansRepository>();
+            services.AddScoped<IUserSubscriptionsRepository, UserSubscriptionsRepository>();
+            services.AddScoped<IUserCreditWalletsRepository, UserCreditWalletsRepository>();
+            services.AddScoped<ICreditCostRulesRepository, CreditCostRulesRepository>();
+
+            services.AddScoped<ICreditTransactionLedgersRepository, CreditTransactionLedgersRepository>();
             services.AddScoped<ICompetitorVideosRepository, CompetitorVideosRepository>();
             services.AddScoped<IKeywordsRepository, KeywordsRepository>();
             services.AddScoped<IKeywordRankingsRepository, KeywordRankingsRepository>();

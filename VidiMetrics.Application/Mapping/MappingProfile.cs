@@ -9,8 +9,11 @@ using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.ChannelPosts;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.DTOs.Core.ChannelStats;
-using VidiMetrics.Application.DTOs.Infra.ApiUsageQuotas;
 using VidiMetrics.Application.DTOs.Infra.UserProfiles;
+using VidiMetrics.Application.DTOs.Infra.SubscriptionPlans;
+using VidiMetrics.Application.DTOs.Infra.UserSubscriptions;
+using VidiMetrics.Application.DTOs.Infra.UserCreditWallets;
+using VidiMetrics.Application.DTOs.Infra.CreditTransactionLedgers;
 using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
 using VidiMetrics.Application.DTOs.Seo.KeywordRankings;
 using VidiMetrics.Application.DTOs.Seo.Keywords;
@@ -66,15 +69,16 @@ namespace VidiMetrics.Application.Mapping
 
             CreateMap<ChannelStat, ChannelStatResponseDto>();
 
-            CreateMap<CreateApiUsageQuotaDto, ApiUsageQuota>();
-            CreateMap<UpdateApiUsageQuotaDto, ApiUsageQuota>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<ApiUsageQuota, ApiUsageQuotaResponseDto>();
-
             CreateMap<CreateUserProfileDto, UserProfile>();
             CreateMap<UpdateUserProfileDto, UserProfile>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<UserProfile, UserProfileResponseDto>();
+
+            CreateMap<SubscriptionPlan, SubscriptionPlanResponseDto>();
+            CreateMap<UserSubscription, UserSubscriptionResponseDto>()
+                .ForMember(dest => dest.PlanName, opt => opt.MapFrom(src => src.SubscriptionPlan != null ? src.SubscriptionPlan.Name : string.Empty));
+            CreateMap<UserCreditWallet, UserCreditWalletResponseDto>();
+            CreateMap<CreditTransactionLedger, CreditTransactionLedgerResponseDto>();
 
             CreateMap<CreateCompetitorVideoDto, CompetitorVideo>();
             CreateMap<UpdateCompetitorVideoDto, CompetitorVideo>()

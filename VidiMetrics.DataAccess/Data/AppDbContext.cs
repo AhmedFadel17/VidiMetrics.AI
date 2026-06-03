@@ -24,10 +24,13 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<Transcript> Transcripts { get; set; }
 
         // Infra
-        public DbSet<ApiUsageQuota> ApiUsageQuotas { get; set; }
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
         public DbSet<UserProfile> UserProfiles { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
+        public DbSet<UserCreditWallet> UserCreditWallets { get; set; }
+        public DbSet<CreditCostRule> CreditCostRules { get; set; }
+        public DbSet<CreditTransactionLedger> CreditTransactionLedgers { get; set; }
+
 
         // Seo
         public DbSet<CompetitorVideo> CompetitorVideos { get; set; }
@@ -117,7 +120,10 @@ namespace VidiMetrics.DataAccess.Data
                 entity.Property(e => e.ProfilePictureUrl).HasMaxLength(500);
                 entity.Property(e => e.Bio).HasMaxLength(1000);
             });
-
+            modelBuilder.Entity<UserCreditWallet>()
+                .HasOne(w => w.UserProfile)
+                .WithOne()
+                .HasForeignKey<UserCreditWallet>(w => w.UserId);
             // SubscriptionPlan Configuration
             modelBuilder.Entity<SubscriptionPlan>(entity =>
             {
@@ -145,9 +151,6 @@ namespace VidiMetrics.DataAccess.Data
                       .HasForeignKey(e => e.PlanId)
                       .OnDelete(DeleteBehavior.Restrict);
 
-                entity.Property(e => e.Status)
-                      .HasConversion<string>()
-                      .HasMaxLength(20);
             });
 
 

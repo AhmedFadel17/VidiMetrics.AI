@@ -100,3 +100,11 @@ export enum AssetType {
   Episode = 4,
   Scene = 5
 }
+
+export enum CreditActionType {
+  GenerateImage = 1,
+  GenerateVideo = 2,
+  RenderScene = 3,
+  UpscaleAsset = 4,
+  AiVoiceover = 5
+}

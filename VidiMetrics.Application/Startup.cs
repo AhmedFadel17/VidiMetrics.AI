@@ -36,7 +36,6 @@ namespace VidiMetrics.Application
             services.AddScoped<IAiImagesService, AiImagesService>();
             services.AddScoped<IAiScriptsService, AiScriptsService>();
             services.AddScoped<IAiVideosService, AiVideosService>();
-            services.AddScoped<IApiUsageQuotasService, ApiUsageQuotasService>();
             services.AddScoped<IChannelsService, ChannelsService>();
             services.AddScoped<ICharactersService, CharactersService>();
             services.AddScoped<ICompetitorVideosService, CompetitorVideosService>();
@@ -50,6 +49,8 @@ namespace VidiMetrics.Application
             services.AddScoped<IStoryEnvironmentsService, StoryEnvironmentsService>();
             services.AddScoped<ITranscriptsService, TranscriptsService>();
             services.AddScoped<IUserProfilesService, UserProfilesService>();
+            services.AddScoped<ISubscriptionPlansService, SubscriptionPlansService>();
+            services.AddScoped<IUserSubscriptionsService, UserSubscriptionsService>();
             services.AddScoped<IVideoTagsService, VideoTagsService>();
 
             services.AddScoped<IImageProvider, PollinationsImageProvider>();

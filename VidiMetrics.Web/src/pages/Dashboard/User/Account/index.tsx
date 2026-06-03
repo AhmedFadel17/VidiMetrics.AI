@@ -3,6 +3,7 @@ import PreferencesTab from "./components/PreferencesTab";
 import SecurityTab from "./components/SecurityTab";
 import BillingsTab from "./components/Billings";
 import { useSearchParams } from "react-router-dom";
+import { useGetBalanceQuery } from "@/store/apis";
 
 type TabType = "profile" | "security" | "preferences" | "billing";
 const tabs: { id: TabType; label: string; icon: string }[] = [
@@ -13,6 +14,8 @@ const tabs: { id: TabType; label: string; icon: string }[] = [
 ];
 export default function AccountPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { data: balanceData, isLoading: isBalanceLoading } = useGetBalanceQuery();
+
   const tabParam = searchParams.get("tab") as TabType;
   let activeTab = tabs.map((t) => t.id).includes(tabParam)
     ? tabParam
@@ -20,7 +23,11 @@ export default function AccountPage() {
   const setActiveTab = (tab: TabType) => {
     setSearchParams({ tab });
   };
-
+  const wallet = balanceData?.data;
+  const total = wallet?.totalCreditsAvailable ?? 0;
+  const used = wallet?.creditsUsed ?? 0;
+  const remaining = Math.max(0, total - used);
+  const fillPercentage = total > 0 ? (remaining / total) * 100 : 0;
   return (
     <div>
       {/* Cinematic Profile Banner Header - Always Visible */}
@@ -113,11 +120,13 @@ export default function AccountPage() {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="font-bold text-tertiary">742 Left</span>
-                  <span className="opacity-50">1,000 Total</span>
+                  <span className="font-bold text-tertiary">{remaining} Left</span>
+                  <span className="opacity-50">{total} Total</span>
                 </div>
                 <div className="w-full bg-surface-container-lowest h-1.5 rounded-full overflow-hidden">
-                  <div className="bg-gradient-to-r from-tertiary to-tertiary-container h-full w-[74%] rounded-full shadow-[0_0_8px_rgba(255,176,205,0.4)]"></div>
+                  <div className="bg-gradient-to-r from-tertiary to-tertiary-container h-full rounded-full shadow-[0_0_8px_rgba(255,176,205,0.4)]"
+                    style={{ width: `${fillPercentage}%` }}
+                  ></div>
                 </div>
               </div>
             </div>
@@ -131,18 +140,16 @@ export default function AccountPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-label tracking-wide font-medium transition-all duration-200 whitespace-nowrap group ${
-                        isActive
-                          ? "bg-surface text-secondary border border-outline-variant/10 shadow-lg shadow-background/40 font-bold"
-                          : "text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-container-high/30"
-                      }`}
+                      className={`flex items-center gap-3 px-5 py-3 rounded-xl text-sm font-label tracking-wide font-medium transition-all duration-200 whitespace-nowrap group ${isActive
+                        ? "bg-surface text-secondary border border-outline-variant/10 shadow-lg shadow-background/40 font-bold"
+                        : "text-on-surface-variant/70 hover:text-on-surface hover:bg-surface-container-high/30"
+                        }`}
                     >
                       <span
-                        className={`material-symbols-outlined text-xl transition-transform group-hover:scale-105 ${
-                          isActive
-                            ? "text-secondary font-variation-fill"
-                            : "text-on-surface-variant/60"
-                        }`}
+                        className={`material-symbols-outlined text-xl transition-transform group-hover:scale-105 ${isActive
+                          ? "text-secondary font-variation-fill"
+                          : "text-on-surface-variant/60"
+                          }`}
                       >
                         {tab.icon}
                       </span>
@@ -157,7 +164,7 @@ export default function AccountPage() {
             {activeTab === "profile" && <ProfileTab />}
             {activeTab === "preferences" && <PreferencesTab />}
             {activeTab === "security" && <SecurityTab />}
-            {activeTab === "billing" && <BillingsTab />}
+            {activeTab === "billing" && <BillingsTab wallet={wallet} />}
           </div>
         </div>
       </div>

@@ -7,9 +7,10 @@ public class SubscriptionPlan
     public string Description { get; set; } = string.Empty;
     public decimal MonthlyPrice { get; set; }
     public int MaxChannelsAllowed { get; set; }
-    public int DailyApiQuotaLimit { get; set; }
+    public int BaseMonthlyCredits { get; set; }
+    public string? StripePriceId { get; set; }
     public bool IsActive { get; set; } = true;
-    
+
     public ICollection<UserProfile> UserProfiles { get; set; } = new List<UserProfile>();
     public ICollection<UserSubscription> UserSubscriptions { get; set; } = new List<UserSubscription>();
 }

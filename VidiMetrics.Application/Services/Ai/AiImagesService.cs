@@ -7,6 +7,7 @@ using Polly.Retry;
 using VidiMetrics.Application.DTOs.Ai.AiImages;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
+using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Providers.ImageProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.Domain.Enums;
@@ -25,7 +26,7 @@ public class AiImagesService : IAiImagesService
     private readonly IValidator<CreateCharacterImageDto> _createCharacterValidator;
     private readonly IValidator<CreateEnvironmentImageDto> _createEnvironmentValidator;
     private readonly IValidator<CreateShowImageDto> _createShowValidator;
-
+    private readonly ICreditTransactionManager _creditManager;
 
     public AiImagesService(
         HttpClient httpClient,
@@ -35,7 +36,8 @@ public class AiImagesService : IAiImagesService
         IValidator<CreateCharacterImageDto> createCharacterValidator,
         IValidator<CreateEnvironmentImageDto> createEnvironmentValidator,
         IValidator<CreateShowImageDto> createShowValidator,
-        IImageProvider imageProvider)
+        IImageProvider imageProvider,
+        ICreditTransactionManager creditManager)
     {
         _httpClient = httpClient;
         _mapper = mapper;
@@ -45,6 +47,7 @@ public class AiImagesService : IAiImagesService
         _createCharacterValidator = createCharacterValidator;
         _createEnvironmentValidator = createEnvironmentValidator;
         _createShowValidator = createShowValidator;
+        _creditManager = creditManager;
 
         _retryPolicy = Policy
             .Handle<HttpRequestException>()
@@ -65,9 +68,21 @@ public class AiImagesService : IAiImagesService
                              $"Traits: {dto.PersonalityTraits}. " +
                              $"Maintain identical facial features, 8k, photorealistic, unreal engine 5, character reference sheet style.";
         var seed = new Random().Next(1, 999999);
-        string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-        var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Character, userId);
-        return _mapper.Map<AiImageResponseDto>(img);
+        return await _creditManager.ExecuteWithCreditsAsync(
+            userId,
+
+            CreditActionType.GenerateImage,
+
+            $"Character Generation: {dto.Name}",
+            async () =>
+
+            {
+                string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+                var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Character, userId);
+                return _mapper.Map<AiImageResponseDto>(img);
+            });
+
+
     }
 
 
@@ -84,9 +99,21 @@ public class AiImagesService : IAiImagesService
                      $"volumetric lighting, shot on 35mm lens, Unreal Engine 5 render, " +
                      $"highly detailed textures, masterpiece, no people.";
         var seed = new Random().Next(1, 999999);
-        string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-        var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Environment, userId);
-        return _mapper.Map<AiImageResponseDto>(img);
+        return await _creditManager.ExecuteWithCreditsAsync(
+            userId,
+
+            CreditActionType.GenerateImage,
+
+            $"Environment Generation: {dto.Name}",
+            async () =>
+
+            {
+                string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+                var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Environment, userId);
+                return _mapper.Map<AiImageResponseDto>(img);
+            });
+
+
     }
 
     public async Task<AiImageResponseDto> CreateShowImageAsync(CreateShowImageDto dto, Guid userId)
@@ -99,9 +126,19 @@ public class AiImagesService : IAiImagesService
                                   $"Atmosphere tailored for {dto.TargetAudience} audience. " +
                                   $"Dramatic cinematic lighting, 8k resolution, highly detailed, photorealistic, depth of field, striking composition, trending on artstation, epic movie poster vibe. " +
                                   $"--no text, words, typography, logo, watermark, blurry"; var seed = new Random().Next(1, 999999);
-        string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-        var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Show, userId);
-        return _mapper.Map<AiImageResponseDto>(img);
+        return await _creditManager.ExecuteWithCreditsAsync(
+            userId,
+
+            CreditActionType.GenerateImage,
+
+            $"Show Generation: {dto.Title}",
+            async () =>
+
+            {
+                string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+                var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Show, userId);
+                return _mapper.Map<AiImageResponseDto>(img);
+            });
     }
 
 

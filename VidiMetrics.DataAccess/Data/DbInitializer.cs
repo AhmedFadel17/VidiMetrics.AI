@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.DataAccess.Data;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Settings;
@@ -36,7 +36,8 @@ namespace VidiMetrics.DataAccess.Data
                         Description = freePlanSettings.Description,
                         MonthlyPrice = freePlanSettings.MonthlyPrice,
                         MaxChannelsAllowed = freePlanSettings.MaxChannelsAllowed,
-                        DailyApiQuotaLimit = freePlanSettings.DailyApiQuotaLimit,
+                        BaseMonthlyCredits = freePlanSettings.BaseMonthlyCredits,
+                        StripePriceId = freePlanSettings.StripePriceId,
                         IsActive = freePlanSettings.IsActive
                     };
 
