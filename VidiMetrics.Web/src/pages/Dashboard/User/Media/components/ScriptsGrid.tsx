@@ -161,6 +161,13 @@ export default function ScriptsGrid() {
                     pageSize={pageSize}
                     totalCount={response?.data?.totalCount || 0}
                     onPageChange={(newPage) => setPage(newPage)}
+                    pageSizeOption={{
+                        values: [6, 12, 24],
+                        onChange: (newPageSize: number) => {
+                            setPageSize(newPageSize);
+                            setPage(1);
+                        }
+                    }}
                 />
             </div>
             <ConfirmationDialog

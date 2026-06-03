@@ -158,10 +158,6 @@ export default function VideosGrid() {
 
 
                         )}
-
-
-
-
                     </div>
                 </div>
 
@@ -173,6 +169,13 @@ export default function VideosGrid() {
                     pageSize={pageSize}
                     totalCount={response?.data?.totalCount || 0}
                     onPageChange={(newPage) => setPage(newPage)}
+                    pageSizeOption={{
+                        values: [6, 12, 24],
+                        onChange: (newPageSize: number) => {
+                            setPageSize(newPageSize);
+                            setPage(1);
+                        }
+                    }}
                 />
             </div>
             <ConfirmationDialog

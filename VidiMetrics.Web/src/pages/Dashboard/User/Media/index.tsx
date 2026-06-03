@@ -20,7 +20,7 @@ export default function MediaLibrary() {
             ]} />
 
             {/* ── Page Header ── */}
-            <div className="pt-2 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0">
+            <div className="py-5 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0">
                 <PageHeader
                     chipText="Media Library"
                     titlePrefix="Media "
@@ -58,7 +58,7 @@ export default function MediaLibrary() {
                 </div>
             </div>
 
-            <div className="flex-1 flex overflow-hidden">
+            <div className="">
                 {activeTab === 'videos' && (
                     <VideosGrid />
                 )}
