@@ -24,6 +24,7 @@ using VidiMetrics.DataAccess.Repositories.Seo.KeywordRankings;
 using VidiMetrics.DataAccess.Repositories.Seo.Keywords;
 using VidiMetrics.DataAccess.Repositories.Seo.SeoAudits;
 using VidiMetrics.DataAccess.Repositories.Seo.VideoTags;
+using VidiMetrics.DataAccess.Providers.Cashing;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
@@ -37,6 +38,11 @@ namespace VidiMetrics.DataAccess
         public static Task<IServiceCollection> AddDataAccessServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = configuration.GetConnectionString("RedisConnection") ?? "localhost:6379";
+                options.InstanceName = "VidiMetrics_";
+            });
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             services.AddScoped<IAiPromptTemplatesRepository, AiPromptTemplatesRepository>();
             services.AddScoped<IAiTasksRepository, AiTasksRepository>();
@@ -66,6 +72,8 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<IEpisodesRepository, EpisodesRepository>();
             services.AddScoped<IScenesRepository, ScenesRepository>();
             services.AddScoped<IShowsRepository, ShowsRepository>();
+
+            services.AddScoped<ICacheProvider, RedisCacheProvider>();
             return Task.FromResult(services);
         }
     }
