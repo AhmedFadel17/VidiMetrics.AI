@@ -112,7 +112,7 @@ namespace VidiMetrics.DataAccess.Data
                 .HasForeignKey(a => a.StoryEnvironmentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // UserProfile Configuration
+
             modelBuilder.Entity<UserProfile>(entity =>
             {
                 entity.HasKey(e => e.UserId);
@@ -120,11 +120,17 @@ namespace VidiMetrics.DataAccess.Data
                 entity.Property(e => e.ProfilePictureUrl).HasMaxLength(500);
                 entity.Property(e => e.Bio).HasMaxLength(1000);
             });
-            modelBuilder.Entity<UserCreditWallet>()
-                .HasOne(w => w.UserProfile)
-                .WithOne()
-                .HasForeignKey<UserCreditWallet>(w => w.UserId);
-            // SubscriptionPlan Configuration
+
+            modelBuilder.Entity<UserCreditWallet>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(w => w.UserProfile)
+                      .WithOne(p => p.CreditWallet)
+                      .HasForeignKey<UserCreditWallet>(w => w.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+            });
+
             modelBuilder.Entity<SubscriptionPlan>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -133,10 +139,8 @@ namespace VidiMetrics.DataAccess.Data
                 entity.Property(e => e.MonthlyPrice).HasPrecision(18, 2);
             });
 
-            // Seeding logic moved to a dedicated folder
             VidiMetrics.DataAccess.Seeds.SubscriptionPlanSeeds.SeedSubscriptionPlans(modelBuilder, _configuration);
 
-            // UserSubscription Configuration
             modelBuilder.Entity<UserSubscription>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -150,9 +154,35 @@ namespace VidiMetrics.DataAccess.Data
                       .WithMany(p => p.UserSubscriptions)
                       .HasForeignKey(e => e.PlanId)
                       .OnDelete(DeleteBehavior.Restrict);
-
             });
 
+            modelBuilder.Entity<CreditCostRule>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.ActionType)
+                      .HasConversion<string>()
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(e => e.CreditCost).IsRequired();
+            });
+
+            modelBuilder.Entity<CreditTransactionLedger>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Description).HasMaxLength(500).IsRequired();
+
+                entity.Property(e => e.ActionType)
+                      .HasConversion<string>()
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.HasOne(l => l.UserProfile)
+                      .WithMany(p => p.CreditLedgerLogs)
+                      .HasForeignKey(l => l.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+            });
 
 
 

@@ -1,6 +1,6 @@
 namespace VidiMetrics.Application.DTOs.Infra.UserProfiles
 {
-    public class UserProfileResponseDto
+    public record UserProfileResponseDto
     {
         public Guid UserId { get; set; }
         public DateTime CreatedAt { get; set; }

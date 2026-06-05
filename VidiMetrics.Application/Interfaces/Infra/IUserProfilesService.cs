@@ -7,9 +7,10 @@ namespace VidiMetrics.Application.Interfaces.Infra;
 
 public interface IUserProfilesService
 {
-    Task<UserProfileResponseDto> GetByIdAsync(Guid id);
+    Task<UserProfileResponseDto> GetByIdAsync(Guid userId);
     Task<IEnumerable<UserProfileResponseDto>> GetAllAsync();
     Task<UserProfileResponseDto> CreateAsync(CreateUserProfileDto dto);
-    Task<UserProfileResponseDto> UpdateAsync(Guid id, UpdateUserProfileDto dto);
-    Task<bool> DeleteAsync(Guid id);
+    Task<UserProfileResponseDto> UpdateAsync(Guid userId, UpdateUserProfileDto dto);
+    Task<UserProfileResponseDto> UpdateProfilePictureAsync(Guid userId, UploadProfilePictureDto dto);
+    Task<bool> DeleteAsync(Guid userId);
 }

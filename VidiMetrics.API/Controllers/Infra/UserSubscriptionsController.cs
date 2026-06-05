@@ -24,6 +24,13 @@ namespace VidiMetrics.API.Controllers.Infra
             _subscriptionsService = subscriptionsService;
         }
 
+        [HttpGet("me")]
+        public async Task<ActionResult<SuccessResponseDto<UserCreditWalletResponseDto>>> GetUserSubscription()
+        {
+            var balance = await _subscriptionsService.GetOrCreateActiveSubscriptionAsync(CurrentUserGuid);
+            return Ok(ApiResponseFactory.Success(balance, "User subscription retrieved successfully."));
+        }
+
         [HttpGet("balance")]
         public async Task<ActionResult<SuccessResponseDto<UserCreditWalletResponseDto>>> GetBalance()
         {

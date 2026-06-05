@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
+using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Providers.VideoProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
@@ -23,6 +24,7 @@ namespace VidiMetrics.Application.Services.Ai
         private readonly IVideoProvider _videoProvider;
         private readonly IValidator<UpdateAiVideoDto> _updateValidator;
         private readonly IValidator<CreateSceneVideoDto> _createValidator;
+        private readonly ICreditTransactionManager _creditManager;
 
         public AiVideosService(
             IMapper mapper,
@@ -30,7 +32,8 @@ namespace VidiMetrics.Application.Services.Ai
             IAiScriptsRepository aiScriptsRepository,
             IVideoProvider videoProvider,
             IValidator<UpdateAiVideoDto> updateValidator,
-            IValidator<CreateSceneVideoDto> createValidator)
+            IValidator<CreateSceneVideoDto> createValidator,
+            ICreditTransactionManager creditManager)
         {
             _mapper = mapper;
             _repo = repo;
@@ -38,6 +41,8 @@ namespace VidiMetrics.Application.Services.Ai
             _videoProvider = videoProvider;
             _updateValidator = updateValidator;
             _createValidator = createValidator;
+            _creditManager = creditManager;
+
         }
 
         public async Task<AiVideoResponseDto> CreateSceneVideoAsync(CreateSceneVideoDto dto, Guid userId)
@@ -50,21 +55,33 @@ namespace VidiMetrics.Application.Services.Ai
             if (script == null) throw new Exception("Script not found or access denied.");
 
             var seed = new Random().Next(1, 999999);
-            VideoGenerationResult providerResult = await _videoProvider.GenerateVideoAsync(script.VisualPrompt, seed);
-            var video = new AiVideo
+            return await _creditManager.ExecuteWithCreditsAsync(
+            userId,
+
+            CreditActionType.GenerateVideo,
+
+            $"Video Generation",
+            async () =>
+
             {
-                VideoUrl = providerResult.VideoUrl,
-                ThumbnailUrl = providerResult.ThumbnailUrl,
-                Duration = providerResult.Duration,
-                Size = providerResult.SizeInBytes,
-                Seed = seed,
-                UserId = userId,
-            };
+                VideoGenerationResult providerResult = await _videoProvider.GenerateVideoAsync(script.VisualPrompt, seed);
+                var video = new AiVideo
+                {
+                    VideoUrl = providerResult.VideoUrl,
+                    ThumbnailUrl = providerResult.ThumbnailUrl,
+                    Duration = providerResult.Duration,
+                    Size = providerResult.SizeInBytes,
+                    Seed = seed,
+                    UserId = userId,
+                };
 
-            await _repo.AddAsync(video);
-            await _repo.SaveChangesAsync();
+                await _repo.AddAsync(video);
+                await _repo.SaveChangesAsync();
 
-            return _mapper.Map<AiVideoResponseDto>(video);
+                return _mapper.Map<AiVideoResponseDto>(video);
+            });
+
+
         }
 
         public async Task<bool> DeleteAsync(Guid id, Guid userId)

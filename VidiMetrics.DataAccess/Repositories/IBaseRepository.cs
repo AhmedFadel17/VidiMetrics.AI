@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace VidiMetrics.DataAccess.Repositories
 {
@@ -18,5 +19,6 @@ namespace VidiMetrics.DataAccess.Repositories
         void RemoveRange(IEnumerable<T> entities);
         Task<bool> SaveChangesAsync();
         IQueryable<T> Query();
+        Task<IDbContextTransaction> BeginTransactionAsync();
     }
 }

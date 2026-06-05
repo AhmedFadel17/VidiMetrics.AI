@@ -42,7 +42,7 @@ public class CreditTransactionManager : ICreditTransactionManager
         }
 
         var rule = await _rulesRepository.Query()
-            .FirstOrDefaultAsync(r => r.ActionKey == actionType && r.IsEnabled);
+            .FirstOrDefaultAsync(r => r.ActionType == actionType && r.IsEnabled);
 
         if (rule == null)
         {

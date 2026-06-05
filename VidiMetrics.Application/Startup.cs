@@ -51,6 +51,7 @@ namespace VidiMetrics.Application
             services.AddScoped<IUserProfilesService, UserProfilesService>();
             services.AddScoped<ISubscriptionPlansService, SubscriptionPlansService>();
             services.AddScoped<IUserSubscriptionsService, UserSubscriptionsService>();
+            services.AddScoped<ICreditTransactionManager, CreditTransactionManager>();
             services.AddScoped<IVideoTagsService, VideoTagsService>();
 
             services.AddScoped<IImageProvider, PollinationsImageProvider>();

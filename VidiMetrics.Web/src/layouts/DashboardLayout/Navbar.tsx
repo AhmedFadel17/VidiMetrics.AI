@@ -1,3 +1,4 @@
+import { useGetUserProfileQuery } from "@/store/apis";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { useAuth } from "react-oidc-context";
@@ -7,7 +8,8 @@ export default function DashboardNavbar() {
   const auth = useAuth();
   const navigate = useNavigate();
   const user = auth.user;
-
+  const { data: profileData } = useGetUserProfileQuery();
+  const profile = profileData?.data;
   const hasNotifications = true; // Mocking new notifications
 
   const handleLogout = () => {
@@ -85,7 +87,7 @@ export default function DashboardNavbar() {
             <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/10 p-[2px] group-hover:border-primary/50 transition-all duration-300">
               <img
                 src={
-                  user?.profile.picture ||
+                  profile?.profilePictureUrl ||
                   "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
                 }
                 alt="Operator"
@@ -106,10 +108,10 @@ export default function DashboardNavbar() {
               <div className="p-3 border-b border-white/5">
                 <div className="flex flex-col">
                   <span className="text-base capitalize text-white truncate">
-                    {user?.profile.given_name + " " + user?.profile.family_name}
+                    {profile?.fullName}
                   </span>
                   <span className="text-sm text-white/40 truncate">
-                    {user?.profile.email}
+                    {profile?.email}
                   </span>
                 </div>
               </div>
@@ -118,9 +120,8 @@ export default function DashboardNavbar() {
                   {({ active }) => (
                     <button
                       onClick={() => navigate("/dashboard/account?tab=profile")}
-                      className={`${
-                        active ? "bg-white/10 text-white" : "text-white/60"
-                      } group flex w-full justify-between items-center rounded px-3 py-1 text-xs transition-all duration-200 uppercase tracking-widest`}
+                      className={`${active ? "bg-white/10 text-white" : "text-white/60"
+                        } group flex w-full justify-between items-center rounded px-3 py-1 text-xs transition-all duration-200 uppercase tracking-widest`}
                     >
                       My Profile
                       <span className="material-symbols-outlined text-lg opacity-60">
@@ -135,9 +136,8 @@ export default function DashboardNavbar() {
                       onClick={() =>
                         navigate("/dashboard/account?tab=preferences")
                       }
-                      className={`${
-                        active ? "bg-white/10 text-white" : "text-white/60"
-                      } group flex w-full justify-between items-center rounded px-3 py-1 text-xs transition-all duration-200 uppercase tracking-widest`}
+                      className={`${active ? "bg-white/10 text-white" : "text-white/60"
+                        } group flex w-full justify-between items-center rounded px-3 py-1 text-xs transition-all duration-200 uppercase tracking-widest`}
                     >
                       Settings
                       <span className="material-symbols-outlined text-lg opacity-60">
@@ -150,9 +150,8 @@ export default function DashboardNavbar() {
                   {({ active }) => (
                     <button
                       onClick={handleLogout}
-                      className={`${
-                        active ? "bg-red-500 text-white" : "text-red-500/80"
-                      } group flex justify-between w-full items-center rounded px-3 py-1 text-xs font-bold transition-all duration-200 uppercase tracking-widest`}
+                      className={`${active ? "bg-red-500 text-white" : "text-red-500/80"
+                        } group flex justify-between w-full items-center rounded px-3 py-1 text-xs font-bold transition-all duration-200 uppercase tracking-widest`}
                     >
                       Logout
                       <span className="material-symbols-outlined text-lg">
@@ -167,9 +166,8 @@ export default function DashboardNavbar() {
                   {({ active }) => (
                     <button
                       onClick={() => navigate("/privacy")}
-                      className={`${
-                        active ? "bg-white/10 text-white" : "text-white/60"
-                      } group flex  w-full items-center rounded px-3 py-2 text-xs transition-all duration-200 uppercase tracking-widest`}
+                      className={`${active ? "bg-white/10 text-white" : "text-white/60"
+                        } group flex  w-full items-center rounded px-3 py-2 text-xs transition-all duration-200 uppercase tracking-widest`}
                     >
                       Privacy Policy
                     </button>
@@ -179,9 +177,8 @@ export default function DashboardNavbar() {
                   {({ active }) => (
                     <button
                       onClick={() => navigate("/terms")}
-                      className={`${
-                        active ? "bg-white/10 text-white" : "text-white/60"
-                      } group flex justify-between w-full items-center rounded px-3 py-2 text-xs transition-all duration-200 uppercase tracking-widest`}
+                      className={`${active ? "bg-white/10 text-white" : "text-white/60"
+                        } group flex justify-between w-full items-center rounded px-3 py-2 text-xs transition-all duration-200 uppercase tracking-widest`}
                     >
                       Terms of use
                     </button>

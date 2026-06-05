@@ -1,6 +1,6 @@
 namespace VidiMetrics.Application.DTOs.Infra.UserProfiles
 {
-    public class CreateUserProfileDto
+    public record CreateUserProfileDto
     {
         public Guid UserId { get; set; }
         public string Email { get; set; } = string.Empty;
@@ -9,7 +9,8 @@ namespace VidiMetrics.Application.DTOs.Infra.UserProfiles
         public string? Bio { get; set; }
         public Guid SubscriptionPlanId { get; set; }
         public DateTime? LastLoginAt { get; set; }
-    public DateTime? CreatedAt { get; set; } 
+        public DateTime? CreatedAt { get; set; }
+
 
         public bool IsActive { get; set; } = true;
     }

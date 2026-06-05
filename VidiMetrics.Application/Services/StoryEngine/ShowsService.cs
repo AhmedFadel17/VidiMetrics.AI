@@ -118,7 +118,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             var image = await _imagesRepository.Query()
                             .FirstOrDefaultAsync(s => s.Id == dto.AiImageId && s.UserId == userId);
             if (image == null) throw new UnauthorizedAccessException("Invalid Image selection or access denied.");
-            image.AssetType = AssetType.Show;
+            image.IsLinked = true;
             _imagesRepository.Update(image);
 
             var entity = _mapper.Map<Show>(dto);

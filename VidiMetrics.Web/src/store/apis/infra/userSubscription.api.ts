@@ -12,6 +12,10 @@ interface UpgradeSubscriptionDto {
 
 export const userSubscriptionsApi = mainApi.injectEndpoints({
   endpoints: (builder) => ({
+    getUserSubscription: builder.query<ApiResponse<UserSubscription>, void>({
+      query: () => '/api/user/subscriptions/me',
+      providesTags: ['Subscription'],
+    }),
     getBalance: builder.query<ApiResponse<UserCreditWallet>, void>({
       query: () => '/api/user/subscriptions/balance',
       providesTags: ['Credits'],
@@ -47,6 +51,7 @@ export const userSubscriptionsApi = mainApi.injectEndpoints({
 });
 
 export const {
+  useGetUserSubscriptionQuery,
   useGetBalanceQuery,
   useGetCreditHistoryQuery,
   useGetSubscriptionHistoryQuery,

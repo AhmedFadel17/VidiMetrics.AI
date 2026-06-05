@@ -77,8 +77,8 @@ public class AiImagesService : IAiImagesService
             async () =>
 
             {
-                string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-                var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Character, userId);
+                ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+                var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Character, userId);
                 return _mapper.Map<AiImageResponseDto>(img);
             });
 
@@ -108,8 +108,8 @@ public class AiImagesService : IAiImagesService
             async () =>
 
             {
-                string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-                var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Environment, userId);
+                ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+                var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Environment, userId);
                 return _mapper.Map<AiImageResponseDto>(img);
             });
 
@@ -135,8 +135,8 @@ public class AiImagesService : IAiImagesService
             async () =>
 
             {
-                string imageUrl = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-                var img = await SaveAiImage(masterPrompt, imageUrl, seed, AssetType.Show, userId);
+                ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
+                var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Show, userId);
                 return _mapper.Map<AiImageResponseDto>(img);
             });
     }
@@ -207,12 +207,13 @@ public class AiImagesService : IAiImagesService
         return _mapper.Map<AiImageResponseDto>(entity);
     }
 
-    private async Task<AiImage> SaveAiImage(string prompt, string imageUrl, int seed, AssetType type, Guid userId)
+    private async Task<AiImage> SaveAiImage(ImageGenerationResult result, string prompt, int seed, AssetType type, Guid userId)
     {
         var img = new AiImage
         {
             Prompt = prompt,
-            ImageUrl = imageUrl,
+            ImageUrl = result.ImageUrl,
+            Size = result.SizeInBytes,
             Seed = seed,
             UserId = userId,
             AssetType = type

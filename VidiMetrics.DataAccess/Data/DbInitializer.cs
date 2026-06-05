@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.DataAccess.Data;
+using VidiMetrics.Domain.Enums; // 🌟 Added for CreditActionType
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Settings;
 
@@ -15,10 +16,8 @@ namespace VidiMetrics.DataAccess.Data
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
-            // Ensure migrations are applied
             await context.Database.MigrateAsync();
 
-            // Seed Subscription Plans from Configuration
             var section = configuration.GetSection("SubscriptionSettings");
             var freePlanSettings = section.GetSection("FreePlan").Get<PlanSettings>();
 
@@ -44,6 +43,39 @@ namespace VidiMetrics.DataAccess.Data
                     await context.SubscriptionPlans.AddAsync(freePlan);
                     await context.SaveChangesAsync();
                 }
+            }
+
+            await SeedCreditCostRulesAsync(context);
+        }
+
+        private static async Task SeedCreditCostRulesAsync(AppDbContext context)
+        {
+            var defaultRules = new List<CreditCostRule>
+            {
+                new() { ActionType = CreditActionType.GenerateImage, CreditCost = 100, IsEnabled = true },
+                new() { ActionType = CreditActionType.GenerateVideo, CreditCost = 500, IsEnabled = true },
+                new() { ActionType = CreditActionType.RenderScene, CreditCost = 300, IsEnabled = true },
+                new() { ActionType = CreditActionType.UpscaleAsset, CreditCost = 50, IsEnabled = true },
+                new() { ActionType = CreditActionType.AiVoiceover, CreditCost = 150, IsEnabled = true }
+            };
+
+            bool changesMade = false;
+
+            foreach (var rule in defaultRules)
+            {
+                var exists = await context.CreditCostRules.AnyAsync(r => r.ActionType == rule.ActionType);
+
+
+                if (!exists)
+                {
+                    await context.CreditCostRules.AddAsync(rule);
+                    changesMade = true;
+                }
+            }
+
+            if (changesMade)
+            {
+                await context.SaveChangesAsync();
             }
         }
     }

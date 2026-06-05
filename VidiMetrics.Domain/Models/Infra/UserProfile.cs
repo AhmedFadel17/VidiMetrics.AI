@@ -2,7 +2,8 @@ namespace VidiMetrics.Domain.Models.Infra;
 
 public class UserProfile
 {
-    public Guid UserId { get; set; } 
+    public Guid UserId { get; set; }
+
     public string Email { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;
     public string? ProfilePictureUrl { get; set; }
@@ -11,8 +12,8 @@ public class UserProfile
     public DateTime? LastLoginAt { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public Guid SubscriptionPlanId { get; set; }
-    public SubscriptionPlan SubscriptionPlan { get; set; } = null!;
 
+    public UserCreditWallet? CreditWallet { get; set; }
     public ICollection<UserSubscription> SubscriptionHistory { get; set; } = new List<UserSubscription>();
+    public ICollection<CreditTransactionLedger> CreditLedgerLogs { get; set; } = new List<CreditTransactionLedger>();
 }

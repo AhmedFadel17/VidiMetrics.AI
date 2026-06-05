@@ -12,11 +12,10 @@ public class UserRegisteredConsumer : IConsumer<UserRegisteredEvent>
     private readonly IUserProfilesService _service;
     private readonly SubscriptionSettings _settings;
 
-    // Inject IOptions<T>
     public UserRegisteredConsumer(IUserProfilesService service, IOptions<SubscriptionSettings> options)
     {
         _service = service;
-        _settings = options.Value; // Extract the actual settings object
+        _settings = options.Value;
     }
 
     public async Task Consume(ConsumeContext<UserRegisteredEvent> context)
@@ -29,7 +28,6 @@ public class UserRegisteredConsumer : IConsumer<UserRegisteredEvent>
             Email = msg.Email,
             FullName = msg.DisplayName,
             CreatedAt = msg.RegisteredAt,
-            // Use the injected settings
             SubscriptionPlanId = Guid.Parse(_settings.FreePlan.Id)
         };
 
