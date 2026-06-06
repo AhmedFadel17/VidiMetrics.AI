@@ -2,7 +2,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiImages;
 
-public class UpdateAiImageDto
+public record UpdateAiImageDto
 {
     public string? ImageUrl { get; set; }
     public string? Prompt { get; set; }

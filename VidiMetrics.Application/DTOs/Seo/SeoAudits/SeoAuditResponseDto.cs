@@ -1,16 +1,13 @@
 using System;
+using VidiMetrics.Application.DTOs.Common;
 
 namespace VidiMetrics.Application.DTOs.Seo.SeoAudits
 {
-    public class SeoAuditResponseDto
+    public record SeoAuditResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public bool IsDeleted { get; set; }
         public int OverallScore { get; set; }
-        public string CriticalIssues { get; set; }
-        public string OptimizationSuggestions { get; set; }
+        public string CriticalIssues { get; set; } = string.Empty;
+        public string OptimizationSuggestions { get; set; } = string.Empty;
         public bool HasClosedCaptions { get; set; }
         public bool IsTitleOptimized { get; set; }
         public bool IsDescriptionOptimized { get; set; }

@@ -1,14 +1,11 @@
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiTasks
 {
-    public class AiTaskResponseDto
+    public record AiTaskResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public bool IsDeleted { get; set; }
-        public string TaskType { get; set; }
+        public string TaskType { get; set; } = string.Empty;
         public AiTaskStatus Status { get; set; }
         public string? InputData { get; set; }
         public string? OutputData { get; set; }

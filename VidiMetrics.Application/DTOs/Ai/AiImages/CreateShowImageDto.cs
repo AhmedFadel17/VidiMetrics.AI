@@ -1,6 +1,6 @@
 namespace VidiMetrics.Application.DTOs.Ai.AiImages;
 
-public class CreateShowImageDto
+public record CreateShowImageDto
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Characters
 {
-    public class UpdateCharacterDto
+    public record UpdateCharacterDto
     {
         public string? Name { get; set; }
         public string? PhysicalDescription { get; set; }

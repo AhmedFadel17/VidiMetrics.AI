@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiScripts
 {
-    public class UpdateAiScriptDto
+    public record UpdateAiScriptDto
     {
         public string? Weather { get; set; } = string.Empty;
         public string? EnvironmentDescription { get; set; } = string.Empty;

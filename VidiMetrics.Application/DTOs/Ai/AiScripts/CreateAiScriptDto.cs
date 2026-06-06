@@ -4,7 +4,7 @@ using VidiMetrics.Domain.Models.Ai;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiScripts
 {
-    public class CreateAiScriptDto
+    public record CreateAiScriptDto
     {
         public string Weather { get; set; } = string.Empty;
         public string EnvironmentDescription { get; set; } = string.Empty;

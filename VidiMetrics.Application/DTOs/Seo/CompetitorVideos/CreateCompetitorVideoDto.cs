@@ -2,11 +2,11 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.Seo.CompetitorVideos
 {
-    public class CreateCompetitorVideoDto
+    public record CreateCompetitorVideoDto
     {
-        public string YouTubeVideoId { get; set; }
-        public string Title { get; set; }
-        public string ChannelName { get; set; }
+        public required string YouTubeVideoId { get; set; }
+        public required string Title { get; set; }
+        public required string ChannelName { get; set; }
         public int CurrentRank { get; set; }
         public Guid TargetKeywordId { get; set; }
     }

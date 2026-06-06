@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiScripts;
 
-public class AiScriptFilterDto : BaseFilterDto
+public record AiScriptFilterDto : BaseFilterDto
 {
     public bool? IsLinked { get; set; }
 }

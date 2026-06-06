@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.Infra.SubscriptionPlans
 {
-    public class SubscriptionPlanResponseDto
+    public record SubscriptionPlanResponseDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;

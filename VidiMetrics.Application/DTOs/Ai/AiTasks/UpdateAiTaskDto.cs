@@ -2,7 +2,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiTasks
 {
-    public class UpdateAiTaskDto
+    public record UpdateAiTaskDto
     {
         public string? TaskType { get; set; }
         public AiTaskStatus? Status { get; set; }

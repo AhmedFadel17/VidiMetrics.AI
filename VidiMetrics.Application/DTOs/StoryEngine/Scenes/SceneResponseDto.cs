@@ -6,7 +6,7 @@ using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Scenes
 {
-    public class SceneResponseDto
+    public record SceneResponseDto
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

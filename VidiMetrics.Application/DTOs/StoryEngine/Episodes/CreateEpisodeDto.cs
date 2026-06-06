@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Episodes
 {
-    public class CreateEpisodeDto
+    public record CreateEpisodeDto
     {
         public int EpisodeNumber { get; set; }
         public required string Title { get; set; }

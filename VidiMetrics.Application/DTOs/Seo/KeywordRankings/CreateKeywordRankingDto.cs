@@ -1,7 +1,7 @@
 
 namespace VidiMetrics.Application.DTOs.Seo.KeywordRankings
 {
-    public class CreateKeywordRankingDto
+    public record CreateKeywordRankingDto
     {
         public Guid Id { get; set; }
         public int Rank { get; set; }

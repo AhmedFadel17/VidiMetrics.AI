@@ -2,7 +2,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.ScriptLines;
 
-public class ScriptLineDto
+public record ScriptLineDto
 {
     public int Sequence { get; set; }
     public ScriptLineType Type { get; set; }

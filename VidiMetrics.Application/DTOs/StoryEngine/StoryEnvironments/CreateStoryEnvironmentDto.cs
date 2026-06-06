@@ -2,11 +2,11 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments
 {
-    public class CreateStoryEnvironmentDto
+    public record CreateStoryEnvironmentDto
     {
-        public string Name { get; set; }
-        public string VisualDescription { get; set; }
-        public string Atmosphere { get; set; }
+        public required string Name { get; set; }
+        public required string VisualDescription { get; set; }
+        public required string Atmosphere { get; set; }
 
         public Guid AiImageId { get; set; }
         public Guid ShowId { get; set; }

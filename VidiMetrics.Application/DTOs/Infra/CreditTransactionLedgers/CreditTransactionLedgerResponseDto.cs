@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Infra.CreditTransactionLedgers
 {
-    public class CreditTransactionLedgerResponseDto
+    public record CreditTransactionLedgerResponseDto
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

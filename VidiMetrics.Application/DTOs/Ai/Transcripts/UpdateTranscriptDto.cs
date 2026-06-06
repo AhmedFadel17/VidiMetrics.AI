@@ -1,7 +1,7 @@
 
 namespace VidiMetrics.Application.DTOs.Ai.Transcripts
 {
-    public class UpdateTranscriptDto
+    public record UpdateTranscriptDto
     {
         public string? RawText { get; set; }
         public string? CleanedText { get; set; }

@@ -2,7 +2,7 @@ using Microsoft.Data.SqlClient;
 
 namespace VidiMetrics.Application.DTOs.Common;
 
-public class BaseFilterDto
+public record BaseFilterDto
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;

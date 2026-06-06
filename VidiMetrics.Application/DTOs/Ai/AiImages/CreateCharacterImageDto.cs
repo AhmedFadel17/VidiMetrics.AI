@@ -1,6 +1,6 @@
 namespace VidiMetrics.Application.DTOs.Ai.AiImages;
 
-public class CreateCharacterImageDto
+public record CreateCharacterImageDto
 {
 
     public required string Name { get; set; }

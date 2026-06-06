@@ -2,9 +2,9 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.Core.Videos
 {
-    public class CreateVideoDto
+    public record CreateVideoDto
     {
-        public string Title { get; set; }
+        public required string Title { get; set; }
         public string? Description { get; set; }
         public TimeSpan Duration { get; set; }
         public string? ThumbnailUrl { get; set; }

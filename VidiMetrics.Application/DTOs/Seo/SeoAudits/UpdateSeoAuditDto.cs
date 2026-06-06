@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.Seo.SeoAudits
 {
-    public class UpdateSeoAuditDto
+    public record UpdateSeoAuditDto
     {
         public int? OverallScore { get; set; }
         public string? CriticalIssues { get; set; }

@@ -1,14 +1,11 @@
 using System;
+using VidiMetrics.Application.DTOs.Common;
 
 namespace VidiMetrics.Application.DTOs.Seo.VideoTags
 {
-    public class VideoTagResponseDto
+    public record VideoTagResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public string? CreatedBy { get; set; }
-        public bool IsDeleted { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public double RelevanceScore { get; set; }
         public Guid VideoId { get; set; }
     }

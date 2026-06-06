@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Shows;
 
-public class ShowFilterDto : BaseFilterDto
+public record ShowFilterDto : BaseFilterDto
 {
     public ShowStatus? Status { get; set; }
     public DateTime? CreatedAfter { get; set; }

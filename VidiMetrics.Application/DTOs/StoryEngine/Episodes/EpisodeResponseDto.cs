@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Episodes
 {
-    public class EpisodeResponseDto
+    public record EpisodeResponseDto
     {
         public Guid Id { get; set; }
         public DateTime CreatedAt { get; set; }

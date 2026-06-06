@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Infra.UserSubscriptions
 {
-    public class UserSubscriptionResponseDto
+    public record UserSubscriptionResponseDto
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

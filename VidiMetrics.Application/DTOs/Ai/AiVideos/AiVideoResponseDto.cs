@@ -1,11 +1,11 @@
 using System;
+using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiVideos
 {
-    public class AiVideoResponseDto
+    public record AiVideoResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
         public string? VideoUrl { get; set; }
         public string? ThumbnailUrl { get; set; }
         public TimeSpan Duration { get; set; }
@@ -14,7 +14,5 @@ namespace VidiMetrics.Application.DTOs.Ai.AiVideos
         public AssetType AssetType { get; set; }
         public bool IsLinked { get; set; }
         public Guid UserId { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
     }
 }

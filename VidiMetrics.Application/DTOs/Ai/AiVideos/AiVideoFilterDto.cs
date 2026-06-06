@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiVideos
 {
-    public class AiVideoFilterDto : BaseFilterDto
+    public record AiVideoFilterDto : BaseFilterDto
     {
         public AssetType? AssetType { get; set; }
     }

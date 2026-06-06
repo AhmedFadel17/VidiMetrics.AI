@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
 {
-    public class UpdateShowDto
+    public record UpdateShowDto
     {
         public string? Title { get; set; }
         public string? Description { get; set; }

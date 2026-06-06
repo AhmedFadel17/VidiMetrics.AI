@@ -2,7 +2,7 @@ using VidiMetrics.Domain.Enums;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiVideos
 {
-    public class UpdateAiVideoDto
+    public record UpdateAiVideoDto
     {
         public string? VideoUrl { get; set; }
         public string? ThumbnailUrl { get; set; }

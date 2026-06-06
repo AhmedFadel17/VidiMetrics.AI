@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.Infra.UserCreditWallets
 {
-    public class UserCreditWalletResponseDto
+    public record UserCreditWalletResponseDto
     {
         public Guid Id { get; set; }
         public Guid UserId { get; set; }

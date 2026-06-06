@@ -2,7 +2,7 @@ using System;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments
 {
-    public class UpdateStoryEnvironmentDto
+    public record UpdateStoryEnvironmentDto
     {
         public string? Name { get; set; }
         public string? VisualDescription { get; set; }
