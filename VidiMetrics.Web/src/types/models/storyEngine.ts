@@ -10,6 +10,7 @@ export interface Show extends BaseEntity {
   targetAudience: string;
   status: ShowStatus;
   externalReferenceId?: string;
+  referenceImageUrl?: string;
   userId: string;
   episodes?: Episode[];
   characters?: Character[];
