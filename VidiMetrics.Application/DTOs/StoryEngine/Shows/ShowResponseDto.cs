@@ -12,6 +12,7 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
         public string Description { get; set; } = string.Empty;
         public string VisualStyle { get; set; } = string.Empty;
         public string TargetAudience { get; set; } = string.Empty;
+        public string? ReferenceImageUrl { get; set; }
         public int TotalEpisodes { get; set; }
         public int Status { get; set; }
     }

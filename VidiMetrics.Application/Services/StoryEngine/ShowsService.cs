@@ -70,7 +70,9 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
         public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, bool isAdmin = false)
         {
-            var query = _repository.Query();
+            IQueryable<Show> query = _repository.Query()
+                .Include(x => x.AiImage);
+
             if (!isAdmin)
             {
                 query = query.Where(x => x.CreatedBy == userId);
