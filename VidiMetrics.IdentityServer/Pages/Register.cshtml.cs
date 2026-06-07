@@ -1,10 +1,10 @@
+using System.ComponentModel.DataAnnotations;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
 using VidiMetrics.IdentityServer.Data;
 using VidiMetrics.IdentityServer.Events;
-using MassTransit;
 
 namespace VidiMetrics.IdentityServer.Pages
 {
@@ -85,8 +85,7 @@ namespace VidiMetrics.IdentityServer.Pages
                         UserName = Input.Email,
                         Email = Input.Email,
                         FirstName = Input.FirstName,
-                        LastName = Input.LastName,
-                        EmailConfirmed = true // Assuming auto-confirm for now
+                        LastName = Input.LastName
                     };
 
                     var result = await _userManager.CreateAsync(user, Input.Password);
@@ -97,7 +96,6 @@ namespace VidiMetrics.IdentityServer.Pages
 
                         await _userManager.AddToRoleAsync(user, "User");
 
-                        // Publish event via Outbox
                         await _publishEndpoint.Publish(new UserRegisteredEvent
                         {
                             UserId = user.Id,
@@ -126,7 +124,6 @@ namespace VidiMetrics.IdentityServer.Pages
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
     }

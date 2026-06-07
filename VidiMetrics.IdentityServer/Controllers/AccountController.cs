@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.IdentityServer.Data;
 using VidiMetrics.IdentityServer.DTOs;
 using VidiMetrics.IdentityServer.Events;
-using MassTransit;
 
 namespace VidiMetrics.IdentityServer.Controllers
 {
@@ -20,7 +20,8 @@ namespace VidiMetrics.IdentityServer.Controllers
         private readonly IPublishEndpoint _publishEndpoint;
 
         public AccountController(
-            UserManager<ApplicationUser> userManager, 
+            UserManager<ApplicationUser> userManager,
+
             AppDbContext dbContext,
             IPublishEndpoint publishEndpoint)
         {
@@ -37,7 +38,6 @@ namespace VidiMetrics.IdentityServer.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Start a transaction to ensure both User and Outbox Message are saved together
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
 
             try
@@ -48,7 +48,8 @@ namespace VidiMetrics.IdentityServer.Controllers
                     Email = dto.Email,
                     FirstName = dto.FirstName,
                     LastName = dto.LastName,
-                    EmailConfirmed = true // Set to false if you implement email verification later
+                    EmailConfirmed = true
+
                 };
 
                 var result = await _userManager.CreateAsync(user, dto.Password);
@@ -57,7 +58,6 @@ namespace VidiMetrics.IdentityServer.Controllers
                 {
                     await _userManager.AddToRoleAsync(user, "User");
 
-                    // 1. Stage the event in the Outbox (This doesn't send to RabbitMQ yet)
                     await _publishEndpoint.Publish(new UserRegisteredEvent
                     {
                         UserId = user.Id,
@@ -66,27 +66,21 @@ namespace VidiMetrics.IdentityServer.Controllers
                         RegisteredAt = DateTime.UtcNow
                     });
 
-                    // 2. Explicitly SaveChanges to write the Outbox message to the DB
                     await _dbContext.SaveChangesAsync();
 
-                    // 3. Commit the database transaction
                     await transaction.CommitAsync();
 
                     return Ok(new { message = "Registration successful" });
                 }
-
-                // If we reach here, user creation failed. Roll back the transaction.
                 await transaction.RollbackAsync();
 
-                // Map Identity errors to our response format
                 var errors = MapIdentityErrors(result.Errors);
                 return BadRequest(new { errors });
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                // Log exception here (e.g., _logger.LogError...)
-                return StatusCode(500, "An internal error occurred during registration.");
+                throw new Exception("An internal error occurred during registration.", ex);
             }
         }
 

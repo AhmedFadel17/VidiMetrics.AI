@@ -1,8 +1,8 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.ComponentModel.DataAnnotations;
 using VidiMetrics.IdentityServer.Data;
 
 namespace VidiMetrics.IdentityServer.Pages.Account
@@ -14,7 +14,8 @@ namespace VidiMetrics.IdentityServer.Pages.Account
         private readonly Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.IdentityServerSettings> _identitySettings;
 
         public LoginModel(
-            SignInManager<ApplicationUser> signInManager, 
+            SignInManager<ApplicationUser> signInManager,
+
             ILogger<LoginModel> logger,
             Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.IdentityServerSettings> identitySettings)
         {
@@ -68,12 +69,10 @@ namespace VidiMetrics.IdentityServer.Pages.Account
 
             returnUrl ??= Url.Content("~/");
 
-            // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ReturnUrl = returnUrl;
 
-            // The registration page is now native to the IdentityServer
             RegisterUrl = "/register";
         }
 
@@ -83,8 +82,6 @@ namespace VidiMetrics.IdentityServer.Pages.Account
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -103,12 +100,18 @@ namespace VidiMetrics.IdentityServer.Pages.Account
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            ReturnUrl = returnUrl;
+            RegisterUrl = "/register";
+
+            if (string.IsNullOrEmpty(returnUrl) || returnUrl == Url.Content("~/"))
+            {
+                IsUrlInvalid = true;
+            }
             return Page();
+
         }
     }
 }
