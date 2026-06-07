@@ -1,16 +1,18 @@
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VidiMetrics.Application.DTOs.Core.Videos;
-using VidiMetrics.Application.Interfaces.Core;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
+using VidiMetrics.Application.DTOs.Core.Videos;
+using VidiMetrics.Application.Interfaces.Core;
 
 namespace VidiMetrics.API.Controllers.Core
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class VideosController : ControllerBase
     {
         private readonly IVideosService _service;

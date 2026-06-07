@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using FluentValidation;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.Application.Interfaces.Ai;
 using VidiMetrics.Application.Interfaces.Core;
@@ -9,6 +10,7 @@ using VidiMetrics.Application.Interfaces.Seo;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.Application.Providers.ChannelPlatformProviders;
 using VidiMetrics.Application.Providers.ImageProviders;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.Application.Providers.StorageProviders;
 using VidiMetrics.Application.Providers.VideoProviders;
 using VidiMetrics.Application.Services.Ai;
@@ -52,6 +54,7 @@ namespace VidiMetrics.Application
             services.AddScoped<ISubscriptionPlansService, SubscriptionPlansService>();
             services.AddScoped<IUserSubscriptionsService, UserSubscriptionsService>();
             services.AddScoped<ICreditTransactionManager, CreditTransactionManager>();
+            services.AddScoped<INotificationsService, NotificationsService>();
             services.AddScoped<IVideoTagsService, VideoTagsService>();
 
             services.AddScoped<IImageProvider, PollinationsImageProvider>();
@@ -59,6 +62,8 @@ namespace VidiMetrics.Application
             services.AddScoped<IStorageProvider, CloudinaryStorageProvider>();
             services.AddScoped<IChannelPlatformProvider, YouTubePlatformProvider>();
             services.AddScoped<IChannelPlatformProvider, TikTokPlatformProvider>();
+            services.AddSignalR();
+            services.AddScoped<INotificationProvider, NotificationProvider>();
 
             return Task.FromResult(services);
         }

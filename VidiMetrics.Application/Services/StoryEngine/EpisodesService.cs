@@ -8,8 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine
@@ -21,20 +23,22 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IMapper _mapper;
         private readonly IValidator<CreateEpisodeDto> _createValidator;
         private readonly IValidator<UpdateEpisodeDto> _updateValidator;
+        private readonly INotificationProvider _notificationProvider;
 
         public EpisodesService(
             IEpisodesRepository repository,
-
             IShowsRepository showsRepository,
             IMapper mapper,
             IValidator<CreateEpisodeDto> createValidator,
-            IValidator<UpdateEpisodeDto> updateValidator)
+            IValidator<UpdateEpisodeDto> updateValidator,
+            INotificationProvider notificationProvider)
         {
             _repository = repository;
             _showsRepository = showsRepository;
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<EpisodeResponseDto> GetByIdAsync(Guid id, Guid userId)
@@ -105,6 +109,15 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Episode Created",
+                $"Your episode '{entity.Title}' (Episode {entity.EpisodeNumber}) has been created successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} created a new episode titled '{entity.Title}' (Episode {entity.EpisodeNumber})."
+            );
+
             return _mapper.Map<EpisodeResponseDto>(entity);
         }
 
@@ -132,7 +145,17 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (entity == null) throw new Exception("Episode not found.");
 
             _repository.Remove(entity);
-            return await _repository.SaveChangesAsync();
+            var isSuccess = await _repository.SaveChangesAsync();
+            if (isSuccess)
+            {
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Episode Deleted",
+                    $"Your episode '{entity.Title}' was successfully deleted.",
+                    NotificationType.Success
+                );
+            }
+            return isSuccess;
         }
     }
 }

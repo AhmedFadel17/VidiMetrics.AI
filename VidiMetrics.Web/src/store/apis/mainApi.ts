@@ -19,6 +19,7 @@ export const mainApi = createApi({
     'Credits',
     'Subscription',
     'SubscriptionPlan',
+    'Notification',
 
     // StoryEngine
     'Show',

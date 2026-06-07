@@ -7,7 +7,7 @@ namespace VidiMetrics.API.Factories
             => new SuccessResponseDto<T>
             {
                 Data = data,
-                Message = message,
+                Message = message ?? "",
                 StatusCode = statusCode
             };
 

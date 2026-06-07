@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260606213012_NotificationsTable")]
+    partial class NotificationsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -639,51 +642,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("CreditTransactionLedgers");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ReadAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.SubscriptionPlan", b =>
@@ -1411,16 +1369,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("UserProfile");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.Notification", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("UserProfile");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.UserCreditWallet", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
@@ -1661,8 +1609,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("CreditLedgerLogs");
 
                     b.Navigation("CreditWallet");
-
-                    b.Navigation("Notifications");
 
                     b.Navigation("SubscriptionHistory");
                 });

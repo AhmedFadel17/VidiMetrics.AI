@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
@@ -32,6 +33,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IMapper _mapper;
         private readonly IValidator<CreateSceneDto> _createValidator;
         private readonly IValidator<UpdateSceneDto> _updateValidator;
+        private readonly INotificationProvider _notificationProvider;
 
         public ScenesService(
             IScenesRepository repository,
@@ -43,7 +45,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
             IShowsRepository showsRepository,
             IMapper mapper,
             IValidator<CreateSceneDto> createValidator,
-            IValidator<UpdateSceneDto> updateValidator)
+            IValidator<UpdateSceneDto> updateValidator,
+            INotificationProvider notificationProvider)
         {
             _repository = repository;
             _charactersRepository = charactersRepository;
@@ -55,6 +58,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<SceneResponseDto> GetByIdAsync(Guid id, Guid userId)
@@ -161,6 +165,15 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Scene Created",
+                $"Your scene '{entity.Name}' (Scene {entity.Order}) has been created successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} created a new scene titled '{entity.Name}' (Scene {entity.Order})."
+            );
+
             return await GetByIdAsync(entity.Id, userId);
         }
 
@@ -211,7 +224,17 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (entity == null) throw new Exception("Scene not found.");
 
             _repository.Remove(entity);
-            return await _repository.SaveChangesAsync();
+            var isSuccess = await _repository.SaveChangesAsync();
+            if (isSuccess)
+            {
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Scene Deleted",
+                    $"Your scene '{entity.Name}' was successfully deleted.",
+                    NotificationType.Success
+                );
+            }
+            return isSuccess;
         }
     }
 }

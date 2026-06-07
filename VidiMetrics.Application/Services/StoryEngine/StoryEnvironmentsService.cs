@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
@@ -24,15 +25,16 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IMapper _mapper;
         private readonly IValidator<CreateStoryEnvironmentDto> _createValidator;
         private readonly IValidator<UpdateStoryEnvironmentDto> _updateValidator;
+        private readonly INotificationProvider _notificationProvider;
 
         public StoryEnvironmentsService(
             IStoryEnvironmentsRepository repository,
-
             IShowsRepository showsRepository,
             IAiImagesRepository imagesRepository,
             IMapper mapper,
             IValidator<CreateStoryEnvironmentDto> createValidator,
-            IValidator<UpdateStoryEnvironmentDto> updateValidator)
+            IValidator<UpdateStoryEnvironmentDto> updateValidator,
+            INotificationProvider notificationProvider)
         {
             _repository = repository;
             _showsRepository = showsRepository;
@@ -40,6 +42,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<StoryEnvironmentResponseDto> GetByIdAsync(Guid id, Guid userId)
@@ -139,6 +142,15 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Environment Created",
+                $"Your story environment '{entity.Name}' has been created successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} created a new story environment named '{entity.Name}'."
+            );
+
             return _mapper.Map<StoryEnvironmentResponseDto>(entity);
         }
 
@@ -166,7 +178,17 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (entity == null) throw new Exception("StoryEnvironment not found.");
 
             _repository.Remove(entity);
-            return await _repository.SaveChangesAsync();
+            var isSuccess = await _repository.SaveChangesAsync();
+            if (isSuccess)
+            {
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Environment Deleted",
+                    $"Your story environment '{entity.Name}' was successfully deleted.",
+                    NotificationType.Success
+                );
+            }
+            return isSuccess;
         }
     }
 }

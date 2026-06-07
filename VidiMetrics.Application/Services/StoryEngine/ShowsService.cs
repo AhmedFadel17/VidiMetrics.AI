@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.Domain.Enums;
@@ -24,32 +25,32 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IAiImagesRepository _imagesRepository;
         private readonly IValidator<CreateShowDto> _createValidator;
         private readonly IValidator<UpdateShowDto> _updateValidator;
+        private readonly INotificationProvider _notificationProvider;
 
         public ShowsService(
             IShowsRepository repository,
             IMapper mapper,
             IAiImagesRepository imagesRepository,
             IValidator<CreateShowDto> createValidator,
-            IValidator<UpdateShowDto> updateValidator)
+            IValidator<UpdateShowDto> updateValidator,
+            INotificationProvider notificationProvider)
         {
             _repository = repository;
             _mapper = mapper;
             _imagesRepository = imagesRepository;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin = false)
         {
             var entity = await _repository.GetByIdAsync(id);
 
-
             if (entity == null)
-
                 throw new KeyNotFoundException("Show not found.");
 
             if (!isAdmin && entity.CreatedBy != userId)
-
                 throw new UnauthorizedAccessException("You are not authorized to view this show.");
 
             return _mapper.Map<ShowResponseDto>(entity);
@@ -59,16 +60,12 @@ namespace VidiMetrics.Application.Services.StoryEngine
         {
             var entity = await _repository.GetWithDetailsByIdAsync(id);
             if (entity == null)
-
                 throw new KeyNotFoundException("Show not found.");
 
             if (!isAdmin && entity.CreatedBy != userId)
-
                 throw new UnauthorizedAccessException("You are not authorized to view this show.");
 
             return _mapper.Map<ShowResponseDto>(entity);
-
-
         }
 
         public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, bool isAdmin = false)
@@ -129,6 +126,15 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Show Created",
+                $"Your show '{entity.Title}' has been created successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} created a new show titled '{entity.Title}'."
+            );
+
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
@@ -148,7 +154,6 @@ namespace VidiMetrics.Application.Services.StoryEngine
 
             _repository.Update(entity);
             await _repository.SaveChangesAsync();
-
             return _mapper.Map<ShowResponseDto>(entity);
         }
 
@@ -162,7 +167,22 @@ namespace VidiMetrics.Application.Services.StoryEngine
                 throw new UnauthorizedAccessException("You are not authorized to delete this show.");
 
             _repository.Remove(entity);
-            return await _repository.SaveChangesAsync();
+            var isSuccess = await _repository.SaveChangesAsync();
+
+            if (isSuccess)
+            {
+                Guid targetUser = entity.CreatedBy ?? userId;
+
+                await _notificationProvider.SendInAppNotificationAsync(
+                    targetUser,
+                    "Show Deleted",
+                    $"Your show '{entity.Title}' was successfully deleted.",
+                    NotificationType.Success
+                );
+
+            }
+
+            return isSuccess;
         }
     }
 }

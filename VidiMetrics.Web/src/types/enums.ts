@@ -108,3 +108,10 @@ export enum CreditActionType {
   UpscaleAsset = 4,
   AiVoiceover = 5
 }
+
+export enum NotificationType {
+  Info = 1,
+  Success = 2,
+  Warning = 3,
+  Critical = 4
+}

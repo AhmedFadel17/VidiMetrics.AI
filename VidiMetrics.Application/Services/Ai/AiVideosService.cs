@@ -9,6 +9,7 @@ using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
 using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Providers.VideoProviders;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
 using VidiMetrics.Domain.Enums;
@@ -25,6 +26,7 @@ namespace VidiMetrics.Application.Services.Ai
         private readonly IValidator<UpdateAiVideoDto> _updateValidator;
         private readonly IValidator<CreateSceneVideoDto> _createValidator;
         private readonly ICreditTransactionManager _creditManager;
+        private readonly INotificationProvider _notificationProvider;
 
         public AiVideosService(
             IMapper mapper,
@@ -33,7 +35,8 @@ namespace VidiMetrics.Application.Services.Ai
             IVideoProvider videoProvider,
             IValidator<UpdateAiVideoDto> updateValidator,
             IValidator<CreateSceneVideoDto> createValidator,
-            ICreditTransactionManager creditManager)
+            ICreditTransactionManager creditManager,
+            INotificationProvider notificationProvider)
         {
             _mapper = mapper;
             _repo = repo;
@@ -42,6 +45,7 @@ namespace VidiMetrics.Application.Services.Ai
             _updateValidator = updateValidator;
             _createValidator = createValidator;
             _creditManager = creditManager;
+            _notificationProvider = notificationProvider;
 
         }
 
@@ -77,6 +81,15 @@ namespace VidiMetrics.Application.Services.Ai
 
                 await _repo.AddAsync(video);
                 await _repo.SaveChangesAsync();
+
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Video Generated",
+                    $"Your AI Video has been generated successfully.",
+                    NotificationType.Success,
+                    true,
+                    $"User {userId} generated a new AI Video."
+                );
 
                 return _mapper.Map<AiVideoResponseDto>(video);
             });

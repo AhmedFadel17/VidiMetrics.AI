@@ -14,6 +14,7 @@ using VidiMetrics.Application.DTOs.Infra.SubscriptionPlans;
 using VidiMetrics.Application.DTOs.Infra.UserSubscriptions;
 using VidiMetrics.Application.DTOs.Infra.UserCreditWallets;
 using VidiMetrics.Application.DTOs.Infra.CreditTransactionLedgers;
+using VidiMetrics.Application.DTOs.Infra.Notifications;
 using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
 using VidiMetrics.Application.DTOs.Seo.KeywordRankings;
 using VidiMetrics.Application.DTOs.Seo.Keywords;
@@ -79,6 +80,8 @@ namespace VidiMetrics.Application.Mapping
                 .ForMember(dest => dest.PlanName, opt => opt.MapFrom(src => src.SubscriptionPlan != null ? src.SubscriptionPlan.Name : string.Empty));
             CreateMap<UserCreditWallet, UserCreditWalletResponseDto>();
             CreateMap<CreditTransactionLedger, CreditTransactionLedgerResponseDto>();
+
+            CreateMap<Notification, NotificationResponseDto>();
 
             CreateMap<CreateCompetitorVideoDto, CompetitorVideo>();
             CreateMap<UpdateCompetitorVideoDto, CompetitorVideo>()

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
@@ -24,6 +25,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
         private readonly IMapper _mapper;
         private readonly IValidator<CreateCharacterDto> _createValidator;
         private readonly IValidator<UpdateCharacterDto> _updateValidator;
+        private readonly INotificationProvider _notificationProvider;
 
         public CharactersService(
             ICharactersRepository repository,
@@ -31,7 +33,8 @@ namespace VidiMetrics.Application.Services.StoryEngine
             IAiImagesRepository imagesRepository,
             IMapper mapper,
             IValidator<CreateCharacterDto> createValidator,
-            IValidator<UpdateCharacterDto> updateValidator)
+            IValidator<UpdateCharacterDto> updateValidator,
+            INotificationProvider notificationProvider)
         {
             _showsRepository = showsRepository;
             _repository = repository;
@@ -39,6 +42,7 @@ namespace VidiMetrics.Application.Services.StoryEngine
             _mapper = mapper;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<CharacterResponseDto> GetByIdAsync(Guid id, Guid userId)
@@ -139,6 +143,15 @@ namespace VidiMetrics.Application.Services.StoryEngine
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Character Created",
+                $"Your character '{entity.Name}' has been created successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} created a new character named '{entity.Name}'."
+            );
+
             return _mapper.Map<CharacterResponseDto>(entity);
         }
 
@@ -166,7 +179,17 @@ namespace VidiMetrics.Application.Services.StoryEngine
             if (entity == null) throw new Exception("Character not found.");
 
             _repository.Remove(entity);
-            return await _repository.SaveChangesAsync();
+            var isSuccess = await _repository.SaveChangesAsync();
+            if (isSuccess)
+            {
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Character Deleted",
+                    $"Your character '{entity.Name}' was successfully deleted.",
+                    NotificationType.Success
+                );
+            }
+            return isSuccess;
         }
     }
 }

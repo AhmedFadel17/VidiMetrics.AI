@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Ai.AiScripts;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
+using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Ai;
 using VidiMetrics.Domain.Models.StoryEngine;
 
@@ -24,6 +26,7 @@ namespace VidiMetrics.Application.Services.Ai
         private readonly IStoryEnvironmentsRepository _storyEnvironmentsRepository;
         private readonly IValidator<CreateAiScriptDto> _createValidator;
         private readonly IValidator<UpdateAiScriptDto> _updateValidator;
+        private readonly INotificationProvider _notificationProvider;
 
         public AiScriptsService(
             IMapper mapper,
@@ -31,7 +34,8 @@ namespace VidiMetrics.Application.Services.Ai
             ICharactersRepository charactersRepository,
             IStoryEnvironmentsRepository storyEnvironmentsRepository,
             IValidator<CreateAiScriptDto> createValidator,
-            IValidator<UpdateAiScriptDto> updateValidator)
+            IValidator<UpdateAiScriptDto> updateValidator,
+            INotificationProvider notificationProvider)
         {
             _mapper = mapper;
             _repo = repo;
@@ -39,6 +43,7 @@ namespace VidiMetrics.Application.Services.Ai
             _storyEnvironmentsRepository = storyEnvironmentsRepository;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<AiScriptResponseDto> CreateAsync(CreateAiScriptDto dto, Guid userId)
@@ -87,6 +92,15 @@ namespace VidiMetrics.Application.Services.Ai
             await _repo.AddAsync(script);
             await _repo.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Script Generated",
+                $"Your AI Script has been generated successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} generated a new AI Script."
+            );
+
             return await GetByIdAsync(script.Id, userId);
         }
 
@@ -97,7 +111,17 @@ namespace VidiMetrics.Application.Services.Ai
             if (entity == null) throw new Exception("Script not found.");
 
             _repo.Remove(entity);
-            return await _repo.SaveChangesAsync();
+            var isSuccess = await _repo.SaveChangesAsync();
+            if (isSuccess)
+            {
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Script Deleted",
+                    $"Your script has been successfully deleted.",
+                    NotificationType.Success
+                );
+            }
+            return isSuccess;
         }
 
         public async Task<PaginationResponseDto<AiScriptResponseDto>> GetAllAsync(AiScriptFilterDto filter, Guid userId)

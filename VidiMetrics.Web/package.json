@@ -17,6 +17,7 @@
     "@fullcalendar/timegrid": "^6.1.20",
     "@headlessui/react": "^2.2.10",
     "@hookform/resolvers": "^5.2.2",
+    "@microsoft/signalr": "^10.0.0",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.7.7",
     "framer-motion": "^12.38.0",

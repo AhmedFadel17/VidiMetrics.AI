@@ -2,10 +2,10 @@ using System.IdentityModel.Tokens.Jwt;
 using MassTransit;
 using OpenIddict.Validation.AspNetCore;
 using VidiMetrics.API.Consumers;
-using VidiMetrics.API.Extensions;
 using VidiMetrics.API.Filters;
 using VidiMetrics.API.Middlwares;
 using VidiMetrics.Application;
+using VidiMetrics.Application.Hubs;
 using VidiMetrics.DataAccess;
 using VidiMetrics.Domain.Settings;
 
@@ -33,7 +33,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
         policy.WithOrigins(frontendSettings?.BaseUrl ?? "")
               .AllowAnyHeader()
-              .AllowAnyMethod());
+              .AllowAnyMethod()
+              .AllowCredentials());
 });
 
 JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
@@ -42,8 +43,8 @@ builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
 
-        var identitySettings = builder.Configuration.GetJsonSection<IdentityServerSettings>("IdentityServerSettings");
-        options.SetIssuer(identitySettings.BaseUrl);
+        var identitySettings = builder.Configuration.GetSection("IdentityServerSettings").Get<IdentityServerSettings>();
+        options.SetIssuer(identitySettings?.BaseUrl ?? "");
         options.UseSystemNetHttp();
         options.UseAspNetCore();
     });
@@ -86,7 +87,7 @@ app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapControllers();
 
 app.Run();

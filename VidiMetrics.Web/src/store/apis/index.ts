@@ -32,3 +32,4 @@ export * from './seo/videoTags.api';
 export * from './infra/userProfiles.api';
 export * from './infra/userSubscription.api';
 export * from './infra/subscriptionPlans.api';
+export * from './infra/notifications.api';

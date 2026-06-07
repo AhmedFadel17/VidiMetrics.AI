@@ -1,4 +1,5 @@
-import { CreditActionType, SubscriptionStatus } from "../enums";
+import { CreditActionType, NotificationType, SubscriptionStatus } from "../enums";
+import { BaseEntity } from "./base";
 
 // ─── SubscriptionPlan ─────────────────────────────────────────────────────────
 export interface SubscriptionPlan {
@@ -71,4 +72,14 @@ export interface CreditTransactionLedger {
   amountDeducted: number;
   description: string;
   timestamp: string;
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────
+export interface Notification extends BaseEntity {
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  readAt: string;
+  userId: string;
 }

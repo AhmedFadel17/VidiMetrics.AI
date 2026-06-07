@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
@@ -12,6 +13,7 @@ namespace VidiMetrics.API.Controllers.Core
 {
     [Route("api/channel/posts")]
     [ApiController]
+    [Authorize]
     public class ChannelPostsController : ApiBaseController
     {
         private readonly IChannelPostsService _service;

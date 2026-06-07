@@ -30,6 +30,7 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<UserCreditWallet> UserCreditWallets { get; set; }
         public DbSet<CreditCostRule> CreditCostRules { get; set; }
         public DbSet<CreditTransactionLedger> CreditTransactionLedgers { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
 
         // Seo
@@ -166,6 +167,15 @@ namespace VidiMetrics.DataAccess.Data
                       .IsRequired();
 
                 entity.Property(e => e.CreditCost).IsRequired();
+            });
+
+            modelBuilder.Entity<Notification>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(e => e.UserProfile)
+                      .WithMany(p => p.Notifications)
+                      .HasForeignKey(e => e.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<CreditTransactionLedger>(entity =>

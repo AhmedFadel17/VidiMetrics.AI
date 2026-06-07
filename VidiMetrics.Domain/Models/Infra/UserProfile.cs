@@ -16,4 +16,5 @@ public class UserProfile
     public UserCreditWallet? CreditWallet { get; set; }
     public ICollection<UserSubscription> SubscriptionHistory { get; set; } = new List<UserSubscription>();
     public ICollection<CreditTransactionLedger> CreditLedgerLogs { get; set; } = new List<CreditTransactionLedger>();
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 }

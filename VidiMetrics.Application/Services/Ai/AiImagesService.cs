@@ -9,6 +9,7 @@ using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.Interfaces.Ai;
 using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Providers.ImageProviders;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Ai;
@@ -27,6 +28,7 @@ public class AiImagesService : IAiImagesService
     private readonly IValidator<CreateEnvironmentImageDto> _createEnvironmentValidator;
     private readonly IValidator<CreateShowImageDto> _createShowValidator;
     private readonly ICreditTransactionManager _creditManager;
+    private readonly INotificationProvider _notificationProvider;
 
     public AiImagesService(
         HttpClient httpClient,
@@ -37,7 +39,8 @@ public class AiImagesService : IAiImagesService
         IValidator<CreateEnvironmentImageDto> createEnvironmentValidator,
         IValidator<CreateShowImageDto> createShowValidator,
         IImageProvider imageProvider,
-        ICreditTransactionManager creditManager)
+        ICreditTransactionManager creditManager,
+        INotificationProvider notificationProvider)
     {
         _httpClient = httpClient;
         _mapper = mapper;
@@ -48,6 +51,7 @@ public class AiImagesService : IAiImagesService
         _createEnvironmentValidator = createEnvironmentValidator;
         _createShowValidator = createShowValidator;
         _creditManager = creditManager;
+        _notificationProvider = notificationProvider;
 
         _retryPolicy = Policy
             .Handle<HttpRequestException>()
@@ -79,6 +83,16 @@ public class AiImagesService : IAiImagesService
             {
                 ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
                 var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Character, userId);
+
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Character Image Generated",
+                    $"Your character image for '{dto.Name}' has been generated successfully.",
+                    NotificationType.Success,
+                    true,
+                    $"User {userId} generated a new character image for '{dto.Name}'."
+                );
+
                 return _mapper.Map<AiImageResponseDto>(img);
             });
 
@@ -110,6 +124,16 @@ public class AiImagesService : IAiImagesService
             {
                 ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
                 var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Environment, userId);
+
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Environment Image Generated",
+                    $"Your environment image for '{dto.Name}' has been generated successfully.",
+                    NotificationType.Success,
+                    true,
+                    $"User {userId} generated a new environment image for '{dto.Name}'."
+                );
+
                 return _mapper.Map<AiImageResponseDto>(img);
             });
 
@@ -137,6 +161,16 @@ public class AiImagesService : IAiImagesService
             {
                 ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
                 var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Show, userId);
+
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Show Image Generated",
+                    $"Your show image for '{dto.Title}' has been generated successfully.",
+                    NotificationType.Success,
+                    true,
+                    $"User {userId} generated a new show image for '{dto.Title}'."
+                );
+
                 return _mapper.Map<AiImageResponseDto>(img);
             });
     }

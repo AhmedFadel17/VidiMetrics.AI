@@ -32,7 +32,7 @@ public class ChannelIntegrationController : ControllerBase
         string targetFrontendUrl = stateSegments[1];
 
         string scheme = Request.Headers["X-Forwarded-Proto"].FirstOrDefault() ?? Request.Scheme;
-        string host = Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? Request.Host.Value;
+        string host = Request.Headers["X-Forwarded-Host"].FirstOrDefault() ?? Request.Host.Value ?? "localhost";
 
         string currentBackendRedirectUri = $"{scheme}://{host}{Request.Path}";
 

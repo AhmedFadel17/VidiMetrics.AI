@@ -36,6 +36,7 @@ import EnvironmentSetup from "@/pages/Dashboard/User/Environments/EnvironemntSet
 import SceneDetails from "@/pages/Dashboard/User/Scenes/Details";
 import AccountPage from "@/pages/Dashboard/User/Account";
 import SocialLinksPage from "@/pages/Dashboard/User/SocialLinks";
+import NotificationsPage from "@/pages/Dashboard/User/Notifications";
 
 // =============================
 // 🚀 MAIN ROUTES
@@ -141,6 +142,11 @@ export const AppUserRoutes: AppRoute[] = [
     path: "/dashboard/account",
     label: "Account",
     element: <AccountPage />,
+  },
+  {
+    path: "/dashboard/notifications",
+    label: "Notifications",
+    element: <NotificationsPage />,
   },
   {
     path: "/dashboard/planner",

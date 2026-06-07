@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
@@ -11,6 +12,7 @@ namespace VidiMetrics.API.Controllers.Infra
 {
     [Route("api/subscriptions/plans")]
     [ApiController]
+    [Authorize]
     public class SubscriptionPlansController : ControllerBase
     {
         private readonly ISubscriptionPlansService _plansService;

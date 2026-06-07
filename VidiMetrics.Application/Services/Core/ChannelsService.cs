@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.Interfaces.Core;
 using VidiMetrics.Application.Providers.ChannelPlatformProviders;
+using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Core.Channels;
 using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Core;
@@ -20,13 +22,14 @@ namespace VidiMetrics.Application.Services.Core
         private readonly IValidator<CreateChannelDto> _createValidator;
         private readonly IValidator<UpdateChannelDto> _updateValidator;
         private readonly Dictionary<TargetPlatform, IChannelPlatformProvider> _providers;
+        private readonly INotificationProvider _notificationProvider;
         public ChannelsService(
             IChannelsRepository repository,
-
             IMapper mapper,
             IValidator<CreateChannelDto> createValidator,
             IValidator<UpdateChannelDto> updateValidator,
-            IEnumerable<IChannelPlatformProvider> providers
+            IEnumerable<IChannelPlatformProvider> providers,
+            INotificationProvider notificationProvider
             )
         {
             _repository = repository;
@@ -34,6 +37,7 @@ namespace VidiMetrics.Application.Services.Core
             _createValidator = createValidator;
             _updateValidator = updateValidator;
             _providers = providers.ToDictionary(p => p.Platform);
+            _notificationProvider = notificationProvider;
         }
 
         public async Task<ChannelResponseDto> GetByIdAsync(Guid id, Guid userId)
@@ -72,6 +76,15 @@ namespace VidiMetrics.Application.Services.Core
             await _repository.AddAsync(entity);
             await _repository.SaveChangesAsync();
 
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Channel Created",
+                $"Your channel '{entity.Name}' has been created successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} created a new channel '{entity.Name}'."
+            );
+
             return _mapper.Map<ChannelResponseDto>(entity);
         }
 
@@ -99,7 +112,17 @@ namespace VidiMetrics.Application.Services.Core
             if (entity == null) throw new UnauthorizedAccessException("Invalid Channel selection or access denied.");
 
             _repository.Remove(entity);
-            return await _repository.SaveChangesAsync();
+            var isSuccess = await _repository.SaveChangesAsync();
+            if (isSuccess)
+            {
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Channel Deleted",
+                    $"Your channel '{entity.Name}' was successfully deleted.",
+                    NotificationType.Success
+                );
+            }
+            return isSuccess;
         }
 
         public async Task<ChannelResponseDto> ConnectChannelAsync(TargetPlatform platform, Guid userId, string authorizationCode, string redirectUri)
@@ -154,11 +177,29 @@ namespace VidiMetrics.Application.Services.Core
                 _repository.Update(existingChannel);
                 await _repository.SaveChangesAsync();
 
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Channel Connected",
+                    $"Your {platform} channel '{existingChannel.Name}' has been connected successfully.",
+                    NotificationType.Success,
+                    true,
+                    $"User {userId} connected their {platform} channel '{existingChannel.Name}'."
+                );
+
                 return _mapper.Map<ChannelResponseDto>(existingChannel);
             }
 
             await _repository.AddAsync(channel);
             await _repository.SaveChangesAsync();
+
+            await _notificationProvider.SendInAppNotificationAsync(
+                userId,
+                "Channel Connected",
+                $"Your {platform} channel '{channel.Name}' has been connected successfully.",
+                NotificationType.Success,
+                true,
+                $"User {userId} connected their {platform} channel '{channel.Name}'."
+            );
 
             return _mapper.Map<ChannelResponseDto>(channel);
         }
