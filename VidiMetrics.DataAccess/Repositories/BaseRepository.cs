@@ -15,7 +15,7 @@ namespace VidiMetrics.DataAccess.Repositories
     {
         protected readonly AppDbContext _context;
         protected readonly DbSet<T> _dbSet;
-        protected readonly ICacheProvider _cacheProvider; 
+        protected readonly ICacheProvider _cacheProvider;
         private readonly TimeSpan _defaultCacheDuration = TimeSpan.FromMinutes(10);
 
         public BaseRepository(AppDbContext context, ICacheProvider cacheProvider)
@@ -38,17 +38,27 @@ namespace VidiMetrics.DataAccess.Repositories
             }
 
             string cacheKey = $"db:{typeof(T).Name}:{id}";
-            var cachedEntity = await _cacheProvider.GetAsync<T>(cacheKey);
-            if (cachedEntity != null)
+
+            try
             {
-                return cachedEntity;
+                var cachedEntity = await _cacheProvider.GetAsync<T>(cacheKey);
+                if (cachedEntity != null)
+                {
+                    return cachedEntity;
+                }
             }
+            catch (Exception) { }
 
             var entity = await _dbSet.FindAsync(id);
             if (entity != null)
             {
                 var ttl = expiration ?? _defaultCacheDuration;
-                await _cacheProvider.SetAsync(cacheKey, entity, ttl);
+
+                try
+                {
+                    await _cacheProvider.SetAsync(cacheKey, entity, ttl);
+                }
+                catch (Exception) { }
             }
             return entity;
         }
@@ -59,30 +69,18 @@ namespace VidiMetrics.DataAccess.Repositories
         }
 
         public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(
-            IQueryable<T> query, 
-            int page, 
-            int pageSize, 
-            string? orderBy, 
-            string? sortOrder, 
+            IQueryable<T> query,
+            int page,
+            int pageSize,
+            string? orderBy,
+            string? sortOrder,
             int? limit,
             bool bypassCache = false,
             TimeSpan? expiration = null)
         {
-            string paginationKey = $"db:{typeof(T).Name}:page_{page}:size_{pageSize}:sort_{orderBy ?? "none"}_{sortOrder ?? "none"}:limit_{limit ?? 0}";
-
-            if (!bypassCache)
-            {
-                var cachedResult = await _cacheProvider.GetAsync<PaginatedCacheWrapper<T>>(paginationKey);
-                if (cachedResult != null)
-                {
-                    return (cachedResult.Items, cachedResult.TotalCount);
-                }
-            }
-
             int totalCount = await query.CountAsync();
             query = query.ApplyOrdering(orderBy, sortOrder);
-            
-            if (limit != null)
+            if (limit.HasValue)
             {
                 query = query.Take(limit.Value);
             }
@@ -91,15 +89,6 @@ namespace VidiMetrics.DataAccess.Repositories
                 query = query.ApplyPagination(page, pageSize);
             }
             var items = await query.ToListAsync();
-
-            if (!bypassCache)
-            {
-                var wrapperToCache = new PaginatedCacheWrapper<T> { Items = items, TotalCount = totalCount };
-                var ttl = expiration ?? _defaultCacheDuration;
-                
-                await _cacheProvider.SetAsync(paginationKey, wrapperToCache, ttl);
-                await TrackPaginationCacheKeyAsync(paginationKey);
-            }
 
             return (items, totalCount);
         }
@@ -129,7 +118,6 @@ namespace VidiMetrics.DataAccess.Repositories
         {
             _context.Entry(entity).State = EntityState.Modified;
             EvictCacheEntry(entity);
-            
             return entity;
         }
 
@@ -160,51 +148,26 @@ namespace VidiMetrics.DataAccess.Repositories
 
         #region Private Helpers
 
-        private async Task TrackPaginationCacheKeyAsync(string newPaginationKey)
-        {
-            string registryKey = $"db:{typeof(T).Name}:all_pagination_keys";
-            var currentRegistry = await _cacheProvider.GetAsync<List<string>>(registryKey) ?? new List<string>();
-            
-            if (!currentRegistry.Contains(newPaginationKey))
-            {
-                currentRegistry.Add(newPaginationKey);
-                await _cacheProvider.SetAsync(registryKey, currentRegistry, TimeSpan.FromDays(1));
-            }
-        }
-
         private void EvictCacheEntry(T entity)
         {
             var idProperty = entity.GetType().GetProperty("Id");
             if (idProperty == null) return;
-            
+
             var idValue = idProperty.GetValue(entity)?.ToString();
             if (string.IsNullOrEmpty(idValue)) return;
 
             string singleKey = $"db:{typeof(T).Name}:{idValue}";
-            Task.Run(() => _cacheProvider.RemoveAsync(singleKey));
-
-            Task.Run(async () => 
+            Task.Run(async () =>
             {
-                string registryKey = $"db:{typeof(T).Name}:all_pagination_keys";
-                var activePaginationKeys = await _cacheProvider.GetAsync<List<string>>(registryKey);
-                
-                if (activePaginationKeys != null)
+                try
                 {
-                    foreach (var pageKey in activePaginationKeys)
-                    {
-                        await _cacheProvider.RemoveAsync(pageKey);
-                    }
-                    await _cacheProvider.RemoveAsync(registryKey);
+                    await _cacheProvider.RemoveAsync(singleKey);
                 }
+                catch (Exception) { }
             });
         }
 
         #endregion
     }
 
-    public class PaginatedCacheWrapper<TEntity>
-    {
-        public IEnumerable<TEntity> Items { get; set; } = new List<TEntity>();
-        public int TotalCount { get; set; }
-    }
 }
