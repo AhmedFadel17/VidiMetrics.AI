@@ -369,7 +369,7 @@ export default function Planner() {
         { label: 'Planner' },
       ]} />
       {/* ── Page Header ── */}
-      <div className="pt-2 pb-5 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0">
+      <div className="py-5 flex justify-between gap-6">
         <PageHeader
           chipText="Content Planner"
           titlePrefix="Schedule "

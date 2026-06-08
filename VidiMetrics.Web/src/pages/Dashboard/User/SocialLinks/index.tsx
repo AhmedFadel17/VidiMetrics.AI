@@ -11,6 +11,7 @@ import { Channel, ChannelPlatform } from "@/types";
 import { toast } from "sonner";
 import { useAuth } from "react-oidc-context";
 import { getChannelAuthUrl, isPlatformAuthImplemented } from "@/utils/channelAuth";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export interface ChannelData {
   id: string;
@@ -222,22 +223,24 @@ export default function SocialLinksPage() {
   ) as ChannelPlatform[];
 
   return (
-    <div>
-      <div className="space-y-4 pb-16">
-        <Breadcrumbs
-          items={[{ label: "Home", path: "/" }, { label: "Social Links" }]}
-        />
-        <div>
-          <h1 className="text-5xl font-headline font-bold text-white tracking-tight flex items-center gap-4">
-            Connect Your <span className="text-gradient-purple">Channels</span>
-          </h1>
-          <p className="text-on-surface-variant/80 mt-2 max-w-2xl">
-            Synchronize your AI-generated narratives across the global
+    <div className="flex flex-col h-full overflow-hidden">
+      <Breadcrumbs items={[
+        { label: 'Home', path: '/dashboard' },
+        { label: 'Social Links' },
+      ]} />
+      <div className="py-5 flex justify-between gap-6">
+        <div className="md:w-2/3 ">
+          <PageHeader
+            chipText="Social Links"
+            titlePrefix="Manage "
+            gradientText="Channels"
+            description="Synchronize your AI-generated narratives across the global
             distribution network. Manage permissions, automation workflows, and
-            cinematic analytics from a single command deck.
-          </p>
+            cinematic analytics from a single command deck."
+          />
         </div>
       </div>
+
 
       <div className="space-y-16 pb-20">
         {selectedManageChannel ? (

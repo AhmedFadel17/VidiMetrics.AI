@@ -20,7 +20,7 @@ export default function MediaLibrary() {
             ]} />
 
             {/* ── Page Header ── */}
-            <div className="py-5 flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0">
+            <div className="py-5 flex justify-between gap-6">
                 <PageHeader
                     chipText="Media Library"
                     titlePrefix="Media "
