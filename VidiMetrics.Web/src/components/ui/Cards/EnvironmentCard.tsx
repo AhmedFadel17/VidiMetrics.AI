@@ -7,18 +7,58 @@ interface EnvironmentCardProps {
 
 export default function EnvironmentCard({ environment }: EnvironmentCardProps) {
     const { id, name, visualDescription, atmosphere, showId, referenceImageUrl } = environment;
-    const thumbnail = referenceImageUrl || 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=800&auto=format&fit=crop&q=60';
+
+    const thumbnail = referenceImageUrl || 'https://images.unsplash.com/photo-1514924013411-cbf25faa35bb?w=500&auto=format&fit=crop&q=60';
+
     return (
-        <div className="relative h-36 rounded-2xl overflow-hidden group cursor-pointer border border-white/5 hover:border-accent-cyan/30 transition-all duration-300">
-            <img src={thumbnail} alt={name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-dashboard-bg/80 via-dashboard-bg/20 to-transparent"></div>
-            <Link to={`/dashboard/series/${showId}/environments/${id}`}>
-                <div className="absolute inset-0 flex flex-col items-start justify-center px-6">
-                    <span className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors mb-4">{name}</span>
-                    <span className="text-xs text-gray-200 group-hover:text-accent-cyan transition-colors mb-2">{visualDescription}</span>
-                    <span className="text-xs rounded bg-accent-purple/50 px-2 py-1 font-bold text-white transition-colors">{atmosphere}</span>
+        <div className="w-full h-36 rounded-2xl bg-gradient-to-r from-white/[0.04] to-white/[0.01] border border-white/5 group hover:border-accent-cyan/40 hover:bg-white/[0.05] transition-all duration-300 shadow-lg relative overflow-hidden backdrop-blur-md">
+            {/* Ambient Corner Flare */}
+            <div className="absolute right-0 top-0 w-24 h-24 rounded-full bg-accent-cyan/5 blur-2xl group-hover:bg-accent-cyan/10 transition-all duration-300 pointer-events-none" />
+
+            <Link to={`/dashboard/series/${showId}/environments/${id}`} className="flex h-full w-full">
+
+                {/* Left Side: Environment Metadata Context Pane */}
+                <div className="flex-1 min-w-0 p-4 flex flex-col justify-between z-10">
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-xs text-accent-cyan tracking-normal">
+                                distance
+                            </span>
+                            <h4 className="text-base font-bold text-white group-hover:text-accent-cyan transition-colors duration-300 truncate tracking-tight">
+                                {name}
+                            </h4>
+                        </div>
+
+                        {visualDescription && (
+                            <p className="text-[11px] text-white/40 font-medium line-clamp-2 leading-snug break-words">
+                                {visualDescription}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* Low Profile Atmosphere Status Tag */}
+                    {atmosphere && (
+                        <div className="flex items-center gap-1.5 self-start bg-white/5 border border-white/5 px-2 py-0.5 rounded-md">
+                            <span className="w-1 h-1 rounded-full bg-accent-cyan animate-pulse" />
+                            <span className="text-[9px] font-black uppercase tracking-widest text-white/50">
+                                {atmosphere}
+                            </span>
+                        </div>
+                    )}
                 </div>
+
+                {/* Right Side: Angled Graphics Display Window */}
+                <div className="relative w-32 md:w-40 h-full shrink-0 overflow-hidden clip-path-slant border-l border-white/5 shadow-2xl">
+                    <img
+                        src={thumbnail}
+                        alt={name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    {/* Shadow overlay to blend card typography context nicely */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0b0c10] via-[#0b0c10]/20 to-transparent" />
+                </div>
+
             </Link>
         </div>
-    )
+    );
 }

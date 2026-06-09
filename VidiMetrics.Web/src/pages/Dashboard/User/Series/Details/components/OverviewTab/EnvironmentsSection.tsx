@@ -25,20 +25,28 @@ export default function EnvironmentsSection({
   if (error)
     return (
       <ErrorScreen
-        onRetry={() => {}}
+        onRetry={() => { }}
         title="Error"
         message="Failed to load environments"
       />
     );
   return (
-    <div className="glass-card rounded-[3rem] p-10 border border-white/5 h-full flex flex-col">
+    <div className="glass-card rounded-xl p-10 border border-white/5 h-full flex flex-col">
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-2xl font-headline font-bold text-white tracking-tight">
           Environments
         </h3>
-        <span className="material-symbols-outlined text-white/20">
-          landscape
-        </span>
+        <button
+          onClick={() =>
+            navigate(`/dashboard/series/${showId}?tab=Environments`)
+          }
+          className="text-xs font-black uppercase tracking-widest text-accent-cyan hover:text-primary transition-colors duration-300 flex items-center gap-2"
+        >
+          <span>View All</span>
+          <span className="material-symbols-outlined text-sm">
+            arrow_forward
+          </span>
+        </button>
       </div>
 
       <div className="space-y-4 flex-grow flex flex-col justify-center">
@@ -47,7 +55,7 @@ export default function EnvironmentsSection({
             onClick={() =>
               navigate(`/dashboard/series/${showId}/environments/new`)
             }
-            className="w-full relative group overflow-hidden rounded-[2rem] border border-white/5 bg-gradient-to-br from-white/[0.01] to-white/[0.03] hover:from-white/[0.03] hover:to-white/[0.06] transition-all duration-500 flex flex-col items-center justify-center p-8 text-center min-h-[220px]"
+            className="w-full relative group overflow-hidden hover:from-white/[0.03] hover:to-white/[0.06] transition-all duration-500 flex flex-col items-center justify-center p-8 text-center min-h-[220px]"
           >
             <div className="absolute -inset-y-12 -inset-x-12 bg-gradient-to-r from-accent-cyan/0 via-accent-cyan/5 to-accent-cyan/0 group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
             <div className="relative space-y-4 z-10 flex flex-col items-center">
@@ -74,19 +82,6 @@ export default function EnvironmentsSection({
         )}
       </div>
       <div className="mt-4">
-        <div className="flex items-center justify-center">
-          <button
-            onClick={() =>
-              navigate(`/dashboard/series/${showId}?tab=Environments`)
-            }
-            className="text-xs font-black uppercase tracking-widest text-accent-cyan hover:text-primary transition-colors duration-300 flex items-center gap-2"
-          >
-            <span>View All</span>
-            <span className="material-symbols-outlined text-sm">
-              arrow_forward
-            </span>
-          </button>
-        </div>
         {environments.length > 0 && (
           <button
             onClick={() =>

@@ -11,8 +11,8 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
     const code = `E${episodeNumber}`
     return (
         <Link to={`/dashboard/series/${showId}/episodes/${id}`} className="flex flex-col h-full">
-            <div className="glass-card rounded-[2rem] p-4 border border-white/5 group hover:border-white/20 transition-all duration-500 flex flex-col h-full">
-                <div className="relative h-44 rounded-2xl overflow-hidden mb-5 flex-shrink-0">
+            <div className="glass-card rounded-xl border border-white/5 group hover:border-white/20 transition-all duration-500 flex flex-col h-full">
+                <div className="relative h-44 rounded-t-xl overflow-hidden flex-shrink-0">
                     {thumbnailUrl ? (
                         <>
                             <img src={thumbnailUrl} alt={title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-60" />
@@ -31,20 +31,18 @@ export default function EpisodeCard({ episode }: EpisodeCardProps) {
                     <div className="absolute bottom-1 right-2">
                         <span className={`px-2 py-1 text-[8px] font-black uppercase tracking-widest rounded-md bg-primary/60 text-on-surface font-bold`}>
 
-                            {formatDate(createdAt, 'ago')}
+                            {formatDate(createdAt)}
                         </span>
                     </div>
                 </div>
-
-                <div className="space-y-3 flex flex-col flex-grow">
-                    <div className="flex justify-between items-start flex-shrink-0">
-                        <h4 className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors">{code}: {title}</h4>
-                    </div>
-                    <div className="flex justify-between items-start flex-grow">
-                        <p className="text-xs text-gray-400 group-hover:text-accent-cyan transition-colors line-clamp-3">{plotSummary}</p>
-                    </div>
-
-
+                <div className="p-3">
+                    <h3 className="text-base font-bold text-white mb-1 truncate">{code}: {title}</h3>
+                    <p
+                        className="text-white/40 text-[11px] font-medium block truncate"
+                        title={plotSummary}
+                    >
+                        {plotSummary}
+                    </p>
                 </div>
             </div>
         </Link>

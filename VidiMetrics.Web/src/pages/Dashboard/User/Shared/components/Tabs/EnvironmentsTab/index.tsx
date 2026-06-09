@@ -1,11 +1,9 @@
 import EnvironmentCard from "@/components/ui/Cards/EnvironmentCard";
-import FilterDropdown from "@/components/ui/FilterDropdown";
-import Pagination from "@/components/ui/Pagination";
-import SearchInput from "@/components/ui/Inputs/SearchInput";
 import { useGetEnvironmentsQuery } from "@/store/apis";
-import { FilterOption } from "@/types";
 import { StoryEnvironment } from "@/types/models/storyEngine";
 import { useState } from "react";
+import { GenericDataGrid } from "@/components/ui/Grids/GenericDataGrid";
+import GlassLaunchButton from "@/components/ui/Buttons/GlassLaunchButton";
 import { useNavigate } from "react-router-dom";
 
 interface EnvironmentsTabProps {
@@ -14,94 +12,82 @@ interface EnvironmentsTabProps {
 
 export default function EnvironmentsTab({ showId }: EnvironmentsTabProps) {
     const navigate = useNavigate();
-    const [page, setPage] = useState(1)
-    const [pageSize, setPageSize] = useState(5)
-    const [searchTerm, setSearchTerm] = useState('')
-    const [sortOption, setSortOption] = useState<FilterOption>({
-        label: 'Newest',
-        value: 'newest',
-        orderBy: 'CreatedAt',
-        sortOrder: 'desc'
-    })
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(6);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const filterOptions: FilterOption[] = [
-        { label: 'Recently Added', value: 'newest', orderBy: 'CreatedAt', sortOrder: 'desc' },
-        { label: 'Oldest First', value: 'oldest', orderBy: 'CreatedAt', sortOrder: 'asc' },
+    const [sortState, setSortState] = useState({
+        orderBy: 'CreatedAt',
+        sortOrder: 'desc' as 'asc' | 'desc'
+    });
+
+    const sortOptions = [
+        { label: 'Recently Added', orderBy: 'CreatedAt', sortOrder: 'desc' as const },
+        { label: 'Oldest First', orderBy: 'CreatedAt', sortOrder: 'asc' as const },
     ];
 
-    const { data: response, isLoading, error } = useGetEnvironmentsQuery(
-        {
-            showId,
-            pageNumber: page,
-            pageSize,
-            searchTerm,
-            orderBy: sortOption.orderBy,
-            sortOrder: sortOption.sortOrder
-        }
-    );
-    const environments: StoryEnvironment[] = response?.data?.items || []
+    const { data: response, isLoading, error } = useGetEnvironmentsQuery({
+        showId,
+        pageNumber: page,
+        pageSize,
+        searchTerm,
+        orderBy: sortState.orderBy,
+        sortOrder: sortState.sortOrder
+    });
+
+    const responseData = response?.data;
+    const environments: StoryEnvironment[] = responseData?.items || [];
+
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-bold text-white">Environments</h3>
-                <div className="flex flex-wrap items-center gap-4">
-                    {/* Search Bar */}
-                    <SearchInput
-                        value={searchTerm}
-                        onChange={(val) => {
-                            setSearchTerm(val);
-                            setPage(1);
-                        }}
-                        placeholder="Search environments..."
-                        className="w-48 md:w-64"
-                    />
-
-                    {/* Filter Dropdown */}
-                    <FilterDropdown
-                        value={sortOption.value}
-                        onChange={(opt) => {
-                            setSortOption(opt);
-                            setPage(1);
-                        }}
-                        options={filterOptions}
-                        className="w-48"
-                    />
-
-
+            <div className="flex justify-between items-start">
+                <div>
+                    <h3 className="text-3xl font-headline font-bold text-white tracking-tight">Environments</h3>
+                    <p className="text-white/40 text-sm font-medium">Manage and review your show parameters and environments.</p>
                 </div>
-            </div>
-
-            {/* Environments Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {/* New Environment Action */}
-                <button
+                <GlassLaunchButton
+                    title="Generate New Environment"
+                    subtitle="Tap to Launch AI Environment Creator"
+                    iconName="auto_awesome_motion"
+                    variant="cyan"
                     onClick={() => navigate(`/dashboard/series/${showId}/environments/new`)}
-                    className="border-[1.5px] border-dashed border-white/10 rounded-[1rem] bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-cyan/40 transition-all duration-500 group flex flex-col items-center justify-center p-4 text-center min-h-[95px]"
-                >
-
-                    <h4 className="text-lg font-bold text-white mb-2">Generate New Environment</h4>
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Tap to launch AI screenwriter</p>
-                </button>
-                {isLoading ? (
-                    [1, 2, 3].map(i => (
-                        <div key={i} className="glass-card h-64 rounded-2xl animate-pulse bg-white/5 border border-white/5"></div>
-                    ))
-                ) : error ? (
-                    <div className="col-span-full p-12 glass-panel border-error/20 flex flex-col items-center justify-center text-center space-y-4">
-                        <span className="material-symbols-outlined text-error text-5xl">warning</span>
-                        <h3 className="text-xl font-bold text-white">Neural Uplink Failed</h3>
-                        <p className="text-white/40">Unable to retrieve environment data.</p>
-                    </div>
-                ) : (
-                    environments.map((env, index) => (
-                        <EnvironmentCard key={index} environment={env} />
-                    ))
-                )}
+                />
             </div>
-            <section className="pt-8">
-                <Pagination page={response?.data?.pageNumber || 0} pageSize={response?.data?.pageSize || 0} totalPages={response?.data?.totalPages || 0} totalCount={response?.data?.totalCount || 0} onPageChange={(page) => setPage(page)} />
-            </section>
+
+            <GenericDataGrid<StoryEnvironment>
+                items={environments}
+                isLoading={isLoading}
+                error={error}
+                loadingMessage="Loading environments..."
+                errorTitle="Network Error"
+                errorMessage="Failed to fetch environments. Please try again."
+                emptyStateMessage="No show parameters found matching this production filter."
+                renderItem={(env) => <EnvironmentCard environment={env} />}
+                searchOption={{
+                    placeholder: "Search environments catalog...",
+                    value: searchTerm,
+                    onChange: (val) => { setSearchTerm(val); setPage(1); }
+                }}
+                sortOption={{
+                    options: sortOptions,
+                    currentOrderBy: sortState.orderBy,
+                    currentSortOrder: sortState.sortOrder,
+                    onChange: (newOrderBy, newSortOrder) => {
+                        setSortState({ orderBy: newOrderBy, sortOrder: newSortOrder });
+                        setPage(1);
+                    }
+                }}
+                paginationData={responseData ? {
+                    pageNumber: responseData.pageNumber || 1,
+                    totalPages: responseData.totalPages || 1,
+                    pageSize: responseData.pageSize || 5,
+                    totalCount: responseData.totalCount || 0
+                } : undefined}
+                onPageChange={(p) => setPage(p)}
+                onPageSizeChange={(size) => { setPageSize(size); setPage(1); }}
+                cols={{ sm: 1, md: 2, lg: 3 }}
+            />
         </div>
-    )
+    );
 }

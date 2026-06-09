@@ -6,12 +6,7 @@ export type AppRoute = {
     element: JSX.Element;
 }
 
-export interface FilterOption {
-    label: string;
-    value: string | number;
-    sortOrder?: 'asc' | 'desc';
-    orderBy?: string;
-}
+
 export type SidebarRoute = {
     path: string;
     label: string;
@@ -23,4 +18,28 @@ export type SidebarRoute = {
         pro?: boolean;
         new?: boolean
     }[]
+}
+
+export type FilterType = 'select' | 'date' | 'text';
+
+export interface FilterFieldDefinition<TValue = any> {
+    id: string;
+    label: string;
+    type: FilterType;
+    options?: { label: string; value: TValue }[];
+    placeholder?: string;
+}
+
+export interface SortOptionDefinition {
+    label: string;
+    orderBy: string;
+    sortOrder: 'asc' | 'desc';
+}
+
+export interface GridQueryState {
+    filters: Record<string, any>;
+    sort?: {
+        orderBy: string;
+        sortOrder: 'asc' | 'desc';
+    };
 }

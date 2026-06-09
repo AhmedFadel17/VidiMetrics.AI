@@ -23,13 +23,13 @@ export default function EpisodesSection({ showId }: EpisodesSectionProps) {
   if (error)
     return (
       <ErrorScreen
-        onRetry={() => {}}
+        onRetry={() => { }}
         title="Error"
         message="Failed to load episodes"
       />
     );
   return (
-    <div className="glass-card rounded-[3rem] p-10 border border-white/5">
+    <div className="glass-card rounded-xl p-10 border border-white/5">
       <div className="flex justify-between items-center mb-10">
         <h3 className="text-3xl font-headline font-bold text-white tracking-tight">
           Episodes
@@ -51,7 +51,7 @@ export default function EpisodesSection({ showId }: EpisodesSectionProps) {
         {episodes.length === 0 && (
           <button
             onClick={() => navigate(`/dashboard/series/${showId}/episodes/new`)}
-            className="col-span-4 relative group overflow-hidden rounded-[2rem] border border-white/5 bg-gradient-to-br from-white/[0.01] to-white/[0.03] hover:from-white/[0.03] hover:to-white/[0.06] transition-all duration-500 flex flex-col items-center justify-center p-8 text-center min-h-[280px]"
+            className="col-span-4 relative group overflow-hidden hover:from-white/[0.03] hover:to-white/[0.06] transition-all duration-500 flex flex-col items-center justify-center p-8 text-center"
           >
             <div className="absolute -inset-y-12 -inset-x-12 bg-gradient-to-r from-accent-cyan/0 via-accent-cyan/5 to-accent-cyan/0 group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
             <div className="relative space-y-4 z-10 flex flex-col items-center">
@@ -81,7 +81,7 @@ export default function EpisodesSection({ showId }: EpisodesSectionProps) {
         {episodes.length > 0 && (
           <button
             onClick={() => navigate(`/dashboard/series/${showId}/episodes/new`)}
-            className="border-[1.5px] border-dashed border-white/10 rounded-[2rem] bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-cyan/40 transition-all duration-500 group flex flex-col items-center justify-center p-8 text-center min-h-[280px]"
+            className="border-[1.5px] border-dashed border-white/10 rounded-xl bg-white/[0.02] hover:bg-white/[0.04] hover:border-accent-cyan/40 transition-all duration-500 group flex flex-col items-center justify-center p-8 text-center "
           >
             <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:bg-accent-cyan/20 transition-all duration-500">
               <span className="material-symbols-outlined text-white group-hover:scale-125 transition-transform duration-500">

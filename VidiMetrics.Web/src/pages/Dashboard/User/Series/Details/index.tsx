@@ -5,23 +5,28 @@ import OverviewTab from './components/OverviewTab'
 import EpisodesTab from '../../Shared/components/Tabs/EpisodesTab'
 import CharactersTab from '../../Shared/components/Tabs/CharactersTab'
 import EnvironmentsTab from '../../Shared/components/Tabs/EnvironmentsTab'
-import ScenesTab from '../../Shared/components/Tabs/ScenesTab'
 import { useParams, useSearchParams } from 'react-router-dom'
-import { useGetShowByIdQuery } from '@/store/apis'
+import { useDeleteShowMutation, useGetShowByIdQuery } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { useState } from 'react'
+import ConfirmationDialog from '@/components/ui/Feedback/ConfirmationDialog'
+import { useNavigate } from 'react-router-dom'
+import { showToast } from '@/utils/toast'
+import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens'
 
 export default function SeriesDetails() {
+    const navigate = useNavigate()
     const { id } = useParams<{ id: string }>();
     const [searchParams, setSearchParams] = useSearchParams();
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+    const [deleteShow, { isLoading: isDeleting }] = useDeleteShowMutation();
     const { data: response, isLoading, error } = useGetShowByIdQuery(id || '');
     const show = response?.data;
 
     type TabType = 'Overview' | "Info" | 'Episodes' | 'Characters' | 'Environments' | 'Timelines'
-    
+
     const tabs: TabType[] = ['Overview', 'Info', 'Episodes', 'Characters', 'Environments', 'Timelines']
-    
-    // Get active tab from URL or default to 'Overview'
+
     const tabParam = searchParams.get('tab') as TabType
     const activeTab = tabs.includes(tabParam) ? tabParam : 'Overview'
 
@@ -29,32 +34,24 @@ export default function SeriesDetails() {
         setSearchParams({ tab });
     }
 
-    if (isLoading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
-                <div className="w-16 h-16 border-4 border-accent-purple/30 border-t-accent-purple rounded-full animate-spin"></div>
-                <p className="text-white/40 font-label text-xs uppercase tracking-widest animate-pulse">Syncing with Neural Engine...</p>
-            </div>
-        );
-    }
+    const handleDelete = async () => {
+        if (!id) {
+            showToast.error('Series Not Found', 'Series not found');
+            return;
+        }
+        try {
+            await deleteShow(id).unwrap();
+            showToast.success('Series Removed', `${show?.title} has been removed from the active series archives.`);
+            navigate(`/dashboard/series`);
+        } catch (error: any) {
+            showToast.error('Removal Failed', error.data?.message || 'A system error occurred while trying to remove the series.');
+        } finally {
+            setIsDeleteDialogOpen(false);
+        }
+    };
 
-    if (error || !show) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6 glass-card rounded-[3rem] border border-error/20 p-12">
-                <span className="material-symbols-outlined text-6xl text-error">warning</span>
-                <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-headline font-bold text-white tracking-tight">Signal Lost</h2>
-                    <p className="text-white/40">Unable to retrieve series parameters from the core. Please verify project ID.</p>
-                </div>
-                <button
-                    onClick={() => window.location.reload()}
-                    className="px-8 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl border border-white/10 transition-all uppercase text-[10px] font-black tracking-widest"
-                >
-                    Reconnect Uplink
-                </button>
-            </div>
-        );
-    }
+    if (isLoading) return <LoadingScreen message="Accessing Series Archives..." accentColor="purple" />
+    if (error || !show) return <ErrorScreen title="Series Not Found" message="Series not found" />
 
     return (
         <div className="space-y-10 pb-20">
@@ -68,7 +65,7 @@ export default function SeriesDetails() {
 
 
             {/* Hero Section */}
-            <SeriesHero show={show} />
+            <SeriesHero show={show} onDelete={() => setIsDeleteDialogOpen(true)} />
 
             {/* Content Tabs */}
             <div className="flex items-center gap-10 border-b border-white/5 pb-4">
@@ -112,6 +109,17 @@ export default function SeriesDetails() {
                     <TimelinesTab showId={show.id} />
                 )}
             </div>
+
+            <ConfirmationDialog
+                isOpen={isDeleteDialogOpen}
+                onClose={() => setIsDeleteDialogOpen(false)}
+                onConfirm={handleDelete}
+                title="Remove Series"
+                description={`Are you sure you want to remove ${show.title} from the series archives? This action will permanently de-initialize their narrative profile and visual assets.`}
+                confirmText="Delete"
+                variant="danger"
+                isLoading={isDeleting}
+            />
         </div>
     )
 }
