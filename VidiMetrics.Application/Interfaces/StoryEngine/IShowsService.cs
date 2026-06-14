@@ -8,10 +8,10 @@ namespace VidiMetrics.Application.Interfaces.StoryEngine;
 
 public interface IShowsService
 {
-    Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin = false);
-    Task<ShowResponseDto> GetWithDetailsByIdAsync(Guid id, Guid userId, bool isAdmin = false);
-    Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, bool isAdmin = false);
-    Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId, bool isAdmin = false);
-    Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto, Guid userId, bool isAdmin = false);
-    Task<bool> DeleteAsync(Guid id, Guid userId, bool isAdmin = false);
+    Task<ShowResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default);
+    Task<ShowResponseDto> GetWithDetailsByIdAsync(Guid userId, Guid id, CancellationToken ct = default);
+    Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, CancellationToken ct = default);
+    Task<ShowResponseDto> CreateAsync(Guid userId, CreateShowDto dto);
+    Task<ShowResponseDto> UpdateAsync(Guid userId, Guid id, UpdateShowDto dto);
+    Task<bool> DeleteAsync(Guid userId, Guid id);
 }

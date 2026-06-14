@@ -3,14 +3,13 @@ using System.Threading.Tasks;
 using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.DTOs.Common;
 
-namespace VidiMetrics.Application.Interfaces.Ai
+namespace VidiMetrics.Application.Interfaces.Ai;
+
+public interface IAiVideosService
 {
-    public interface IAiVideosService
-    {
-        Task<AiVideoResponseDto> GetByIdAsync(Guid id, Guid userId);
-        Task<PaginationResponseDto<AiVideoResponseDto>> GetAllAsync(AiVideoFilterDto filter, Guid userId);
-        Task<AiVideoResponseDto> CreateSceneVideoAsync(CreateSceneVideoDto dto, Guid userId);
-        Task<AiVideoResponseDto> UpdateAsync(Guid id, UpdateAiVideoDto dto, Guid userId);
-        Task<bool> DeleteAsync(Guid id, Guid userId);
-    }
+    Task<AiVideoResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default);
+    Task<PaginationResponseDto<AiVideoResponseDto>> GetAllAsync(Guid userId, AiVideoFilterDto filter, CancellationToken ct = default);
+    Task<AiVideoResponseDto> CreateSceneVideoAsync(Guid userId, CreateSceneVideoDto dto);
+    Task<AiVideoResponseDto> UpdateAsync(Guid userId, Guid id, UpdateAiVideoDto dto);
+    Task<bool> DeleteAsync(Guid userId, Guid id);
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
@@ -14,148 +15,122 @@ using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.StoryEngine;
 
-namespace VidiMetrics.Application.Services.StoryEngine
+namespace VidiMetrics.Application.Services.StoryEngine;
+
+public class EpisodesService : IEpisodesService
 {
-    public class EpisodesService : IEpisodesService
+    private readonly IEpisodesRepository _repository;
+    private readonly IShowsRepository _showsRepository;
+    private readonly IMapper _mapper;
+    private readonly IValidator<CreateEpisodeDto> _createValidator;
+    private readonly IValidator<UpdateEpisodeDto> _updateValidator;
+    private readonly INotificationProvider _notificationProvider;
+
+    public EpisodesService(
+        IEpisodesRepository repository,
+        IShowsRepository showsRepository,
+        IMapper mapper,
+        IValidator<CreateEpisodeDto> createValidator,
+        IValidator<UpdateEpisodeDto> updateValidator,
+        INotificationProvider notificationProvider)
     {
-        private readonly IEpisodesRepository _repository;
-        private readonly IShowsRepository _showsRepository;
-        private readonly IMapper _mapper;
-        private readonly IValidator<CreateEpisodeDto> _createValidator;
-        private readonly IValidator<UpdateEpisodeDto> _updateValidator;
-        private readonly INotificationProvider _notificationProvider;
+        _repository = repository;
+        _showsRepository = showsRepository;
+        _mapper = mapper;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
+        _notificationProvider = notificationProvider;
+    }
 
-        public EpisodesService(
-            IEpisodesRepository repository,
-            IShowsRepository showsRepository,
-            IMapper mapper,
-            IValidator<CreateEpisodeDto> createValidator,
-            IValidator<UpdateEpisodeDto> updateValidator,
-            INotificationProvider notificationProvider)
+    public async Task<EpisodeResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
+    {
+        IQueryable<Episode> query = _repository.Query().Include(x => x.AiVideo);
+        var entity = await query.FirstOrDefaultAsync(e => e.Id == id && e.Show.UserId == userId, cancellationToken: ct);
+        if (entity == null) throw new KeyNotFoundException("Episode not found.");
+        return _mapper.Map<EpisodeResponseDto>(entity);
+    }
+
+    public async Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(Guid userId, EpisodeFilterDto filter, CancellationToken ct = default)
+    {
+        IQueryable<Episode> query = _repository.Query().Include(x => x.AiVideo);
+        query = query.Where(x => x.Show.UserId == userId);
+        if (filter.ShowId.HasValue)
         {
-            _repository = repository;
-            _showsRepository = showsRepository;
-            _mapper = mapper;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
-            _notificationProvider = notificationProvider;
+            query = query.Where(x => x.ShowId == filter.ShowId.Value);
         }
-
-        public async Task<EpisodeResponseDto> GetByIdAsync(Guid id, Guid userId)
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            IQueryable<Episode> query = _repository.Query()
-            .Include(x => x.AiVideo);
-
-            var entity = await query.FirstOrDefaultAsync(e => e.Id == id && e.Show.UserId == userId);
-            if (entity == null) throw new Exception("Episode not found.");
-
-            return _mapper.Map<EpisodeResponseDto>(entity);
+            query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) ||
+                                   x.PlotSummary.ToLower().Contains(filter.SearchTerm.ToLower()));
         }
-
-        public async Task<PaginationResponseDto<EpisodeResponseDto>> GetAllAsync(EpisodeFilterDto filter, Guid userId)
+        if (filter.CreatedAfter.HasValue)
         {
-            IQueryable<Episode> query = _repository.Query()
-            .Include(x => x.AiVideo);
-
-            query = query.Where(x => x.Show.UserId == userId);
-
-            if (filter.ShowId.HasValue)
-            {
-                query = query.Where(x => x.ShowId == filter.ShowId.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-            {
-                query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) ||
-
-                                       x.PlotSummary.ToLower().Contains(filter.SearchTerm.ToLower()));
-            }
-
-            if (filter.CreatedAfter.HasValue)
-            {
-                query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
-            }
-
-            if (filter.CreatedBefore.HasValue)
-            {
-                query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
-            }
-
-            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
-                query,
-                filter.PageNumber,
-                filter.PageSize,
-                filter.OrderBy,
-                filter.SortOrder,
-                filter.Limit);
-
-            var paginationSource = new PaginationSource<Episode>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
-            return _mapper.Map<PaginationResponseDto<EpisodeResponseDto>>(paginationSource);
+            query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
         }
-
-        public async Task<EpisodeResponseDto> CreateAsync(CreateEpisodeDto dto, Guid userId)
+        if (filter.CreatedBefore.HasValue)
         {
-            await _createValidator.ValidateAndThrowAsync(dto);
+            query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
+        }
+        var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
+            query,
+            filter.PageNumber,
+            filter.PageSize,
+            filter.OrderBy,
+            filter.SortOrder,
+            filter.Limit,
+            cancellationToken: ct);
+        var paginationSource = new PaginationSource<Episode>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
+        return _mapper.Map<PaginationResponseDto<EpisodeResponseDto>>(paginationSource);
+    }
 
-            var show = await _showsRepository.Query()
-                .FirstOrDefaultAsync(s => s.Id == dto.ShowId && s.UserId == userId);
+    public async Task<EpisodeResponseDto> CreateAsync(Guid userId, CreateEpisodeDto dto)
+    {
+        await _createValidator.ValidateAndThrowAsync(dto);
+        var show = await _showsRepository.Query().FirstOrDefaultAsync(s => s.Id == dto.ShowId && s.UserId == userId);
+        if (show == null) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
+        if (dto.EpisodeNumber != show.TotalEpisodes + 1) throw new InvalidOperationException("Invalid Episode Number");
+        var entity = _mapper.Map<Episode>(dto);
+        entity.CreatedAt = DateTime.UtcNow;
+        await _repository.AddAsync(entity);
+        await _repository.SaveChangesAsync();
+        await _notificationProvider.SendInAppNotificationAsync(
+            userId,
+            "Episode Created",
+            $"Your episode '{entity.Title}' (Episode {entity.EpisodeNumber}) has been created successfully.",
+            NotificationType.Success,
+            true,
+            $"User {userId} created a new episode titled '{entity.Title}' (Episode {entity.EpisodeNumber})."
+        );
+        return _mapper.Map<EpisodeResponseDto>(entity);
+    }
 
-            if (show == null) throw new UnauthorizedAccessException("Invalid Show selection or access denied.");
-            if (dto.EpisodeNumber != show.TotalEpisodes + 1) throw new Exception("Invalid Episode Number");
+    public async Task<EpisodeResponseDto> UpdateAsync(Guid userId, Guid id, UpdateEpisodeDto dto)
+    {
+        await _updateValidator.ValidateAndThrowAsync(dto);
+        var entity = await _repository.Query().FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
+        if (entity == null) throw new KeyNotFoundException("Episode not found.");
+        _mapper.Map(dto, entity);
+        entity.UpdatedAt = DateTime.UtcNow;
+        _repository.Update(entity);
+        await _repository.SaveChangesAsync();
+        return _mapper.Map<EpisodeResponseDto>(entity);
+    }
 
-            var entity = _mapper.Map<Episode>(dto);
-            entity.CreatedAt = DateTime.UtcNow;
-
-            await _repository.AddAsync(entity);
-            await _repository.SaveChangesAsync();
-
+    public async Task<bool> DeleteAsync(Guid userId, Guid id)
+    {
+        var entity = await _repository.Query().FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
+        if (entity == null) throw new KeyNotFoundException("Episode not found.");
+        _repository.Remove(entity);
+        var isSuccess = await _repository.SaveChangesAsync();
+        if (isSuccess)
+        {
             await _notificationProvider.SendInAppNotificationAsync(
                 userId,
-                "Episode Created",
-                $"Your episode '{entity.Title}' (Episode {entity.EpisodeNumber}) has been created successfully.",
-                NotificationType.Success,
-                true,
-                $"User {userId} created a new episode titled '{entity.Title}' (Episode {entity.EpisodeNumber})."
+                "Episode Deleted",
+                $"Your episode '{entity.Title}' was successfully deleted.",
+                NotificationType.Success
             );
-
-            return _mapper.Map<EpisodeResponseDto>(entity);
         }
-
-        public async Task<EpisodeResponseDto> UpdateAsync(Guid id, UpdateEpisodeDto dto, Guid userId)
-        {
-            await _updateValidator.ValidateAndThrowAsync(dto);
-
-            var entity = await _repository.Query()
-                .FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
-            if (entity == null) throw new Exception("Episode not found.");
-
-            _mapper.Map(dto, entity);
-            entity.UpdatedAt = DateTime.UtcNow;
-
-            _repository.Update(entity);
-            await _repository.SaveChangesAsync();
-
-            return _mapper.Map<EpisodeResponseDto>(entity);
-        }
-
-        public async Task<bool> DeleteAsync(Guid id, Guid userId)
-        {
-            var entity = await _repository.Query()
-                .FirstOrDefaultAsync(x => x.Id == id && x.Show.UserId == userId);
-            if (entity == null) throw new Exception("Episode not found.");
-
-            _repository.Remove(entity);
-            var isSuccess = await _repository.SaveChangesAsync();
-            if (isSuccess)
-            {
-                await _notificationProvider.SendInAppNotificationAsync(
-                    userId,
-                    "Episode Deleted",
-                    $"Your episode '{entity.Title}' was successfully deleted.",
-                    NotificationType.Success
-                );
-            }
-            return isSuccess;
-        }
+        return isSuccess;
     }
 }

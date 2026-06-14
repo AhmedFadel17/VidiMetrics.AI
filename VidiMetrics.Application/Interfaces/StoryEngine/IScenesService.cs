@@ -8,9 +8,9 @@ namespace VidiMetrics.Application.Interfaces.StoryEngine;
 
 public interface IScenesService
 {
-    Task<SceneResponseDto> GetByIdAsync(Guid id, Guid userId);
-    Task<PaginationResponseDto<SceneResponseDto>> GetAllAsync(SceneFilterDto filter, Guid userId);
-    Task<SceneResponseDto> CreateAsync(CreateSceneDto dto, Guid userId);
-    Task<SceneResponseDto> UpdateAsync(Guid id, UpdateSceneDto dto, Guid userId);
-    Task<bool> DeleteAsync(Guid id, Guid userId);
+    Task<SceneResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default);
+    Task<PaginationResponseDto<SceneResponseDto>> GetAllAsync(Guid userId, SceneFilterDto filter, CancellationToken ct = default);
+    Task<SceneResponseDto> CreateAsync(Guid userId, CreateSceneDto dto);
+    Task<SceneResponseDto> UpdateAsync(Guid userId, Guid id, UpdateSceneDto dto);
+    Task<bool> DeleteAsync(Guid userId, Guid id);
 }

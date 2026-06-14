@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
@@ -16,175 +17,139 @@ using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Ai;
 using VidiMetrics.Domain.Models.StoryEngine;
 
-namespace VidiMetrics.Application.Services.StoryEngine
+namespace VidiMetrics.Application.Services.StoryEngine;
+
+public class ShowsService : IShowsService
 {
-    public class ShowsService : IShowsService
+    private readonly IShowsRepository _repository;
+    private readonly IMapper _mapper;
+    private readonly IAiImagesRepository _imagesRepository;
+    private readonly IValidator<CreateShowDto> _createValidator;
+    private readonly IValidator<UpdateShowDto> _updateValidator;
+    private readonly INotificationProvider _notificationProvider;
+
+    public ShowsService(
+        IShowsRepository repository,
+        IMapper mapper,
+        IAiImagesRepository imagesRepository,
+        IValidator<CreateShowDto> createValidator,
+        IValidator<UpdateShowDto> updateValidator,
+        INotificationProvider notificationProvider)
     {
-        private readonly IShowsRepository _repository;
-        private readonly IMapper _mapper;
-        private readonly IAiImagesRepository _imagesRepository;
-        private readonly IValidator<CreateShowDto> _createValidator;
-        private readonly IValidator<UpdateShowDto> _updateValidator;
-        private readonly INotificationProvider _notificationProvider;
+        _repository = repository;
+        _mapper = mapper;
+        _imagesRepository = imagesRepository;
+        _createValidator = createValidator;
+        _updateValidator = updateValidator;
+        _notificationProvider = notificationProvider;
+    }
 
-        public ShowsService(
-            IShowsRepository repository,
-            IMapper mapper,
-            IAiImagesRepository imagesRepository,
-            IValidator<CreateShowDto> createValidator,
-            IValidator<UpdateShowDto> updateValidator,
-            INotificationProvider notificationProvider)
+    public async Task<ShowResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
+    {
+        var entity = await _repository.Query().Include(x => x.AiImage).FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (entity == null)
+            throw new KeyNotFoundException("Show not found.");
+        return _mapper.Map<ShowResponseDto>(entity);
+    }
+
+    public async Task<ShowResponseDto> GetWithDetailsByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
+    {
+        var entity = await _repository.Query()
+            .Include(x => x.AiImage)
+            .Include(x => x.Episodes)
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (entity == null)
+            throw new KeyNotFoundException("Show not found.");
+        return _mapper.Map<ShowResponseDto>(entity);
+    }
+
+    public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, CancellationToken ct = default)
+    {
+        IQueryable<Show> query = _repository.Query().Include(x => x.AiImage).Where(x => x.UserId == userId);
+        if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
         {
-            _repository = repository;
-            _mapper = mapper;
-            _imagesRepository = imagesRepository;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
-            _notificationProvider = notificationProvider;
+            query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) || x.Description.ToLower().Contains(filter.SearchTerm.ToLower()));
         }
-
-        public async Task<ShowResponseDto> GetByIdAsync(Guid id, Guid userId, bool isAdmin = false)
+        if (filter.Status.HasValue)
         {
-            var entity = await _repository.GetByIdAsync(id);
-
-            if (entity == null)
-                throw new KeyNotFoundException("Show not found.");
-
-            if (!isAdmin && entity.CreatedBy != userId)
-                throw new UnauthorizedAccessException("You are not authorized to view this show.");
-
-            return _mapper.Map<ShowResponseDto>(entity);
+            query = query.Where(x => x.Status == filter.Status.Value);
         }
-
-        public async Task<ShowResponseDto> GetWithDetailsByIdAsync(Guid id, Guid userId, bool isAdmin = false)
+        if (filter.CreatedAfter.HasValue)
         {
-            var entity = await _repository.GetWithDetailsByIdAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException("Show not found.");
-
-            if (!isAdmin && entity.CreatedBy != userId)
-                throw new UnauthorizedAccessException("You are not authorized to view this show.");
-
-            return _mapper.Map<ShowResponseDto>(entity);
+            query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
         }
-
-        public async Task<PaginationResponseDto<ShowResponseDto>> GetAllAsync(Guid userId, ShowFilterDto filter, bool isAdmin = false)
+        if (filter.CreatedBefore.HasValue)
         {
-            IQueryable<Show> query = _repository.Query()
-                .Include(x => x.AiImage);
-
-            if (!isAdmin)
-            {
-                query = query.Where(x => x.CreatedBy == userId);
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.SearchTerm))
-            {
-                query = query.Where(x => x.Title.ToLower().Contains(filter.SearchTerm.ToLower()) || x.Description.ToLower().Contains(filter.SearchTerm.ToLower()));
-            }
-
-            if (filter.Status.HasValue)
-            {
-                query = query.Where(x => x.Status == filter.Status.Value);
-            }
-
-            if (filter.CreatedAfter.HasValue)
-            {
-                query = query.Where(x => x.CreatedAt >= filter.CreatedAfter.Value);
-            }
-
-            if (filter.CreatedBefore.HasValue)
-            {
-                query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
-            }
-
-            var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
-                query,
-                filter.PageNumber,
-                filter.PageSize,
-                filter.OrderBy,
-                filter.SortOrder,
-                filter.Limit);
-
-            var paginationSource = new PaginationSource<Show>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
-            return _mapper.Map<PaginationResponseDto<ShowResponseDto>>(paginationSource);
+            query = query.Where(x => x.CreatedAt <= filter.CreatedBefore.Value);
         }
+        var (entities, totalCount) = await _repository.GetAllWithPaginationAsync(
+            query,
+            filter.PageNumber,
+            filter.PageSize,
+            filter.OrderBy,
+            filter.SortOrder,
+            filter.Limit,
+            cancellationToken: ct);
+        var paginationSource = new PaginationSource<Show>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
+        return _mapper.Map<PaginationResponseDto<ShowResponseDto>>(paginationSource);
+    }
 
-        public async Task<ShowResponseDto> CreateAsync(CreateShowDto dto, Guid userId, bool isAdmin = false)
+    public async Task<ShowResponseDto> CreateAsync(Guid userId, CreateShowDto dto)
+    {
+        await _createValidator.ValidateAndThrowAsync(dto);
+        var image = await _imagesRepository.Query().FirstOrDefaultAsync(s => s.Id == dto.AiImageId && s.UserId == userId);
+        if (image == null)
+
+            throw new UnauthorizedAccessException("Invalid Image selection or access denied.");
+        image.IsLinked = true;
+        _imagesRepository.Update(image);
+        var entity = _mapper.Map<Show>(dto);
+        entity.UserId = userId;
+        entity.CreatedBy = userId;
+        entity.CreatedAt = DateTime.UtcNow;
+        await _repository.AddAsync(entity);
+        await _repository.SaveChangesAsync();
+        await _notificationProvider.SendInAppNotificationAsync(
+            userId,
+            "Show Created",
+            $"Your show '{entity.Title}' has been created successfully.",
+            NotificationType.Success,
+            true,
+            $"User {userId} created a new show titled '{entity.Title}'."
+        );
+        return _mapper.Map<ShowResponseDto>(entity);
+    }
+
+    public async Task<ShowResponseDto> UpdateAsync(Guid userId, Guid id, UpdateShowDto dto)
+    {
+        await _updateValidator.ValidateAndThrowAsync(dto);
+        var entity = await _repository.Query().FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (entity == null)
+            throw new KeyNotFoundException("Show not found.");
+        _mapper.Map(dto, entity);
+        entity.UpdatedAt = DateTime.UtcNow;
+        _repository.Update(entity);
+        await _repository.SaveChangesAsync();
+        return _mapper.Map<ShowResponseDto>(entity);
+    }
+
+    public async Task<bool> DeleteAsync(Guid userId, Guid id)
+    {
+        var entity = await _repository.Query().FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (entity == null)
+            throw new KeyNotFoundException("Show not found.");
+        _repository.Remove(entity);
+        var isSuccess = await _repository.SaveChangesAsync();
+        if (isSuccess)
         {
-            await _createValidator.ValidateAndThrowAsync(dto);
-
-            var image = await _imagesRepository.Query()
-                            .FirstOrDefaultAsync(s => s.Id == dto.AiImageId && s.UserId == userId);
-            if (image == null) throw new UnauthorizedAccessException("Invalid Image selection or access denied.");
-            image.IsLinked = true;
-            _imagesRepository.Update(image);
-
-            var entity = _mapper.Map<Show>(dto);
-            entity.UserId = userId;
-            entity.CreatedBy = userId;
-            entity.CreatedAt = DateTime.UtcNow;
-
-            await _repository.AddAsync(entity);
-            await _repository.SaveChangesAsync();
-
+            Guid targetUser = entity.CreatedBy ?? userId;
             await _notificationProvider.SendInAppNotificationAsync(
-                userId,
-                "Show Created",
-                $"Your show '{entity.Title}' has been created successfully.",
-                NotificationType.Success,
-                true,
-                $"User {userId} created a new show titled '{entity.Title}'."
+                targetUser,
+                "Show Deleted",
+                $"Your show '{entity.Title}' was successfully deleted.",
+                NotificationType.Success
             );
-
-            return _mapper.Map<ShowResponseDto>(entity);
         }
-
-        public async Task<ShowResponseDto> UpdateAsync(Guid id, UpdateShowDto dto, Guid userId, bool isAdmin)
-        {
-            await _updateValidator.ValidateAndThrowAsync(dto);
-
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException("Show not found.");
-
-            if (!isAdmin && entity.CreatedBy != userId)
-                throw new UnauthorizedAccessException("You are not authorized to update this show.");
-
-            _mapper.Map(dto, entity);
-            entity.UpdatedAt = DateTime.UtcNow;
-
-            _repository.Update(entity);
-            await _repository.SaveChangesAsync();
-            return _mapper.Map<ShowResponseDto>(entity);
-        }
-
-        public async Task<bool> DeleteAsync(Guid id, Guid userId, bool isAdmin)
-        {
-            var entity = await _repository.GetByIdAsync(id);
-            if (entity == null)
-                throw new KeyNotFoundException("Show not found.");
-
-            if (!isAdmin && entity.CreatedBy != userId)
-                throw new UnauthorizedAccessException("You are not authorized to delete this show.");
-
-            _repository.Remove(entity);
-            var isSuccess = await _repository.SaveChangesAsync();
-
-            if (isSuccess)
-            {
-                Guid targetUser = entity.CreatedBy ?? userId;
-
-                await _notificationProvider.SendInAppNotificationAsync(
-                    targetUser,
-                    "Show Deleted",
-                    $"Your show '{entity.Title}' was successfully deleted.",
-                    NotificationType.Success
-                );
-
-            }
-
-            return isSuccess;
-        }
+        return isSuccess;
     }
 }

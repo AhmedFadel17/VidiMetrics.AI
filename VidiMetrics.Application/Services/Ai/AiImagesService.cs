@@ -1,4 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +30,7 @@ public class AiImagesService : IAiImagesService
     private readonly IImageProvider _imageProvider;
     private readonly IValidator<UpdateAiImageDto> _updateValidator;
     private readonly IValidator<CreateCharacterImageDto> _createCharacterValidator;
-    private readonly IValidator<CreateEnvironmentImageDto> _createEnvironmentValidator;
+    private readonly IValidator<CreateLocationImageDto> _createLocationValidator;
     private readonly IValidator<CreateShowImageDto> _createShowValidator;
     private readonly ICreditTransactionManager _creditManager;
     private readonly INotificationProvider _notificationProvider;
@@ -36,7 +41,7 @@ public class AiImagesService : IAiImagesService
         IAiImagesRepository repo,
         IValidator<UpdateAiImageDto> updateValidator,
         IValidator<CreateCharacterImageDto> createCharacterValidator,
-        IValidator<CreateEnvironmentImageDto> createEnvironmentValidator,
+        IValidator<CreateLocationImageDto> createLocationValidator,
         IValidator<CreateShowImageDto> createShowValidator,
         IImageProvider imageProvider,
         ICreditTransactionManager creditManager,
@@ -48,7 +53,7 @@ public class AiImagesService : IAiImagesService
         _imageProvider = imageProvider;
         _updateValidator = updateValidator;
         _createCharacterValidator = createCharacterValidator;
-        _createEnvironmentValidator = createEnvironmentValidator;
+        _createLocationValidator = createLocationValidator;
         _createShowValidator = createShowValidator;
         _creditManager = creditManager;
         _notificationProvider = notificationProvider;
@@ -56,12 +61,10 @@ public class AiImagesService : IAiImagesService
         _retryPolicy = Policy
             .Handle<HttpRequestException>()
             .Or<TaskCanceledException>()
-            .WaitAndRetryAsync(3, retryAttempt =>
-
-                TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 
-    public async Task<AiImageResponseDto> CreateCharacterImageAsync(CreateCharacterImageDto dto, Guid userId)
+    public async Task<AiImageResponseDto> CreateCharacterImageAsync(Guid userId, CreateCharacterImageDto dto)
     {
         await _createCharacterValidator.ValidateAndThrowAsync(dto);
 
@@ -74,12 +77,9 @@ public class AiImagesService : IAiImagesService
         var seed = new Random().Next(1, 999999);
         return await _creditManager.ExecuteWithCreditsAsync(
             userId,
-
             CreditActionType.GenerateImage,
-
             $"Character Generation: {dto.Name}",
             async () =>
-
             {
                 ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
                 var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Character, userId);
@@ -95,69 +95,58 @@ public class AiImagesService : IAiImagesService
 
                 return _mapper.Map<AiImageResponseDto>(img);
             });
-
-
     }
 
-
-
-
-    public async Task<AiImageResponseDto> CreateEnvironmentImageAsync(CreateEnvironmentImageDto dto, Guid userId)
+    public async Task<AiImageResponseDto> CreateLocationImageAsync(Guid userId, CreateLocationImageDto dto)
     {
-        await _createEnvironmentValidator.ValidateAndThrowAsync(dto);
+        await _createLocationValidator.ValidateAndThrowAsync(dto);
 
-        string masterPrompt = $"Cinematic wide shot of a professional series environment: {dto.Name}. " +
-                     $"Visual Details: {dto.VisualDescription}. " +
-                     $"Atmosphere and Mood: {dto.Atmosphere}. " +
-                     $"Style: High-end film production design, hyper-realistic, 8k resolution, " +
-                     $"volumetric lighting, shot on 35mm lens, Unreal Engine 5 render, " +
-                     $"highly detailed textures, masterpiece, no people.";
+        string masterPrompt = $"Cinematic wide shot of a professional series location: {dto.Name}. " +
+                             $"Visual Details: {dto.VisualDescription}. " +
+                             $"Atmosphere and Mood: {dto.Atmosphere}. " +
+                             $"Style: High-end film production design, hyper-realistic, 8k resolution, " +
+                             $"volumetric lighting, shot on 35mm lens, Unreal Engine 5 render, " +
+                             $"highly detailed textures, masterpiece, no people.";
         var seed = new Random().Next(1, 999999);
         return await _creditManager.ExecuteWithCreditsAsync(
             userId,
-
             CreditActionType.GenerateImage,
-
-            $"Environment Generation: {dto.Name}",
+            $"Location Generation: {dto.Name}",
             async () =>
-
             {
                 ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
-                var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Environment, userId);
+                var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Location, userId);
 
                 await _notificationProvider.SendInAppNotificationAsync(
                     userId,
-                    "Environment Image Generated",
-                    $"Your environment image for '{dto.Name}' has been generated successfully.",
+                    "Location Image Generated",
+                    $"Your location image for '{dto.Name}' has been generated successfully.",
                     NotificationType.Success,
                     true,
-                    $"User {userId} generated a new environment image for '{dto.Name}'."
+                    $"User {userId} generated a new location image for '{dto.Name}'."
                 );
 
                 return _mapper.Map<AiImageResponseDto>(img);
             });
-
-
     }
 
-    public async Task<AiImageResponseDto> CreateShowImageAsync(CreateShowImageDto dto, Guid userId)
+    public async Task<AiImageResponseDto> CreateShowImageAsync(Guid userId, CreateShowImageDto dto)
     {
         await _createShowValidator.ValidateAndThrowAsync(dto);
 
         string masterPrompt = $"A high-end cinematic show thumbnail poster titled '{dto.Title}'. " +
-                                  $"Subject: {dto.Description}. " +
-                                  $"Visual Art Style: {dto.VisualStyle}. " +
-                                  $"Atmosphere tailored for {dto.TargetAudience} audience. " +
-                                  $"Dramatic cinematic lighting, 8k resolution, highly detailed, photorealistic, depth of field, striking composition, trending on artstation, epic movie poster vibe. " +
-                                  $"--no text, words, typography, logo, watermark, blurry"; var seed = new Random().Next(1, 999999);
+                             $"Subject: {dto.Description}. " +
+                             $"Visual Art Style: {dto.VisualStyle}. " +
+                             $"Atmosphere tailored for {dto.TargetAudience} audience. " +
+                             $"Dramatic cinematic lighting, 8k resolution, highly detailed, photorealistic, depth of field, striking composition, trending on artstation, epic movie poster vibe. " +
+                             $"--no text, words, typography, logo, watermark, blurry";
+
+        var seed = new Random().Next(1, 999999);
         return await _creditManager.ExecuteWithCreditsAsync(
             userId,
-
             CreditActionType.GenerateImage,
-
             $"Show Generation: {dto.Title}",
             async () =>
-
             {
                 ImageGenerationResult result = await _imageProvider.GenerateImageAsync(masterPrompt, seed);
                 var img = await SaveAiImage(result, masterPrompt, seed, AssetType.Show, userId);
@@ -175,25 +164,21 @@ public class AiImagesService : IAiImagesService
             });
     }
 
-
-
-
-
-    public async Task<bool> DeleteAsync(Guid id, Guid userId)
+    public async Task<bool> DeleteAsync(Guid userId, Guid id)
     {
-        var entity = await _repo.Query()
-                            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-        if (entity == null) throw new Exception("Image not found.");
+        var entity = await _repo.Query().FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (entity == null) throw new KeyNotFoundException("Image not found.");
 
         _repo.Remove(entity);
         return await _repo.SaveChangesAsync();
     }
 
-    public async Task<PaginationResponseDto<AiImageResponseDto>> GetAllAsync(AiImageFilterDto filter, Guid userId)
+    public async Task<PaginationResponseDto<AiImageResponseDto>> GetAllAsync(Guid userId, AiImageFilterDto filter, CancellationToken ct = default)
     {
         IQueryable<AiImage> query = _repo.Query();
-
         query = query.Where(x => x.UserId == userId);
+
+
         if (filter.AssetType.HasValue)
         {
             if (filter.AssetType.Value == AssetType.Unlinked)
@@ -205,32 +190,33 @@ public class AiImagesService : IAiImagesService
                 query = query.Where(x => x.AssetType == filter.AssetType.Value);
             }
         }
+
+
         var (entities, totalCount) = await _repo.GetAllWithPaginationAsync(
-                query,
-                filter.PageNumber,
-                filter.PageSize,
-                filter.OrderBy,
-                filter.SortOrder,
-                filter.Limit);
+            query,
+            filter.PageNumber,
+            filter.PageSize,
+            filter.OrderBy,
+            filter.SortOrder,
+            filter.Limit,
+            cancellationToken: ct);
 
         var paginationSource = new PaginationSource<AiImage>(entities.ToList(), filter.PageNumber, filter.PageSize, totalCount);
         return _mapper.Map<PaginationResponseDto<AiImageResponseDto>>(paginationSource);
     }
 
-    public async Task<AiImageResponseDto> GetByIdAsync(Guid id, Guid userId)
+    public async Task<AiImageResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
     {
-        var entity = await _repo.Query()
-                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
-        if (entity == null) throw new Exception("Image not found.");
+        var entity = await _repo.Query().FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId, cancellationToken: ct);
+        if (entity == null) throw new KeyNotFoundException("Image not found.");
         return _mapper.Map<AiImageResponseDto>(entity);
     }
 
-    public async Task<AiImageResponseDto> UpdateAsync(Guid id, UpdateAiImageDto dto, Guid userId)
+    public async Task<AiImageResponseDto> UpdateAsync(Guid userId, Guid id, UpdateAiImageDto dto)
     {
         await _updateValidator.ValidateAndThrowAsync(dto);
-        var entity = await _repo.Query()
-                            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
-        if (entity == null) throw new Exception("Image not found.");
+        var entity = await _repo.Query().FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId);
+        if (entity == null) throw new KeyNotFoundException("Image not found.");
 
         _mapper.Map(dto, entity);
         entity.UpdatedAt = DateTime.UtcNow;

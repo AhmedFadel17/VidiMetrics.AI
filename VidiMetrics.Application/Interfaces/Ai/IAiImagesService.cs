@@ -5,11 +5,11 @@ namespace VidiMetrics.Application.Interfaces.Ai;
 
 public interface IAiImagesService
 {
-    Task<AiImageResponseDto> GetByIdAsync(Guid id, Guid userId);
-    Task<PaginationResponseDto<AiImageResponseDto>> GetAllAsync(AiImageFilterDto filter, Guid userId);
-    Task<AiImageResponseDto> CreateCharacterImageAsync(CreateCharacterImageDto dto, Guid userId);
-    Task<AiImageResponseDto> CreateEnvironmentImageAsync(CreateEnvironmentImageDto dto, Guid userId);
-    Task<AiImageResponseDto> CreateShowImageAsync(CreateShowImageDto dto, Guid userId);
-    Task<AiImageResponseDto> UpdateAsync(Guid id, UpdateAiImageDto dto, Guid userId);
-    Task<bool> DeleteAsync(Guid id, Guid userId);
+    Task<AiImageResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default);
+    Task<PaginationResponseDto<AiImageResponseDto>> GetAllAsync(Guid userId, AiImageFilterDto filter, CancellationToken ct = default);
+    Task<AiImageResponseDto> CreateCharacterImageAsync(Guid userId, CreateCharacterImageDto dto);
+    Task<AiImageResponseDto> CreateLocationImageAsync(Guid userId, CreateLocationImageDto dto);
+    Task<AiImageResponseDto> CreateShowImageAsync(Guid userId, CreateShowImageDto dto);
+    Task<AiImageResponseDto> UpdateAsync(Guid userId, Guid id, UpdateAiImageDto dto);
+    Task<bool> DeleteAsync(Guid userId, Guid id);
 }
