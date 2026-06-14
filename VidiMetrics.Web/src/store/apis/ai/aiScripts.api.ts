@@ -1,6 +1,6 @@
 import { mainApi } from '../mainApi';
 import { ApiResponse, PaginationFilter, PaginationResponse } from '@/types/api';
-import { AiScript } from '@/types/models/ai';
+import { AiScript, ScriptLine } from '@/types/models/ai';
 
 export interface AiScriptFilterDto extends PaginationFilter {
   isLinked?: boolean | null;
@@ -9,14 +9,16 @@ export interface CreateAiScriptDto {
   weather: string;
   environmentDescription: string;
   visualPrompt: string;
-  storyEnvironmentId: string;
+  locationId: string;
+  characterIds: string[];
+  scriptLines: ScriptLine[];
 }
 
 export interface UpdateAiScriptDto {
   weather: string;
   environmentDescription: string;
   visualPrompt: string;
-  storyEnvironmentId: string;
+  locationId: string;
 }
 
 export const aiScriptsApi = mainApi.injectEndpoints({

@@ -3,7 +3,7 @@ using VidiMetrics.Domain.Models.Ai;
 
 namespace VidiMetrics.Domain.Models.StoryEngine;
 
-public class StoryEnvironment : BaseEntity
+public class Location : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
 

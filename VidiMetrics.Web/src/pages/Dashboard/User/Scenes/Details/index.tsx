@@ -3,13 +3,13 @@ import SceneHero from './components/SceneHero'
 import SceneInfoTab from './components/SceneInfoTab'
 import OverviewTab from './components/OverviewTab'
 import CharactersTab from '../../Shared/components/Tabs/CharactersTab'
-import EnvironmentsTab from '../../Shared/components/Tabs/EnvironmentsTab'
+import LocationsTab from '../../Shared/components/Tabs/LocationsTab'
 
 export default function SceneDetails() {
-    type TabType = 'Overview' | "Info" | 'Characters' | 'Environments'
+    type TabType = 'Overview' | "Info" | 'Characters' | 'Locations'
     const [activeTab, setActiveTab] = useState<TabType>('Overview')
 
-    const tabs: TabType[] = ['Overview', 'Info', 'Characters', 'Environments']
+    const tabs: TabType[] = ['Overview', 'Info', 'Characters', 'Locations']
 
     return (
         <div className="space-y-10 pb-20">
@@ -57,12 +57,7 @@ export default function SceneDetails() {
                 {activeTab === 'Info' && (
                     <SceneInfoTab />
                 )}
-                {activeTab === 'Characters' && (
-                    <CharactersTab />
-                )}
-                {activeTab === 'Environments' && (
-                    <EnvironmentsTab />
-                )}
+
             </div>
         </div>
     )

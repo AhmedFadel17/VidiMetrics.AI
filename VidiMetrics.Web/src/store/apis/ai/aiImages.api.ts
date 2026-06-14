@@ -7,7 +7,7 @@ export interface AiImageFilterDto extends PaginationFilter {
   assetType?: AssetType | null;
 }
 
-export interface CreateEnvironmentImageDto {
+export interface CreateLocationImageDto {
   name: string;
   visualDescription: string;
   atmosphere: string;
@@ -64,8 +64,8 @@ export const aiImagesApi = mainApi.injectEndpoints({
       query: (id) => `/api/ai/images/${id}`,
       providesTags: (_result, _err, id) => [{ type: 'AiImage', id }],
     }),
-    createEnvironmentImage: builder.mutation<ApiResponse<AiImage>, CreateEnvironmentImageDto>({
-      query: (body) => ({ url: '/api/ai/images/environment', method: 'POST', body }),
+    createLocationImage: builder.mutation<ApiResponse<AiImage>, CreateLocationImageDto>({
+      query: (body) => ({ url: '/api/ai/images/location', method: 'POST', body }),
       invalidatesTags: [{ type: 'AiImage', id: 'LIST' }],
     }),
     createCharacterImage: builder.mutation<ApiResponse<AiImage>, CreateCharacterImageDto>({
@@ -96,7 +96,7 @@ export const aiImagesApi = mainApi.injectEndpoints({
 export const {
   useGetAiImagesQuery,
   useGetAiImageByIdQuery,
-  useCreateEnvironmentImageMutation,
+  useCreateLocationImageMutation,
   useCreateCharacterImageMutation,
   useCreateSeriesImageMutation,
   useUpdateAiImageMutation,

@@ -6,33 +6,33 @@ import { useCreateAiScriptMutation } from '@/store/apis/ai/aiScripts.api'
 import ScriptEditor, { ScriptLine, makeId } from '../components/ScriptEditor'
 
 interface StepScriptSetupProps {
-  environmentsLookup: Lookup[]
+  locationsLookup: Lookup[]
   charactersLookup: Lookup[]
   onNext: (scriptId: string, visualPrompt: string, characterIds: string[], environmentId: string) => void
   initialScriptLines?: ScriptLine[]
-  initialEnvironmentId?: string
+  initialLocationId?: string
   initialCharacterIds?: string[]
 }
 
 export default function StepScriptSetup({
-  environmentsLookup,
+  locationsLookup,
   charactersLookup,
   onNext,
   initialScriptLines = [],
-  initialEnvironmentId = '',
+  initialLocationId = '',
   initialCharacterIds = [],
 }: StepScriptSetupProps) {
   const navigate = useNavigate()
   const [createAiScript, { isLoading: isCreating }] = useCreateAiScriptMutation()
 
   const [scriptLines, setScriptLines] = useState<ScriptLine[]>(initialScriptLines)
-  const [selectedEnvironmentId, setSelectedEnvironmentId] = useState<string>(initialEnvironmentId)
+  const [selectedLocationId, setSelectedLocationId] = useState<string>(initialLocationId)
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>(initialCharacterIds)
   const [isCharacterPickerOpen, setIsCharacterPickerOpen] = useState(false)
 
-  const selectedEnvironment = useMemo(
-    () => environmentsLookup.find(e => e.id === selectedEnvironmentId),
-    [environmentsLookup, selectedEnvironmentId]
+  const selectedLocation = useMemo(
+    () => locationsLookup.find(e => e.id === selectedLocationId),
+    [locationsLookup, selectedLocationId]
   )
 
   const selectedCharacters = useMemo(
@@ -40,9 +40,8 @@ export default function StepScriptSetup({
     [charactersLookup, selectedCharacterIds]
   )
 
-  // Sync env line when environment selection changes
   useEffect(() => {
-    if (!selectedEnvironmentId) return
+    if (!selectedLocationId) return
     setScriptLines(prev => {
       const envIdx = prev.findIndex(l => l.type === 'env')
       const envLine = {
@@ -58,7 +57,7 @@ export default function StepScriptSetup({
       }
       return [envLine, ...prev]
     })
-  }, [selectedEnvironmentId])
+  }, [selectedLocationId])
 
   const toggleCharacter = (charId: string) => {
     if (selectedCharacterIds.includes(charId)) {
@@ -69,8 +68,8 @@ export default function StepScriptSetup({
   }
 
   const handleNext = async () => {
-    if (!selectedEnvironmentId) {
-      toast.error('Environment Missing', { description: 'Please select a story environment context.' })
+    if (!selectedLocationId) {
+      toast.error('Location Missing', { description: 'Please select a story location context.' })
       return
     }
     if (selectedCharacterIds.length === 0) {
@@ -101,7 +100,7 @@ export default function StepScriptSetup({
 
     try {
       const response = await createAiScript({
-        storyEnvironmentId: selectedEnvironmentId,
+        locationId: selectedLocationId,
         weather: weather || 'Clear Sky',
         environmentDescription: environmentDescription || 'Atmospheric',
         characterIds: selectedCharacterIds,
@@ -110,7 +109,7 @@ export default function StepScriptSetup({
 
       if (response?.data) {
         toast.success('Script Saved', { description: 'Your scene script has been compiled and visual prompt is generated.' })
-        onNext(response.data.id, response.data.visualPrompt, selectedCharacterIds, selectedEnvironmentId)
+        onNext(response.data.id, response.data.visualPrompt, selectedCharacterIds, selectedLocationId)
       }
     } catch (err: any) {
       toast.error('Script Compilation Failed', { description: err.data?.message || 'Error occurred while validating script backend.' })
@@ -141,7 +140,7 @@ export default function StepScriptSetup({
           {/* Script editor body */}
           <ScriptEditor
             lines={scriptLines}
-            environment={selectedEnvironment}
+            environment={selectedLocation}
             characters={charactersLookup}
             onChange={setScriptLines}
           />
@@ -186,20 +185,20 @@ export default function StepScriptSetup({
           </h3>
           <div className="relative mb-2 group">
             <div className="w-full h-40 rounded-md overflow-hidden mb-4 ghost-border bg-surface-container-lowest flex items-center justify-center">
-              {selectedEnvironment?.imageUrl ? (
-                <img src={selectedEnvironment.imageUrl} alt={selectedEnvironment.name} className="w-full h-full object-cover" />
+              {selectedLocation?.imageUrl ? (
+                <img src={selectedLocation.imageUrl} alt={selectedLocation.name} className="w-full h-full object-cover" />
               ) : (
                 <span className="material-symbols-outlined text-white/10 text-5xl">image</span>
               )}
             </div>
             <div className="relative">
               <select
-                value={selectedEnvironmentId}
-                onChange={e => setSelectedEnvironmentId(e.target.value)}
+                value={selectedLocationId}
+                onChange={e => setSelectedLocationId(e.target.value)}
                 className="w-full bg-surface-container-lowest border-none rounded-md text-on-surface py-3 px-4 ghost-border appearance-none focus:ring-2 focus:ring-secondary/20 cursor-pointer text-sm"
               >
                 <option value="" disabled>Select Location...</option>
-                {environmentsLookup.map(env => (
+                {locationsLookup.map(env => (
                   <option key={env.id} value={env.id}>{env.name}</option>
                 ))}
               </select>

@@ -1,11 +1,11 @@
 using FluentValidation;
-using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
+using VidiMetrics.Application.DTOs.StoryEngine.Locations;
 
-namespace VidiMetrics.Application.Validators.StoryEngine.StoryEnvironments
+namespace VidiMetrics.Application.Validators.StoryEngine.Locations
 {
-    public class UpdateStoryEnvironmentValidator : AbstractValidator<UpdateStoryEnvironmentDto>
+    public class UpdateLocationValidator : AbstractValidator<UpdateLocationDto>
     {
-        public UpdateStoryEnvironmentValidator()
+        public UpdateLocationValidator()
         {
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name cannot be empty.").When(x => x.Name != null);
             RuleFor(x => x.VisualDescription).NotEmpty().WithMessage("VisualDescription cannot be empty.").When(x => x.VisualDescription != null);

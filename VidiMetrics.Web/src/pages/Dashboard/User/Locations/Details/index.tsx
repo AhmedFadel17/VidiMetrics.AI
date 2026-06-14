@@ -1,4 +1,4 @@
-import { useGetEnvironmentByIdQuery, useGetShowByIdQuery, useDeleteEnvironmentMutation } from '@/store/apis'
+import { useGetLocationByIdQuery, useGetShowByIdQuery, useDeleteLocationMutation } from '@/store/apis'
 import { useParams, useNavigate } from 'react-router-dom'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens'
@@ -6,35 +6,35 @@ import { useState } from 'react'
 import ConfirmationDialog from '@/components/ui/Feedback/ConfirmationDialog'
 import { showToast } from '@/utils/toast'
 
-export default function EnvironmentDetails() {
-    const { showId, id: environmentId } = useParams<{ showId: string, id: string }>();
+export default function LocationDetails() {
+    const { showId, id: locationId } = useParams<{ showId: string, id: string }>();
     const navigate = useNavigate();
     const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId || '');
-    const { data: environmentResponse, isLoading: isEnvironmentLoading } = useGetEnvironmentByIdQuery(environmentId || '');
-    const [deleteEnvironment, { isLoading: isDeleting }] = useDeleteEnvironmentMutation();
+    const { data: locationResponse, isLoading: isLocationLoading } = useGetLocationByIdQuery(locationId || '');
+    const [deleteLocation, { isLoading: isDeleting }] = useDeleteLocationMutation();
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const show = showResponse?.data;
-    const environment = environmentResponse?.data;
+    const location = locationResponse?.data;
 
-    if (isShowLoading || isEnvironmentLoading) return <LoadingScreen message="Accessing Environment Archives..." accentColor="purple" />
-    if (!show || !environment) return <ErrorScreen title="Series Connection Lost" message="Unable to retrieve environment details for environment placement." />
+    if (isShowLoading || isLocationLoading) return <LoadingScreen message="Accessing Location Archives..." accentColor="purple" />
+    if (!show || !location) return <ErrorScreen title="Series Connection Lost" message="Unable to retrieve location details for location placement." />
 
-    const formattedDate = new Date(environment.createdAt).toLocaleDateString('en-US', {
+    const formattedDate = new Date(location.createdAt).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
     });
 
     const handleDelete = async () => {
-        if (!environmentId) return;
+        if (!locationId) return;
         try {
-            await deleteEnvironment(environmentId).unwrap();
-            showToast.success('Environment Deprioritized', `${environment.name} has been removed from the active series archives.`);
-            navigate(`/dashboard/series/${showId}?tab=Environments`);
+            await deleteLocation(locationId).unwrap();
+            showToast.success('Location Deprioritized', `${location.name} has been removed from the active series archives.`);
+            navigate(`/dashboard/series/${showId}?tab=Locations`);
         } catch (error: any) {
-            showToast.error('De-initialization Failed', error.data?.message || 'A system error occurred while trying to remove the environment.');
+            showToast.error('De-initialization Failed', error.data?.message || 'A system error occurred while trying to remove the location.');
         } finally {
             setIsDeleteDialogOpen(false);
         }
@@ -47,25 +47,24 @@ export default function EnvironmentDetails() {
                 { label: 'Home', path: '/' },
                 { label: 'Series Library', path: '/dashboard/series' },
                 { label: show.title, path: `/dashboard/series/${show.id}` },
-                { label: 'Environments', path: `/dashboard/series/${show.id}?tab=Environments` },
-                { label: environment.name },
+                { label: 'Locations', path: `/dashboard/series/${show.id}?tab=Locations` },
+                { label: location.name },
             ]} />
 
             {/* Main Content Canvas */}
             <div className="max-w-7xl mx-auto px-4 lg:px-10">
                 {/* Hero Section & Asymmetric Layout */}
                 <div className="grid grid-cols-12 gap-10 items-start">
-                    {/* Environment Portrait (The Pulse) */}
                     <div className="col-span-12 lg:col-span-5 lg:sticky lg:top-28">
                         <div className="relative group">
                             <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent z-10 rounded-2xl"></div>
                             <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-3xl blur-2xl opacity-50 group-hover:opacity-75 transition-opacity duration-500"></div>
                             <div className="relative rounded-2xl overflow-hidden aspect-[4/5] cinematic-shadow border border-outline-variant/15 bg-surface-container-low">
-                                {environment.referenceImageUrl ? (
+                                {location.referenceImageUrl ? (
                                     <img
-                                        alt={`${environment.name} Environment Portrait`}
+                                        alt={`${location.name} Location Portrait`}
                                         className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                        src={environment.referenceImageUrl}
+                                        src={location.referenceImageUrl}
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-on-surface-variant/20">
@@ -87,11 +86,11 @@ export default function EnvironmentDetails() {
                                         <span className="w-2 h-2 rounded-full bg-primary mr-2 animate-pulse"></span>
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Location</span>
                                     </div>
-                                    <h2 className="text-5xl lg:text-7xl font-headline font-bold text-on-surface tracking-tighter mb-2">{environment.name}</h2>
+                                    <h2 className="text-5xl lg:text-7xl font-headline font-bold text-on-surface tracking-tighter mb-2">{location.name}</h2>
                                 </div>
                                 <div className="flex space-x-3">
                                     <button
-                                        onClick={() => showToast.info('Edit mode coming soon', 'Environment modification is being recalibrated.')}
+                                        onClick={() => showToast.info('Edit mode coming soon', 'Location modification is being recalibrated.')}
                                         className="flex items-center px-5 py-2.5 rounded-lg glass-card border border-outline-variant/20 text-on-surface hover:border-secondary hover:text-secondary transition-all active:scale-95"
                                     >
                                         <span className="material-symbols-outlined mr-2 text-xl">edit</span>
@@ -122,7 +121,7 @@ export default function EnvironmentDetails() {
                                         </h3>
                                         <div className="space-y-6">
                                             <div>
-                                                <p className="text-lg text-on-surface leading-relaxed">{environment.visualDescription}</p>
+                                                <p className="text-lg text-on-surface leading-relaxed">{location.visualDescription}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -138,7 +137,7 @@ export default function EnvironmentDetails() {
                                     </h3>
                                     <div className="space-y-4">
                                         <div>
-                                            <p className="text-sm text-on-surface leading-snug">{environment.atmosphere || 'No atmosphere specified.'}</p>
+                                            <p className="text-sm text-on-surface leading-snug">{location.atmosphere || 'No atmosphere specified.'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -157,7 +156,7 @@ export default function EnvironmentDetails() {
                                         <span className="text-[9px] uppercase tracking-widest text-on-surface-variant/40 font-bold">Generated By</span>
                                         <span className="text-xs font-medium flex items-center">
                                             <span className="material-symbols-outlined text-[14px] mr-1 text-primary">bolt</span>
-                                            {environment.createdBy || 'VidiMetrics AI'}
+                                            {location.createdBy || 'VidiMetrics AI'}
                                         </span>
                                     </div>
                                 </div>
@@ -184,8 +183,8 @@ export default function EnvironmentDetails() {
                 isOpen={isDeleteDialogOpen}
                 onClose={() => setIsDeleteDialogOpen(false)}
                 onConfirm={handleDelete}
-                title="Remove Environment Archetype"
-                description={`Are you sure you want to remove ${environment.name} from the series archives? This action will permanently de-initialize their narrative profile and visual assets.`}
+                title="Remove Location Archetype"
+                description={`Are you sure you want to remove ${location.name} from the series archives? This action will permanently de-initialize their narrative profile and visual assets.`}
                 confirmText="De-initialize"
                 variant="danger"
                 isLoading={isDeleting}

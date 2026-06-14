@@ -1,6 +1,6 @@
 namespace VidiMetrics.Application.DTOs.Ai.AiImages;
 
-public record CreateEnvironmentImageDto
+public record CreateLocationImageDto
 {
     public required string Name { get; set; }
 

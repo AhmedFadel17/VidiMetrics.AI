@@ -3,7 +3,7 @@ import { SeriesFormValues } from '@/types'
 import { useCreateSeriesImageMutation } from '@/store/apis/ai/aiImages.api'
 import { toast } from 'sonner'
 import { InputField } from '@/components/ui/Inputs/InputField'
-import { TextAreaField } from '@/components/ui/Inputs/TextareaField'
+import { TextAreaField } from '@/components/ui/Inputs/TextAreaField'
 import { Button } from '@/components/ui/Button'
 
 interface StepSeriesDetailsProps {

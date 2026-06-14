@@ -4,11 +4,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
-import { useCreateEnvironmentMutation, useGetShowByIdQuery } from '@/store/apis'
+import { useCreateLocationMutation, useGetShowByIdQuery } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { LoadingScreen, ErrorScreen } from '@/components/ui/Feedback/StatusScreens'
-import { EnvironmentFormValues } from '@/types'
-import { useCreateEnvironmentImageMutation } from '@/store/apis/ai/aiImages.api'
+import { LocationFormValues } from '@/types'
+import { useCreateLocationImageMutation } from '@/store/apis/ai/aiImages.api'
 
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
@@ -29,17 +29,17 @@ const slideVariants = {
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function EnvironmentSetup() {
+export default function LocationSetup() {
   const { showId } = useParams<{ showId: string }>()
   const navigate = useNavigate()
   const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId ?? '')
-  const [createEnvironment, { isLoading: isCreating }] = useCreateEnvironmentMutation()
-  const [createEnvironmentImage, { isLoading: isGenerating }] = useCreateEnvironmentImageMutation()
+  const [createLocation, { isLoading: isCreating }] = useCreateLocationMutation()
+  const [createLocationImage, { isLoading: isGenerating }] = useCreateLocationImageMutation()
 
 
   const show = showResponse?.data
 
-  const form = useForm<EnvironmentFormValues>({
+  const form = useForm<LocationFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: '',
@@ -53,28 +53,28 @@ export default function EnvironmentSetup() {
 
   const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = form
 
-  const environmentName = watch('name')
+  const locationName = watch('name')
   const visualDescription = watch('visualDescription')
   const atmosphere = watch('atmosphere')
   const referenceImageUrl = watch('referenceImageUrl')
   const previewVisible = !!referenceImageUrl
   const canGenerate = visualDescription?.length >= 10 && atmosphere?.length >= 5
   // ─── Submit ──────────────────────────────────────────────────────────────────
-  const onSubmit = async (values: EnvironmentFormValues) => {
+  const onSubmit = async (values: LocationFormValues) => {
     if (!showId) return
     try {
-      await createEnvironment({
+      await createLocation({
         ...values,
         showId,
       }).unwrap()
 
-      toast.success('Environment Initialized', {
+      toast.success('Location Initialized', {
         description: 'Archetype accepted. Neural engine is compiling visual references...',
       })
-      setTimeout(() => navigate(`/dashboard/series/${showId}?tab=Environments`), 1500)
+      setTimeout(() => navigate(`/dashboard/series/${showId}?tab=Locations`), 1500)
     } catch (error: any) {
       toast.error('Initialization Failed', {
-        description: error.data?.message ?? 'System failure during environment creation.',
+        description: error.data?.message ?? 'System failure during location creation.',
       })
     }
   }
@@ -82,8 +82,8 @@ export default function EnvironmentSetup() {
 
   const handleGenerate = async () => {
     try {
-      const result = await createEnvironmentImage({
-        name: environmentName,
+      const result = await createLocationImage({
+        name: locationName,
         visualDescription: visualDescription,
         atmosphere: atmosphere,
       }).unwrap()
@@ -92,19 +92,19 @@ export default function EnvironmentSetup() {
         setValue('referenceImageUrl', result.data.imageUrl)
         setValue('aiImageId', result.data.id)
         toast.success('Visual Reference Compiled', {
-          description: 'Neural core has successfully synthesized the environment appearance.'
+          description: 'Neural core has successfully synthesized the location appearance.'
         })
       }
     } catch (error: any) {
       toast.error('Synthesis Failed', {
-        description: error.data?.message ?? 'Failed to generate environment visual reference.'
+        description: error.data?.message ?? 'Failed to generate location visual reference.'
       })
     }
   }
 
   // ─── Guards ──────────────────────────────────────────────────────────────────
   if (isShowLoading) return <LoadingScreen message="Accessing Show Parameters..." accentColor="purple" />
-  if (!show) return <ErrorScreen title="Series Connection Lost" message="Unable to retrieve show details for environment placement." />
+  if (!show) return <ErrorScreen title="Series Connection Lost" message="Unable to retrieve show details for location placement." />
 
 
   // ─── Render ──────────────────────────────────────────────────────────────────
@@ -126,13 +126,13 @@ export default function EnvironmentSetup() {
           { label: 'Home', path: '/' },
           { label: 'Series Library', path: '/dashboard/series' },
           { label: show.title, path: `/dashboard/series/${show.id}` },
-          { label: 'Environments', path: `/dashboard/series/${show.id}?tab=Environments` },
-          { label: 'New Environment' },
+          { label: 'Locations', path: `/dashboard/series/${show.id}?tab=Locations` },
+          { label: 'New Location' },
         ]} />
         <div className="flex items-end justify-between">
           <div>
             <h1 className="font-display text-4xl font-black tracking-tight text-white">
-              Environment <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Creator</span>
+              Location <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Creator</span>
             </h1>
           </div>
           <button
@@ -153,18 +153,18 @@ export default function EnvironmentSetup() {
           <div className="p-8 min-h-[480px] overflow-hidden relative">
             <div className="space-y-8">
               <div>
-                <h2 className="font-display text-3xl font-bold text-white mb-1">Environment Identity</h2>
-                <p className="text-white/50 text-sm font-body">Define how the viewers perceives your environment.</p>
+                <h2 className="font-display text-3xl font-bold text-white mb-1">Location Identity</h2>
+                <p className="text-white/50 text-sm font-body">Define how the viewers perceives your location.</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                 {/* Left: Textareas */}
                 <div className="space-y-6 flex flex-col h-full">
 
-                  {/* Environment Name */}
+                  {/* Location Name */}
                   <div className="md:col-span-2 space-y-2">
                     <label className="block text-[10px] font-black uppercase tracking-[0.25em] text-white/40">
-                      Environment Name
+                      Location Name
                     </label>
                     <div className="relative group">
                       <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-white/30 group-focus-within:text-accent-cyan transition-colors text-xl">
@@ -238,7 +238,7 @@ export default function EnvironmentSetup() {
                     <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>
                       auto_fix_high
                     </span>
-                    {isGenerating ? 'Neural Core Processing...' : '✨ Generate Environment Preview'}
+                    {isGenerating ? 'Neural Core Processing...' : '✨ Generate Location Preview'}
                   </button>
                 </div>
 
@@ -253,7 +253,7 @@ export default function EnvironmentSetup() {
                           <span className="material-symbols-outlined text-white/20 text-3xl">image_search</span>
                         </div>
                         <p className="text-white/25 text-xs font-label uppercase tracking-widest text-center">
-                          Fill descriptions above then<br />generate your environment preview
+                          Fill descriptions above then<br />generate your location preview
                         </p>
                       </div>
                     )}
@@ -280,7 +280,7 @@ export default function EnvironmentSetup() {
                       <div className="relative w-full h-full group cursor-pointer" onClick={() => { setValue('referenceImageUrl', ''); setValue('aiImageId', ''); }}>
                         <img
                           src={referenceImageUrl}
-                          alt="Generated environment preview"
+                          alt="Generated location preview"
                           className="w-full h-full object-cover brightness-80 group-hover:brightness-90 transition-all duration-500"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -320,7 +320,7 @@ export default function EnvironmentSetup() {
                   <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
                     rocket_launch
                   </span>
-                  Launch Environment
+                  Launch Location
                 </>
               )}
             </button>

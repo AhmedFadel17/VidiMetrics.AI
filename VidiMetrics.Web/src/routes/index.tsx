@@ -30,13 +30,14 @@ import EpisodeSetup from "@/pages/Dashboard/User/Episodes/EpisodeSetup";
 import EpisodeDetails from "@/pages/Dashboard/User/Episodes/Details";
 import CharacterDetails from "@/pages/Dashboard/User/Characters/Details";
 import CharacterSetup from "@/pages/Dashboard/User/Characters/CharacterSetup";
-import EnvironmentDetails from "@/pages/Dashboard/User/Environments/Details";
+import LocationDetails from "@/pages/Dashboard/User/Locations/Details";
 import SceneSetup from "@/pages/Dashboard/User/Scenes/SceneSetup";
-import EnvironmentSetup from "@/pages/Dashboard/User/Environments/EnvironemntSetup";
+import LocationSetup from "@/pages/Dashboard/User/Locations/LocationSetup";
 import SceneDetails from "@/pages/Dashboard/User/Scenes/Details";
 import AccountPage from "@/pages/Dashboard/User/Account";
 import SocialLinksPage from "@/pages/Dashboard/User/SocialLinks";
 import NotificationsPage from "@/pages/Dashboard/User/Notifications";
+import CoPilotPage from "@/pages/Dashboard/User/CoPilot";
 
 // =============================
 // 🚀 MAIN ROUTES
@@ -114,14 +115,14 @@ export const AppUserRoutes: AppRoute[] = [
     element: <SceneSetup />,
   },
   {
-    path: "/dashboard/series/:showId/environments/:id",
-    label: "Environments",
-    element: <EnvironmentDetails />,
+    path: "/dashboard/series/:showId/locations/:id",
+    label: "Locations",
+    element: <LocationDetails />,
   },
   {
-    path: "/dashboard/series/:showId/environments/new",
-    label: "Environments",
-    element: <EnvironmentSetup />,
+    path: "/dashboard/series/:showId/locations/new",
+    label: "Locations",
+    element: <LocationSetup />,
   },
   {
     path: "/dashboard/series/:showId/episodes/:episodeId/scenes/:id",
@@ -132,6 +133,11 @@ export const AppUserRoutes: AppRoute[] = [
     path: "/dashboard/storyboarder",
     label: "Storyboarder",
     element: <UserStoryboarder />,
+  },
+  {
+    path: "/dashboard/copilot",
+    label: "CoPilot",
+    element: <CoPilotPage />,
   },
   {
     path: "/dashboard/social-links",

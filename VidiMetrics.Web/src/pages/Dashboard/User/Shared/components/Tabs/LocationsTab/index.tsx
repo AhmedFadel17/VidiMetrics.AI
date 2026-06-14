@@ -1,16 +1,16 @@
-import EnvironmentCard from "@/components/ui/Cards/EnvironmentCard";
-import { useGetEnvironmentsQuery } from "@/store/apis";
-import { StoryEnvironment } from "@/types/models/storyEngine";
+import LocationCard from "@/components/ui/Cards/LocationCard";
+import { useGetLocationsQuery } from "@/store/apis";
+import { Location } from "@/types/models/storyEngine";
 import { useState } from "react";
 import { GenericDataGrid } from "@/components/ui/Grids/GenericDataGrid";
 import GlassLaunchButton from "@/components/ui/Buttons/GlassLaunchButton";
 import { useNavigate } from "react-router-dom";
 
-interface EnvironmentsTabProps {
+interface LocationsTabProps {
     showId: string;
 }
 
-export default function EnvironmentsTab({ showId }: EnvironmentsTabProps) {
+export default function LocationsTab({ showId }: LocationsTabProps) {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(6);
@@ -26,7 +26,7 @@ export default function EnvironmentsTab({ showId }: EnvironmentsTabProps) {
         { label: 'Oldest First', orderBy: 'CreatedAt', sortOrder: 'asc' as const },
     ];
 
-    const { data: response, isLoading, error } = useGetEnvironmentsQuery({
+    const { data: response, isLoading, error } = useGetLocationsQuery({
         showId,
         pageNumber: page,
         pageSize,
@@ -36,36 +36,36 @@ export default function EnvironmentsTab({ showId }: EnvironmentsTabProps) {
     });
 
     const responseData = response?.data;
-    const environments: StoryEnvironment[] = responseData?.items || [];
+    const locations: Location[] = responseData?.items || [];
 
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex justify-between items-start">
                 <div>
-                    <h3 className="text-3xl font-headline font-bold text-white tracking-tight">Environments</h3>
-                    <p className="text-white/40 text-sm font-medium">Manage and review your show parameters and environments.</p>
+                    <h3 className="text-3xl font-headline font-bold text-white tracking-tight">Locations</h3>
+                    <p className="text-white/40 text-sm font-medium">Manage and review your show parameters and locations.</p>
                 </div>
                 <GlassLaunchButton
-                    title="Generate New Environment"
-                    subtitle="Tap to Launch AI Environment Creator"
+                    title="Generate New Location"
+                    subtitle="Tap to Launch AI Location Creator"
                     iconName="auto_awesome_motion"
                     variant="cyan"
-                    onClick={() => navigate(`/dashboard/series/${showId}/environments/new`)}
+                    onClick={() => navigate(`/dashboard/series/${showId}/locations/new`)}
                 />
             </div>
 
-            <GenericDataGrid<StoryEnvironment>
-                items={environments}
+            <GenericDataGrid<Location>
+                items={locations}
                 isLoading={isLoading}
                 error={error}
-                loadingMessage="Loading environments..."
+                loadingMessage="Loading locations..."
                 errorTitle="Network Error"
-                errorMessage="Failed to fetch environments. Please try again."
-                emptyStateMessage="No show parameters found matching this production filter."
-                renderItem={(env) => <EnvironmentCard environment={env} />}
+                errorMessage="Failed to fetch locations. Please try again."
+                emptyStateMessage="No locations found matching this production filter."
+                renderItem={(location) => <LocationCard location={location} />}
                 searchOption={{
-                    placeholder: "Search environments catalog...",
+                    placeholder: "Search locations catalog...",
                     value: searchTerm,
                     onChange: (val) => { setSearchTerm(val); setPage(1); }
                 }}

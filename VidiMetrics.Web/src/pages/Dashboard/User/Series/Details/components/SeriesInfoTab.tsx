@@ -7,7 +7,7 @@ import { Show } from '@/types/models/storyEngine';
 import { useUpdateShowMutation } from '@/store/apis/storyEngine/shows.api';
 import { ShowStatus } from '@/types/enums';
 import { InputField } from '@/components/ui/Inputs/InputField';
-import { TextAreaField } from '@/components/ui/Inputs/TextareaField';
+import { TextAreaField } from '@/components/ui/Inputs/TextAreaField';
 
 // 📋 1. Define Form Validation Schema with Zod
 const seriesInfoSchema = z.object({
@@ -32,7 +32,7 @@ export default function SeriesInfoTab({ show }: SeriesInfoTabProps) {
         register,
         handleSubmit,
         reset,
-        formState: { errors, isDirty },
+        formState: { errors },
     } = useForm<SeriesInfoFormValues>({
         resolver: zodResolver(seriesInfoSchema),
         defaultValues: {

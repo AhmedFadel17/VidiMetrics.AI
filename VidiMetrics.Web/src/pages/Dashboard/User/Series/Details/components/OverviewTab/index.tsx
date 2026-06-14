@@ -1,5 +1,5 @@
 import CharactersSection from "./CharactersSection";
-import EnvironmentsSection from "./EnvironmentsSection";
+import LocationsSection from "./LocationsSection";
 import EpisodesSection from "./EpisodesSection";
 
 import { Show } from "@/types/models/storyEngine";
@@ -15,7 +15,7 @@ export default function OverviewTab({ show }: OverviewTabProps) {
                 <CharactersSection showId={show.id} />
             </div>
             <div className="col-span-4 space-y-8">
-                <EnvironmentsSection showId={show.id} />
+                <LocationsSection showId={show.id} />
             </div>
             <div className="col-span-12">
                 <EpisodesSection showId={show.id} />

@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useGetShowByIdQuery, useGetEpisodeByIdQuery } from '@/store/apis'
 import { useGetCharactersLookupQuery } from '@/store/apis/storyEngine/characters.api'
-import { useGetEnvironmentsLookupQuery } from '@/store/apis/storyEngine/storyEnvironments.api'
+import { useGetLocationsLookupQuery } from '@/store/apis/storyEngine/locations.api'
 import { LoadingScreen, ErrorScreen } from '@/components/ui/Feedback/StatusScreens'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { ScriptLine } from './components/ScriptEditor'
@@ -23,7 +23,7 @@ export default function SceneSetup() {
   const [scriptId, setScriptId] = useState<string>('')
   const [visualPrompt, setVisualPrompt] = useState<string>('')
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([])
-  const [selectedEnvironmentId, setSelectedEnvironmentId] = useState<string>('')
+  const [selectedLocationId, setSelectedLocationId] = useState<string>('')
   const [scriptLines, setScriptLines] = useState<ScriptLine[]>([])
 
   // Step 2 to Step 3 Shared State
@@ -35,14 +35,14 @@ export default function SceneSetup() {
   const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId || '')
   const { data: episodeResponse, isLoading: isEpisodeLoading } = useGetEpisodeByIdQuery(episodeId || '')
   const { data: charactersLookupResponse, isLoading: isCharactersLoading } = useGetCharactersLookupQuery(showId)
-  const { data: environmentsLookupResponse, isLoading: isEnvironmentsLoading } = useGetEnvironmentsLookupQuery(showId)
+  const { data: locationsLookupResponse, isLoading: isLocationsLoading } = useGetLocationsLookupQuery(showId)
 
   const show = showResponse?.data
   const episode = episodeResponse?.data
   const charactersLookup = charactersLookupResponse?.data || []
-  const environmentsLookup = environmentsLookupResponse?.data || []
+  const locationsLookup = locationsLookupResponse?.data || []
 
-  if (isShowLoading || isEpisodeLoading || isCharactersLoading || isEnvironmentsLoading) {
+  if (isShowLoading || isEpisodeLoading || isCharactersLoading || isLocationsLoading) {
     return <LoadingScreen message="Syncing Scene Parameters..." accentColor="cyan" />
   }
 
@@ -50,7 +50,7 @@ export default function SceneSetup() {
     return <ErrorScreen title="Context Lost" message="Unable to retrieve episode data for scene placement." />
   }
 
-  const selectedEnvironment = environmentsLookup.find(e => e.id === selectedEnvironmentId)
+  const selectedLocation = locationsLookup.find(e => e.id === selectedLocationId)
   const selectedCharacters = charactersLookup.filter(c => selectedCharacterIds.includes(c.id))
 
   const handleStep1Complete = (
@@ -62,7 +62,7 @@ export default function SceneSetup() {
     setScriptId(newScriptId)
     setVisualPrompt(newVisualPrompt)
     setSelectedCharacterIds(charIds)
-    setSelectedEnvironmentId(envId)
+    setSelectedLocationId(envId)
     setCurrentStep(2)
   }
 
@@ -93,7 +93,7 @@ export default function SceneSetup() {
               <span className="material-symbols-outlined text-accent-cyan text-5xl">add_to_photos</span>
               Scene <span className="text-accent-cyan">Setup</span>
             </h1>
-            <p className="text-white/60 text-lg mt-1">Define the sequence, environment, and cast for this narrative segment.</p>
+            <p className="text-white/60 text-lg mt-1">Define the sequence, location, and cast for this narrative segment.</p>
           </div>
 
           {/* Stepper progress indicator */}
@@ -111,11 +111,11 @@ export default function SceneSetup() {
         {/* Step 1: Script & Cast & Environment Setup */}
         {currentStep === 1 && (
           <StepScriptSetup
-            environmentsLookup={environmentsLookup}
+            locationsLookup={locationsLookup}
             charactersLookup={charactersLookup}
             onNext={handleStep1Complete}
             initialScriptLines={scriptLines}
-            initialEnvironmentId={selectedEnvironmentId}
+            initialLocationId={selectedLocationId}
             initialCharacterIds={selectedCharacterIds}
           />
         )}
@@ -125,8 +125,7 @@ export default function SceneSetup() {
           <StepPromptPreview
             scriptId={scriptId}
             visualPrompt={visualPrompt}
-            environmentName={selectedEnvironment?.name}
-            environmentAtmosphere={selectedEnvironment?.atmosphere}
+            environmentName={selectedLocation?.name}
             castNames={selectedCharacters.map(c => c.name)}
             initialMood={mood}
             initialOrder={order}
@@ -143,7 +142,7 @@ export default function SceneSetup() {
             episodeId={episodeId || ''}
             showId={showId || ''}
             characterIds={selectedCharacterIds}
-            environmentName={selectedEnvironment?.name}
+            environmentName={selectedLocation?.name}
             mood={mood}
             order={order}
             onBackToPrompt={() => setCurrentStep(2)}

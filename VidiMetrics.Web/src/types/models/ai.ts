@@ -1,6 +1,6 @@
 import { BaseEntity } from "./base";
 import { AiTaskStatus, ModelTarget, ScriptLineType, AssetType } from "../enums";
-import { StoryEnvironment } from "./storyEngine";
+import { Location } from "./storyEngine";
 
 // ─── AiImage ──────────────────────────────────────────────────────────────────
 export interface AiImage extends BaseEntity {
@@ -18,8 +18,8 @@ export interface AiScript extends BaseEntity {
   weather: string;
   environmentDescription: string;
   visualPrompt: string;
-  storyEnvironmentId: string;
-  storyEnvironment?: StoryEnvironment;
+  locationId: string;
+  location?: Location;
   scriptLines?: ScriptLine[];
   isLinked: boolean;
 }
@@ -73,3 +73,5 @@ export interface Transcript extends BaseEntity {
   timestampsJson?: string;
   videoId: string;
 }
+
+

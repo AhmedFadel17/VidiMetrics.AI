@@ -1,8 +1,8 @@
 using VidiMetrics.Application.DTOs.Common;
 
-namespace VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
+namespace VidiMetrics.Application.DTOs.StoryEngine.Locations;
 
-public record StoryEnvironmentFilterDto : BaseFilterDto
+public record LocationFilterDto : BaseFilterDto
 {
     public Guid? ShowId { get; set; }
     public DateTime? CreatedAfter { get; set; }

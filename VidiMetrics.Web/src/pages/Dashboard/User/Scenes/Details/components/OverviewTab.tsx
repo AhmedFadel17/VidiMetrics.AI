@@ -1,5 +1,5 @@
 import CharactersSection from "../../../Series/Details/components/OverviewTab/CharactersSection";
-import EnvironmentsSection from "../../../Series/Details/components/OverviewTab/EnvironmentsSection";
+import EnvironmentsSection from "../../../Series/Details/components/OverviewTab/LocationsSection";
 
 export default function OverviewTab() {
     return (

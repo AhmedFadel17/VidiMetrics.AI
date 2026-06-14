@@ -4,7 +4,7 @@ import TimelinesTab from '../../Shared/components/Tabs/TimelinesTab'
 import OverviewTab from './components/OverviewTab'
 import EpisodesTab from '../../Shared/components/Tabs/EpisodesTab'
 import CharactersTab from '../../Shared/components/Tabs/CharactersTab'
-import EnvironmentsTab from '../../Shared/components/Tabs/EnvironmentsTab'
+import LocationsTab from '../../Shared/components/Tabs/LocationsTab'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { useDeleteShowMutation, useGetShowByIdQuery } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
@@ -23,9 +23,9 @@ export default function SeriesDetails() {
     const { data: response, isLoading, error } = useGetShowByIdQuery(id || '');
     const show = response?.data;
 
-    type TabType = 'Overview' | "Info" | 'Episodes' | 'Characters' | 'Environments' | 'Timelines'
+    type TabType = 'Overview' | "Info" | 'Episodes' | 'Characters' | 'Locations' | 'Timelines'
 
-    const tabs: TabType[] = ['Overview', 'Info', 'Episodes', 'Characters', 'Environments', 'Timelines']
+    const tabs: TabType[] = ['Overview', 'Info', 'Episodes', 'Characters', 'Locations', 'Timelines']
 
     const tabParam = searchParams.get('tab') as TabType
     const activeTab = tabs.includes(tabParam) ? tabParam : 'Overview'
@@ -101,8 +101,8 @@ export default function SeriesDetails() {
                 {activeTab === 'Characters' && (
                     <CharactersTab showId={show.id} />
                 )}
-                {activeTab === 'Environments' && (
-                    <EnvironmentsTab showId={show.id} />
+                {activeTab === 'Locations' && (
+                    <LocationsTab showId={show.id} />
                 )}
 
                 {activeTab === 'Timelines' && (

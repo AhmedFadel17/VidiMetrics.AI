@@ -1,11 +1,11 @@
 using FluentValidation;
-using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
+using VidiMetrics.Application.DTOs.StoryEngine.Locations;
 
-namespace VidiMetrics.Application.Validators.StoryEngine.StoryEnvironments
+namespace VidiMetrics.Application.Validators.StoryEngine.Locations
 {
-    public class CreateStoryEnvironmentValidator : AbstractValidator<CreateStoryEnvironmentDto>
+    public class CreateLocationValidator : AbstractValidator<CreateLocationDto>
     {
-        public CreateStoryEnvironmentValidator()
+        public CreateLocationValidator()
         {
             RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
             RuleFor(x => x.VisualDescription).NotEmpty().WithMessage("VisualDescription is required.");

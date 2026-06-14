@@ -20,7 +20,7 @@ export type SeriesFormValues = {
     referenceImageUrl: string
 }
 
-export type EnvironmentFormValues = {
+export type LocationFormValues = {
     name: string
     visualDescription: string
     atmosphere: string

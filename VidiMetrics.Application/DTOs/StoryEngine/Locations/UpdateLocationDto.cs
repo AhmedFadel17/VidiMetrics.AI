@@ -1,8 +1,8 @@
 using System;
 
-namespace VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments
+namespace VidiMetrics.Application.DTOs.StoryEngine.Locations
 {
-    public record UpdateStoryEnvironmentDto
+    public record UpdateLocationDto
     {
         public string? Name { get; set; }
         public string? VisualDescription { get; set; }

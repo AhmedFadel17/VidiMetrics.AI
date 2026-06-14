@@ -14,7 +14,7 @@ export interface Show extends BaseEntity {
   userId: string;
   episodes?: Episode[];
   characters?: Character[];
-  storyEnvironments?: StoryEnvironment[];
+  locations?: Location[];
   totalEpisodes: number;
 }
 
@@ -54,12 +54,43 @@ export interface Scene extends BaseEntity {
   characters?: Character[];
 }
 
-// ─── StoryEnvironment ─────────────────────────────────────────────────────────
-export interface StoryEnvironment extends BaseEntity {
+// ─── Location ─────────────────────────────────────────────────────────
+export interface Location extends BaseEntity {
   name: string;
   visualDescription: string;
   atmosphere: string;
   referenceImageUrl?: string;
   showId: string;
   scenes?: Scene[];
+}
+
+export interface ShowDraft {
+  Title: string;
+  Description: string;
+  VisualStyle: string;
+  TargetAudience: string;
+  Characters?: CharacterDraft[];
+  Episodes?: EpisodeDraft[];
+  Locations?: LocationDraft[];
+}
+
+export interface CharacterDraft {
+  Name: string;
+  Role: string;
+  PhysicalDescription?: string;
+  ClothingStyle?: string;
+  PersonalityTraits?: string;
+  InsightLevel?: number;
+}
+
+export interface EpisodeDraft {
+  EpisodeNumber: number;
+  Title: string;
+  PlotSummary: string;
+}
+
+export interface LocationDraft {
+  Name: string;
+  VisualDescription: string;
+  Atmosphere: string;
 }
