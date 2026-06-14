@@ -7,7 +7,7 @@ namespace VidiMetrics.Application.Validators.Ai.AiScripts
     {
         public UpdateAiScriptValidator()
         {
-            RuleFor(x => x.StoryEnvironmentId).NotEmpty();
+            RuleFor(x => x.LocationId).NotEmpty();
         }
     }
 }

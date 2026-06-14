@@ -38,7 +38,6 @@ export const mainApi = createApi({
     'Transcript',
     'AiImage',
     'AiScript',
-    'AiChat',
     // Copilot
     'CopilotChat',
     'CopilotMessage',
