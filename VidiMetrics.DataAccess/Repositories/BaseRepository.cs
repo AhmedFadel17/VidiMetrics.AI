@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -30,11 +31,11 @@ namespace VidiMetrics.DataAccess.Repositories
             return _dbSet.AsQueryable();
         }
 
-        public async Task<T?> GetByIdAsync(Guid id, bool bypassCache = false, TimeSpan? expiration = null)
+        public async Task<T?> GetByIdAsync(Guid id, bool bypassCache = false, TimeSpan? expiration = null, CancellationToken cancellationToken = default)
         {
             if (bypassCache)
             {
-                return await _dbSet.FindAsync(id);
+                return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
             }
 
             string cacheKey = $"db:{typeof(T).Name}:{id}";
@@ -49,7 +50,7 @@ namespace VidiMetrics.DataAccess.Repositories
             }
             catch (Exception) { }
 
-            var entity = await _dbSet.FindAsync(id);
+            var entity = await _dbSet.FindAsync(new object[] { id }, cancellationToken);
             if (entity != null)
             {
                 var ttl = expiration ?? _defaultCacheDuration;
@@ -63,9 +64,9 @@ namespace VidiMetrics.DataAccess.Repositories
             return entity;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.ToListAsync(cancellationToken);
         }
 
         public async Task<(IEnumerable<T>, int)> GetAllWithPaginationAsync(
@@ -76,9 +77,10 @@ namespace VidiMetrics.DataAccess.Repositories
             string? sortOrder,
             int? limit,
             bool bypassCache = false,
-            TimeSpan? expiration = null)
+            TimeSpan? expiration = null,
+            CancellationToken cancellationToken = default)
         {
-            int totalCount = await query.CountAsync();
+            int totalCount = await query.CountAsync(cancellationToken);
             query = query.ApplyOrdering(orderBy, sortOrder);
             if (limit.HasValue)
             {
@@ -88,26 +90,26 @@ namespace VidiMetrics.DataAccess.Repositories
             {
                 query = query.ApplyPagination(page, pageSize);
             }
-            var items = await query.ToListAsync();
+            var items = await query.ToListAsync(cancellationToken);
 
             return (items, totalCount);
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.Where(predicate).ToListAsync();
+            return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
         }
 
-        public async Task<T> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity, CancellationToken cancellationToken = default)
         {
-            await _dbSet.AddAsync(entity);
+            await _dbSet.AddAsync(entity, cancellationToken);
             EvictCacheEntry(entity);
             return entity;
         }
 
-        public async Task AddRangeAsync(IEnumerable<T> entities)
+        public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
         {
-            await _dbSet.AddRangeAsync(entities);
+            await _dbSet.AddRangeAsync(entities, cancellationToken);
             foreach (var entity in entities)
             {
                 EvictCacheEntry(entity);
@@ -136,14 +138,14 @@ namespace VidiMetrics.DataAccess.Repositories
             }
         }
 
-        public async Task<bool> SaveChangesAsync()
+        public async Task<bool> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.SaveChangesAsync() > 0;
+            return await _context.SaveChangesAsync(cancellationToken) > 0;
         }
 
-        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
-            return await _context.Database.BeginTransactionAsync();
+            return await _context.Database.BeginTransactionAsync(cancellationToken);
         }
 
         #region Private Helpers
@@ -157,6 +159,7 @@ namespace VidiMetrics.DataAccess.Repositories
             if (string.IsNullOrEmpty(idValue)) return;
 
             string singleKey = $"db:{typeof(T).Name}:{idValue}";
+
             Task.Run(async () =>
             {
                 try
@@ -169,5 +172,4 @@ namespace VidiMetrics.DataAccess.Repositories
 
         #endregion
     }
-
 }

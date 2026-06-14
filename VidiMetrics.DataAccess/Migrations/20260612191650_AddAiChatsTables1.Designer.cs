@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VidiMetrics.DataAccess.Data;
 
@@ -11,9 +12,11 @@ using VidiMetrics.DataAccess.Data;
 namespace VidiMetrics.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260612191650_AddAiChatsTables1")]
+    partial class AddAiChatsTables1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,86 @@ namespace VidiMetrics.DataAccess.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiChat", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AiChats");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiChatMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("ActionType")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ChatId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Component")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CreditCost")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAi")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsExecuted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RawPayload")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ResponseText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChatId");
+
+                    b.ToTable("AiChatMessages");
+                });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiImage", b =>
                 {
@@ -131,7 +214,7 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<bool>("IsLinked")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("LocationId")
+                    b.Property<Guid>("StoryEnvironmentId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -150,7 +233,7 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LocationId");
+                    b.HasIndex("StoryEnvironmentId");
 
                     b.ToTable("AiScripts");
                 });
@@ -374,146 +457,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("VoiceProfile");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotChat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CopilotChats");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotDraft", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ActionType")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ChatId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("EntityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("EntityType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExecutionResultJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("MissingFieldsJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("ParentEntityId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("ParentEntityType")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PayloadJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Summary")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("UserPrompt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ValidationWarningsJson")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatId");
-
-                    b.ToTable("CopilotDrafts");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotMessage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ChatId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChatId");
-
-                    b.ToTable("CopilotMessages");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Channel", b =>
@@ -1280,51 +1223,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.ToTable("Episodes");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Location", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("AiImageId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Atmosphere")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("ShowId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("VisualDescription")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AiImageId");
-
-                    b.HasIndex("ShowId");
-
-                    b.ToTable("Locations");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Scene", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1349,15 +1247,15 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("LocationId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Order")
                         .HasColumnType("int");
+
+                    b.Property<Guid?>("StoryEnvironmentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -1374,7 +1272,7 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.HasIndex("EpisodeId");
 
-                    b.HasIndex("LocationId");
+                    b.HasIndex("StoryEnvironmentId");
 
                     b.ToTable("Scenes");
                 });
@@ -1446,15 +1344,71 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.ToTable("Shows");
                 });
 
+            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AiImageId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Atmosphere")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("ShowId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("VisualDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AiImageId");
+
+                    b.HasIndex("ShowId");
+
+                    b.ToTable("StoryEnvironments");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiChatMessage", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Ai.AiChat", "Chat")
+                        .WithMany("Messages")
+                        .HasForeignKey("ChatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Chat");
+                });
+
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiScript", b =>
                 {
-                    b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Location", "Location")
+                    b.HasOne("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", "StoryEnvironment")
                         .WithMany()
-                        .HasForeignKey("LocationId")
+                        .HasForeignKey("StoryEnvironmentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Location");
+                    b.Navigation("StoryEnvironment");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiTask", b =>
@@ -1494,28 +1448,6 @@ namespace VidiMetrics.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Video");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotDraft", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Copilot.CopilotChat", "Chat")
-                        .WithMany("Drafts")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chat");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotMessage", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Copilot.CopilotChat", "Chat")
-                        .WithMany("Messages")
-                        .HasForeignKey("ChatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Chat");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Channel", b =>
@@ -1716,23 +1648,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("Show");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Location", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Ai.AiImage", "AiImage")
-                        .WithMany()
-                        .HasForeignKey("AiImageId");
-
-                    b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Show", "Show")
-                        .WithMany("Locations")
-                        .HasForeignKey("ShowId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AiImage");
-
-                    b.Navigation("Show");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Scene", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.Ai.AiScript", "AiScript")
@@ -1751,9 +1666,9 @@ namespace VidiMetrics.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Location", null)
+                    b.HasOne("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", null)
                         .WithMany("Scenes")
-                        .HasForeignKey("LocationId");
+                        .HasForeignKey("StoryEnvironmentId");
 
                     b.Navigation("AiScript");
 
@@ -1798,16 +1713,31 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("UserProfile");
                 });
 
+            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", b =>
+                {
+                    b.HasOne("VidiMetrics.Domain.Models.Ai.AiImage", "AiImage")
+                        .WithMany()
+                        .HasForeignKey("AiImageId");
+
+                    b.HasOne("VidiMetrics.Domain.Models.StoryEngine.Show", "Show")
+                        .WithMany("StoryEnvironments")
+                        .HasForeignKey("ShowId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AiImage");
+
+                    b.Navigation("Show");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiChat", b =>
+                {
+                    b.Navigation("Messages");
+                });
+
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiScript", b =>
                 {
                     b.Navigation("ScriptLines");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotChat", b =>
-                {
-                    b.Navigation("Drafts");
-
-                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Channel", b =>
@@ -1851,11 +1781,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("Scenes");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Location", b =>
-                {
-                    b.Navigation("Scenes");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Scene", b =>
                 {
                     b.Navigation("SceneCharacters");
@@ -1867,7 +1792,12 @@ namespace VidiMetrics.DataAccess.Migrations
 
                     b.Navigation("Episodes");
 
-                    b.Navigation("Locations");
+                    b.Navigation("StoryEnvironments");
+                });
+
+            modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.StoryEnvironment", b =>
+                {
+                    b.Navigation("Scenes");
                 });
 #pragma warning restore 612, 618
         }

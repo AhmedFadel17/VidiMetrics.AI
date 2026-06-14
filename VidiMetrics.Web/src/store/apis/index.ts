@@ -6,7 +6,7 @@ export * from './storyEngine/shows.api';
 export * from './storyEngine/characters.api';
 export * from './storyEngine/episodes.api';
 export * from './storyEngine/scenes.api';
-export * from './storyEngine/storyEnvironments.api';
+export * from './storyEngine/locations.api';
 
 // ─── Core ─────────────────────────────────────────────────────────────────────
 export * from './core/channels.api';
@@ -20,6 +20,8 @@ export * from './ai/aiImages.api';
 export * from './ai/aiScripts.api';
 export * from './ai/aiVideos.api';
 export * from './ai/transcripts.api';
+export * from './ai/aiChatsApi';
+export * from './ai/copilot.api';
 
 // ─── Seo ──────────────────────────────────────────────────────────────────────
 export * from './seo/competitorVideos.api';

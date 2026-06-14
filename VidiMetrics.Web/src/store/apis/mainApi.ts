@@ -26,7 +26,7 @@ export const mainApi = createApi({
     'Character',
     'Episode',
     'Scene',
-    'StoryEnvironment',
+    'Location',
     // Core
     'Channel',
     'Video',
@@ -38,6 +38,11 @@ export const mainApi = createApi({
     'Transcript',
     'AiImage',
     'AiScript',
+    'AiChat',
+    // Copilot
+    'CopilotChat',
+    'CopilotMessage',
+    'CopilotDraft',
     // Seo
     'Keyword',
     'KeywordRanking',

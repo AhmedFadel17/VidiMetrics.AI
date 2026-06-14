@@ -13,8 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
+builder.Services.Configure<ApisSettings>(builder.Configuration.GetSection("ApisSettings"));
+builder.Services.Configure<SubscriptionSettings>(builder.Configuration.GetSection("SubscriptionSettings"));
+
 await builder.Services.AddDataAccessServices(builder.Configuration);
-await builder.Services.AddApplicationServices();
+await builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddControllers(options =>
 {
@@ -53,8 +56,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 });
-builder.Services.Configure<ApisSettings>(builder.Configuration.GetSection("ApisSettings"));
-builder.Services.Configure<SubscriptionSettings>(builder.Configuration.GetSection("SubscriptionSettings"));
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<UserRegisteredConsumer>();

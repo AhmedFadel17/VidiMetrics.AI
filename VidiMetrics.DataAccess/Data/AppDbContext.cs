@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Domain.Models.Ai;
+using VidiMetrics.Domain.Models.Copilot;
 using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Models.Seo;
@@ -14,6 +15,11 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<ChannelPost> ChannelPosts { get; set; }
         public DbSet<ChannelStat> ChannelStats { get; set; }
         public DbSet<Video> Videos { get; set; }
+
+        // Copilot
+        public DbSet<CopilotChat> CopilotChats { get; set; }
+        public DbSet<CopilotMessage> CopilotMessages { get; set; }
+        public DbSet<CopilotDraft> CopilotDrafts { get; set; }
 
         // Ai
         public DbSet<AiPromptTemplate> AiPromptTemplates { get; set; }
@@ -42,7 +48,7 @@ namespace VidiMetrics.DataAccess.Data
 
         // StoryEngine
         public DbSet<Character> Characters { get; set; }
-        public DbSet<StoryEnvironment> StoryEnvironments { get; set; }
+        public DbSet<Location> Locations { get; set; }
         public DbSet<Episode> Episodes { get; set; }
         public DbSet<Scene> Scenes { get; set; }
         public DbSet<Show> Shows { get; set; }
@@ -108,9 +114,9 @@ namespace VidiMetrics.DataAccess.Data
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<AiScript>()
-                .HasOne(a => a.StoryEnvironment)
+                .HasOne(a => a.Location)
                 .WithMany()
-                .HasForeignKey(a => a.StoryEnvironmentId)
+                .HasForeignKey(a => a.LocationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
 

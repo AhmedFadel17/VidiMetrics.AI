@@ -6,15 +6,16 @@ using VidiMetrics.Application.DTOs.Ai.AiTasks;
 using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.DTOs.Ai.Transcripts;
 using VidiMetrics.Application.DTOs.Common;
+using VidiMetrics.Application.DTOs.Copilot;
 using VidiMetrics.Application.DTOs.Core.ChannelPosts;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.DTOs.Core.ChannelStats;
-using VidiMetrics.Application.DTOs.Infra.UserProfiles;
-using VidiMetrics.Application.DTOs.Infra.SubscriptionPlans;
-using VidiMetrics.Application.DTOs.Infra.UserSubscriptions;
-using VidiMetrics.Application.DTOs.Infra.UserCreditWallets;
 using VidiMetrics.Application.DTOs.Infra.CreditTransactionLedgers;
 using VidiMetrics.Application.DTOs.Infra.Notifications;
+using VidiMetrics.Application.DTOs.Infra.SubscriptionPlans;
+using VidiMetrics.Application.DTOs.Infra.UserCreditWallets;
+using VidiMetrics.Application.DTOs.Infra.UserProfiles;
+using VidiMetrics.Application.DTOs.Infra.UserSubscriptions;
 using VidiMetrics.Application.DTOs.Seo.CompetitorVideos;
 using VidiMetrics.Application.DTOs.Seo.KeywordRankings;
 using VidiMetrics.Application.DTOs.Seo.Keywords;
@@ -22,10 +23,11 @@ using VidiMetrics.Application.DTOs.Seo.SeoAudits;
 using VidiMetrics.Application.DTOs.Seo.VideoTags;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
+using VidiMetrics.Application.DTOs.StoryEngine.Locations;
 using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
-using VidiMetrics.Application.DTOs.StoryEngine.StoryEnvironments;
 using VidiMetrics.Domain.Models.Ai;
+using VidiMetrics.Domain.Models.Copilot;
 using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Models.Seo;
@@ -123,10 +125,10 @@ namespace VidiMetrics.Application.Mapping
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Show, ShowResponseDto>();
 
-            CreateMap<CreateStoryEnvironmentDto, StoryEnvironment>();
-            CreateMap<UpdateStoryEnvironmentDto, StoryEnvironment>()
+            CreateMap<CreateLocationDto, Location>();
+            CreateMap<UpdateLocationDto, Location>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<StoryEnvironment, StoryEnvironmentResponseDto>();
+            CreateMap<Location, LocationResponseDto>();
 
             CreateMap<CreateSceneDto, Scene>()
                 .ForMember(dest => dest.SceneCharacters, opt => opt.Ignore());
@@ -142,6 +144,11 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<AiScript, VidiMetrics.Application.DTOs.Ai.AiScripts.AiScriptResponseDto>();
             CreateMap<ScriptLine, VidiMetrics.Application.DTOs.Ai.AiScripts.ScriptLineResponseDto>();
             CreateMap<VidiMetrics.Application.DTOs.Ai.ScriptLines.ScriptLineDto, ScriptLine>();
+
+            CreateMap<CreateCopilotChatDto, CopilotChat>();
+            CreateMap<CopilotChat, CopilotChatResponseDto>();
+            CreateMap<CopilotMessage, CopilotMessageResponseDto>();
+            CreateMap<CopilotDraft, CopilotDraftResponseDto>();
         }
     }
 }

@@ -4,12 +4,16 @@ using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.DataAccess.Data;
 using VidiMetrics.DataAccess.Providers.Cashing;
 using VidiMetrics.DataAccess.Repositories;
+
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.Ai.AiPromptTemplates;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiTasks;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
 using VidiMetrics.DataAccess.Repositories.Ai.Transcripts;
+using VidiMetrics.DataAccess.Repositories.Copilot.CopilotChats;
+using VidiMetrics.DataAccess.Repositories.Copilot.CopilotDrafts;
+using VidiMetrics.DataAccess.Repositories.Copilot.CopilotMessages;
 using VidiMetrics.DataAccess.Repositories.Core.Channels;
 using VidiMetrics.DataAccess.Repositories.Core.ChannelsPosts;
 using VidiMetrics.DataAccess.Repositories.Core.ChannelStats;
@@ -28,9 +32,9 @@ using VidiMetrics.DataAccess.Repositories.Seo.SeoAudits;
 using VidiMetrics.DataAccess.Repositories.Seo.VideoTags;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Characters;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
+using VidiMetrics.DataAccess.Repositories.StoryEngine.Locations;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
-using VidiMetrics.DataAccess.Repositories.StoryEngine.StoryEnvironments;
 
 namespace VidiMetrics.DataAccess
 {
@@ -45,6 +49,11 @@ namespace VidiMetrics.DataAccess
                 options.InstanceName = "VidiMetrics_";
             });
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+
+            services.AddScoped<ICopilotChatsRepository, CopilotChatsRepository>();
+            services.AddScoped<ICopilotMessagesRepository, CopilotMessagesRepository>();
+            services.AddScoped<ICopilotDraftsRepository, CopilotDraftsRepository>();
+
             services.AddScoped<IAiPromptTemplatesRepository, AiPromptTemplatesRepository>();
             services.AddScoped<IAiTasksRepository, AiTasksRepository>();
             services.AddScoped<IAiImagesRepository, AiImagesRepository>();
@@ -70,7 +79,7 @@ namespace VidiMetrics.DataAccess
             services.AddScoped<ISeoAuditsRepository, SeoAuditsRepository>();
             services.AddScoped<IVideoTagsRepository, VideoTagsRepository>();
             services.AddScoped<ICharactersRepository, CharactersRepository>();
-            services.AddScoped<IStoryEnvironmentsRepository, StoryEnvironmentsRepository>();
+            services.AddScoped<ILocationsRepository, LocationsRepository>();
             services.AddScoped<IEpisodesRepository, EpisodesRepository>();
             services.AddScoped<IScenesRepository, ScenesRepository>();
             services.AddScoped<IShowsRepository, ShowsRepository>();
