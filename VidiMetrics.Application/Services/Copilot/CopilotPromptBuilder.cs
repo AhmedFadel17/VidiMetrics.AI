@@ -40,7 +40,7 @@ public class CopilotPromptBuilder : ICopilotPromptBuilder
         sb.AppendLine("- Description");
         sb.AppendLine("- VisualStyle");
         sb.AppendLine("- TargetAudience");
-        sb.AppendLine("- AiImageId");
+        // sb.AppendLine("- AiImageId");
         sb.AppendLine();
         sb.AppendLine("Update Show:");
         sb.AppendLine("- Title");
@@ -57,7 +57,7 @@ public class CopilotPromptBuilder : ICopilotPromptBuilder
         sb.AppendLine("- PersonalityTraits");
         sb.AppendLine("- Role");
         sb.AppendLine("- InsightLevel");
-        sb.AppendLine("- AiImageId");
+        // sb.AppendLine("- AiImageId");
         sb.AppendLine("- ShowId");
         sb.AppendLine();
         sb.AppendLine("Update Character:");
@@ -88,7 +88,7 @@ public class CopilotPromptBuilder : ICopilotPromptBuilder
         sb.AppendLine("- Name");
         sb.AppendLine("- VisualDescription");
         sb.AppendLine("- Atmosphere");
-        sb.AppendLine("- AiImageId");
+        // sb.AppendLine("- AiImageId");
         sb.AppendLine("- ShowId");
         sb.AppendLine();
         sb.AppendLine("Update Location:");

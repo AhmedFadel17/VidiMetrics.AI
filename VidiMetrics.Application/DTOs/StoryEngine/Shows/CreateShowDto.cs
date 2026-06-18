@@ -8,6 +8,6 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
         public required string Description { get; set; }
         public required string VisualStyle { get; set; }
         public required string TargetAudience { get; set; }
-        public Guid AiImageId { get; set; }
+        public Guid? AiImageId { get; set; }
     }
 }

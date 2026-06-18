@@ -13,4 +13,9 @@ public class CopilotMessage : BaseEntity
 
     public CopilotMessageRole Role { get; set; }
     public string Content { get; set; } = string.Empty;
+
+    public Guid? DraftId { get; set; }
+
+    [ForeignKey(nameof(DraftId))]
+    public CopilotDraft? Draft { get; set; }
 }

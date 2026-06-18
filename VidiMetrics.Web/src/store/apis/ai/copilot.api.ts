@@ -45,7 +45,10 @@ export const copilotApi = mainApi.injectEndpoints({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: [{ type: 'CopilotDraft', id: 'LIST' }, { type: 'CopilotMessage', id: 'LIST' }],
+            invalidatesTags: [
+                { type: 'CopilotDraft', id: 'LIST' },
+                { type: 'CopilotMessage', id: 'LIST' },
+            ],
         }),
 
         getCopilotChats: builder.query<ApiResponse<CopilotChatDto[]>, void>({
@@ -70,9 +73,13 @@ export const copilotApi = mainApi.injectEndpoints({
                 result?.data
                     ? [
                         ...result.data.map(({ id }) => ({ type: 'CopilotMessage' as const, id })),
-                        { type: 'CopilotMessage', id: `LIST-${chatId}` },
+                        { type: 'CopilotMessage' as const, id: `LIST-${chatId}` },
+                        { type: 'CopilotMessage' as const, id: 'LIST' },
                     ]
-                    : [{ type: 'CopilotMessage', id: `LIST-${chatId}` }],
+                    : [
+                        { type: 'CopilotMessage' as const, id: `LIST-${chatId}` },
+                        { type: 'CopilotMessage' as const, id: 'LIST' },
+                    ],
         }),
 
         getCopilotChatDrafts: builder.query<ApiResponse<CopilotDraftDto[]>, string>({

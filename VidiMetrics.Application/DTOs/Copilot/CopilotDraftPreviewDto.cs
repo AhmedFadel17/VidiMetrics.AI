@@ -12,4 +12,7 @@ public record CopilotDraftPreviewDto
     public List<string> MissingFields { get; set; } = new();
     public List<string> ValidationWarnings { get; set; } = new();
     public bool CanExecute { get; set; }
+    public CopilotDraftStatus Status { get; set; }
+    public string? ExecutionResultJson { get; set; }
+    public string? ErrorMessage { get; set; }
 }

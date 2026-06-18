@@ -31,6 +31,9 @@ export interface CopilotDraftPreviewDto {
     missingFields: string[];
     validationWarnings: string[];
     canExecute: boolean;
+    status: CopilotDraftStatus;
+    executionResultJson?: string | null;
+    errorMessage?: string | null;
 }
 
 export interface SendCopilotMessageResponseDto {
@@ -58,6 +61,8 @@ export interface CopilotMessageDto extends BaseEntity {
     chatId: string;
     role: CopilotMessageRole;
     content: string;
+    draftId?: string | null;
+    draft?: CopilotDraftPreviewDto | null;
 }
 
 export interface CopilotDraftDto extends BaseEntity {

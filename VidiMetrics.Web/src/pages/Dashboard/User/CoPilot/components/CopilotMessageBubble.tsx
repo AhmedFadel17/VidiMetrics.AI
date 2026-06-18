@@ -16,11 +16,15 @@ export default function CopilotMessageBubble({ role, content, isLoading = false 
                 : 'bg-white/5 border border-white/5 text-white/90 rounded-tl-none'
                 }`}
         >
-            <div className="flex items-center gap-2">
-                {isLoading &&
-                    <span className="material-symbols-outlined text-sm text-white">loader</span>}
-                <span>{content}</span>
-            </div>
+            {isLoading ? (
+                <div className="flex items-center gap-1.5 py-1 px-0.5">
+                    <div className="w-2 h-2 rounded-full bg-white/40 animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-2 h-2 rounded-full bg-white/60 animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-2 h-2 rounded-full bg-white/80 animate-bounce"></div>
+                </div>
+            ) : (
+                <div className="whitespace-pre-wrap">{content}</div>
+            )}
         </div>
     )
 }

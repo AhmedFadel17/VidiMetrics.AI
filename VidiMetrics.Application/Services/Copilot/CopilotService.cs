@@ -123,13 +123,14 @@ public class CopilotService : ICopilotService
         await _draftRepository.AddAsync(draft, ct);
         await _draftRepository.SaveChangesAsync(ct);
 
-        var assistantText = BuildDraftAssistantMessage(decision.Answer, draft.Summary, missingFields, warnings);
+        var assistantText = decision.Answer;
 
         var assistantMessageForDraft = new CopilotMessage
         {
             ChatId = chat.Id,
             Role = CopilotMessageRole.Assistant,
             Content = assistantText,
+            DraftId = draft.Id,
             CreatedBy = userId
         };
 
@@ -151,7 +152,8 @@ public class CopilotService : ICopilotService
                 Payload = decision.Payload,
                 MissingFields = missingFields,
                 ValidationWarnings = warnings,
-                CanExecute = !missingFields.Any() && !payloadErrors.Any()
+                CanExecute = !missingFields.Any() && !payloadErrors.Any(),
+                Status = draft.Status
             }
         };
     }
@@ -212,6 +214,8 @@ public class CopilotService : ICopilotService
             draft.Status = CopilotDraftStatus.Executed;
             draft.ExecutionResultJson = JsonSerializer.Serialize(result);
             draft.UpdatedAt = DateTime.UtcNow;
+
+
 
             _draftRepository.Update(draft);
             await _draftRepository.SaveChangesAsync(ct);
@@ -283,11 +287,13 @@ public class CopilotService : ICopilotService
     {
         await EnsureChatOwnershipAsync(userId, chatId, ct);
 
-        return await _messageRepository.Query()
+        var messages = await _messageRepository.Query()
+            .Include(x => x.Draft)
             .Where(x => x.ChatId == chatId && !x.IsDeleted)
             .OrderBy(x => x.CreatedAt)
-            .ProjectTo<CopilotMessageResponseDto>(_mapper.ConfigurationProvider)
             .ToListAsync(ct);
+
+        return _mapper.Map<List<CopilotMessageResponseDto>>(messages);
     }
 
     public async Task<List<CopilotDraftResponseDto>> GetChatDraftsAsync(Guid userId, Guid chatId, CancellationToken ct = default)

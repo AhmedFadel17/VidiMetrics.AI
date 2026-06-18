@@ -2,6 +2,7 @@ using System;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using VidiMetrics.Application.DTOs.Ai.AiImages;
 using VidiMetrics.Application.DTOs.Ai.AiScripts;
 using VidiMetrics.Application.DTOs.StoryEngine.Characters;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
@@ -24,6 +25,7 @@ public class CopilotExecutionRouter : ICopilotExecutionRouter
     private readonly ILocationsService _locationService;
     private readonly IScenesService _sceneService;
     private readonly IAiScriptsService _aiScriptService;
+    private readonly IAiImagesService _aiImagesService;
 
     public CopilotExecutionRouter(
         IShowsService showService,
@@ -31,7 +33,8 @@ public class CopilotExecutionRouter : ICopilotExecutionRouter
         ICharactersService characterService,
         ILocationsService locationService,
         IScenesService sceneService,
-        IAiScriptsService aiScriptService)
+        IAiScriptsService aiScriptService,
+        IAiImagesService aiImagesService)
     {
         _showService = showService;
         _episodeService = episodeService;
@@ -39,6 +42,7 @@ public class CopilotExecutionRouter : ICopilotExecutionRouter
         _locationService = locationService;
         _sceneService = sceneService;
         _aiScriptService = aiScriptService;
+        _aiImagesService = aiImagesService;
     }
 
     public async Task<object?> ExecuteAsync(Guid userId, CopilotDraft draft, CancellationToken ct = default)
@@ -86,6 +90,9 @@ public class CopilotExecutionRouter : ICopilotExecutionRouter
     private async Task<object?> ExecuteCreateShowAsync(Guid userId, CopilotDraft draft, CancellationToken ct)
     {
         var dto = Deserialize<CreateShowDto>(draft.PayloadJson);
+        var imageDto = Deserialize<CreateShowImageDto>(draft.PayloadJson);
+        var image = await _aiImagesService.CreateShowImageAsync(userId, imageDto);
+        dto.AiImageId = image.Id;
         return await _showService.CreateAsync(userId, dto);
     }
 
@@ -140,6 +147,9 @@ public class CopilotExecutionRouter : ICopilotExecutionRouter
     private async Task<object?> ExecuteCreateCharacterAsync(Guid userId, CopilotDraft draft, CancellationToken ct)
     {
         var dto = Deserialize<CreateCharacterDto>(draft.PayloadJson);
+        var imageDto = Deserialize<CreateCharacterImageDto>(draft.PayloadJson);
+        var image = await _aiImagesService.CreateCharacterImageAsync(userId, imageDto);
+        dto.AiImageId = image.Id;
         return await _characterService.CreateAsync(userId, dto);
     }
 
@@ -167,6 +177,9 @@ public class CopilotExecutionRouter : ICopilotExecutionRouter
     private async Task<object?> ExecuteCreateLocationAsync(Guid userId, CopilotDraft draft, CancellationToken ct)
     {
         var dto = Deserialize<CreateLocationDto>(draft.PayloadJson);
+        var imageDto = Deserialize<CreateLocationImageDto>(draft.PayloadJson);
+        var image = await _aiImagesService.CreateLocationImageAsync(userId, imageDto);
+        dto.AiImageId = image.Id;
         return await _locationService.CreateAsync(userId, dto);
     }
 

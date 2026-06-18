@@ -11,7 +11,6 @@ namespace VidiMetrics.Application.Validators.StoryEngine.Shows
             RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
             RuleFor(x => x.VisualStyle).NotEmpty().WithMessage("VisualStyle is required.");
             RuleFor(x => x.TargetAudience).NotEmpty().WithMessage("TargetAudience is required.");
-            RuleFor(x => x.AiImageId).NotEmpty().WithMessage("AiImageId is required.");
         }
     }
 }
