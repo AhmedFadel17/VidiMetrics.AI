@@ -8,7 +8,6 @@ import AIInsights from "@/pages/Main/AIInsights";
 
 import Features from "@/pages/Main/Features";
 import Storyboarder from "@/pages/Main/Storyboarder";
-import UserStoryboarder from "@/pages/Dashboard/User/Storyboarder";
 import PricingPage from "@/pages/Main/Pricing";
 import API from "@/pages/Main/API";
 import Documentation from "@/pages/Main/Documentation";
@@ -128,11 +127,6 @@ export const AppUserRoutes: AppRoute[] = [
     path: "/dashboard/series/:showId/episodes/:episodeId/scenes/:id",
     label: "Scenes",
     element: <SceneDetails />,
-  },
-  {
-    path: "/dashboard/storyboarder",
-    label: "Storyboarder",
-    element: <UserStoryboarder />,
   },
   {
     path: "/dashboard/copilot",
