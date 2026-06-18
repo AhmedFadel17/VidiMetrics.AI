@@ -1,6 +1,6 @@
 using FluentValidation;
 using VidiMetrics.Application.DTOs.Core.ChannelPosts;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.Application.Validators.Core.ChannelPosts
 {
@@ -33,7 +33,7 @@ namespace VidiMetrics.Application.Validators.Core.ChannelPosts
             RuleFor(x => x.ScheduledAt)
                 .GreaterThan(DateTime.UtcNow.AddMinutes(-1))
                 .WithMessage("Scheduled execution time must be in the future.")
-                .When(x => x.ScheduledAt.HasValue && x.Status == PostStatus.Queued);
+                .When(x => x.ScheduledAt.HasValue && x.Status == ChannelPostStatus.Queued);
         }
 
         private bool BeAValidUrl(string url)

@@ -1,6 +1,6 @@
 import { mainApi } from '../mainApi';
 import { ApiResponse, PaginationResponse, PaginationFilter } from '@/types/api';
-import { Show } from '@/types/models/storyEngine';
+import { Show, StoryEngineStats } from '@/types/models/storyEngine';
 
 // ─── Request bodies ───────────────────────────────────────────────────────────
 export interface CreateShowRequest {
@@ -54,7 +54,10 @@ export const showsApi = mainApi.injectEndpoints({
       query: (id) => `/api/shows/${id}`,
       providesTags: (_result, _err, id) => [{ type: 'Show', id }],
     }),
-
+    getStoryEngineStats: builder.query<ApiResponse<StoryEngineStats>, void>({
+      query: () => `/api/shows/stats`,
+      providesTags: (_result, _err) => [{ type: 'Show', id: 'STATS' }],
+    }),
     createShow: builder.mutation<ApiResponse<Show>, CreateShowRequest>({
       query: (body) => ({ url: '/api/shows', method: 'POST', body }),
       invalidatesTags: [{ type: 'Show', id: 'LIST' }],
@@ -84,4 +87,5 @@ export const {
   useCreateShowMutation,
   useUpdateShowMutation,
   useDeleteShowMutation,
+  useGetStoryEngineStatsQuery,
 } = showsApi;

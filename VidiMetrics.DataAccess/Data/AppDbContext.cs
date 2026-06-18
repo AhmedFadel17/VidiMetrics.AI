@@ -14,6 +14,7 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<Channel> Channels { get; set; }
         public DbSet<ChannelPost> ChannelPosts { get; set; }
         public DbSet<ChannelStat> ChannelStats { get; set; }
+        public DbSet<ShowChannel> ShowChannels { get; set; }
         public DbSet<Video> Videos { get; set; }
 
         // Copilot
@@ -75,6 +76,22 @@ namespace VidiMetrics.DataAccess.Data
                 .WithMany(c => c.ChannelPosts)
                 .HasForeignKey(p => p.ChannelId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ShowChannel>()
+                .HasKey(sc => new { sc.ShowId, sc.ChannelId });
+
+            modelBuilder.Entity<ShowChannel>()
+                .HasOne(sc => sc.Show)
+                .WithMany(s => s.ShowChannels)
+                .HasForeignKey(sc => sc.ShowId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ShowChannel>()
+                .HasOne(sc => sc.Channel)
+                .WithMany(c => c.ShowChannels)
+                .HasForeignKey(sc => sc.ChannelId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<Episode>()
                 .HasOne(e => e.AiVideo)
                 .WithMany()
@@ -90,6 +107,9 @@ namespace VidiMetrics.DataAccess.Data
 
             modelBuilder.Entity<SceneCharacter>()
                 .HasKey(sc => new { sc.SceneId, sc.CharacterId });
+
+
+
 
             modelBuilder.Entity<SceneCharacter>()
                 .HasOne(sc => sc.Scene)

@@ -79,3 +79,14 @@ export interface CopilotDraftDto extends BaseEntity {
     executionResultJson?: string | null;
     errorMessage?: string | null;
 }
+
+
+export interface CopilotStatsResponseDto {
+    totalChats: number;
+    totalDrafts: number;
+    totalMessages: number;
+    executedDrafts: number;
+    pendingDrafts: number;
+    rejectedDrafts: number;
+    failedDrafts: number;
+}

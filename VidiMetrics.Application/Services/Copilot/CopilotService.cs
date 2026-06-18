@@ -307,6 +307,38 @@ public class CopilotService : ICopilotService
             .ToListAsync(ct);
     }
 
+    public async Task<CopilotStatsResponseDto> GetStatsAsync(Guid userId, CancellationToken ct = default)
+    {
+
+        var totalChats = _chatRepository.Query()
+           .Where(x => x.UserId == userId && !x.IsDeleted)
+           .Count();
+        var totalMessages = _messageRepository.Query()
+                   .Where(x => x.Chat.UserId == userId && !x.IsDeleted)
+                   .Count();
+        var draftsQuery = _draftRepository.Query()
+           .Where(x => x.UserId == userId && !x.IsDeleted);
+
+        var totalDrafts = draftsQuery.Count();
+        var totalDraftsPending = draftsQuery.Where(x => x.Status == CopilotDraftStatus.Pending).Count();
+        var totalDraftsExecuted = draftsQuery.Where(x => x.Status == CopilotDraftStatus.Executed).Count();
+        var totalDraftsFailed = draftsQuery.Where(x => x.Status == CopilotDraftStatus.Failed).Count();
+        var totalDraftsRejected = draftsQuery.Where(x => x.Status == CopilotDraftStatus.Rejected).Count();
+
+
+
+        return new CopilotStatsResponseDto
+        {
+            TotalChats = totalChats,
+            TotalDrafts = totalDrafts,
+            PendingDrafts = totalDraftsPending,
+            ExecutedDrafts = totalDraftsExecuted,
+            FailedDrafts = totalDraftsFailed,
+            RejectedDrafts = totalDraftsRejected,
+            TotalMessages = totalMessages
+        };
+    }
+
     private async Task EnsureChatOwnershipAsync(Guid userId, Guid chatId, CancellationToken ct)
     {
         var chat = await _chatRepository.Query()

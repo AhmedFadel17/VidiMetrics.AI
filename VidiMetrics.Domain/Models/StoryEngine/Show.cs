@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using VidiMetrics.Domain.Enums;
 using VidiMetrics.Domain.Models.Ai;
+using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
 
 namespace VidiMetrics.Domain.Models.StoryEngine;
@@ -26,6 +27,6 @@ public class Show : BaseEntity
     public ICollection<Episode> Episodes { get; set; } = new List<Episode>();
     public ICollection<Character> Characters { get; set; } = new List<Character>();
     public ICollection<Location> Locations { get; set; } = new List<Location>();
-
+    public virtual ICollection<ShowChannel> ShowChannels { get; set; } = new List<ShowChannel>();
     public int TotalEpisodes => Episodes?.Count ?? 0;
 }

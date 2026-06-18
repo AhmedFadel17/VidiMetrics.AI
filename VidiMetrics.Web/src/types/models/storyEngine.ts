@@ -97,3 +97,12 @@ export interface LocationDraft {
   VisualDescription: string;
   Atmosphere: string;
 }
+
+
+export interface StoryEngineStats {
+  totalShows: number;
+  totalEpisodes: number;
+  totalScenes: number;
+  totalCharacters: number;
+  totalLocations: number;
+}

@@ -9,6 +9,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
+using VidiMetrics.Application.DTOs.StoryEngine.Stats;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
@@ -151,5 +152,29 @@ public class ShowsService : IShowsService
             );
         }
         return isSuccess;
+    }
+
+    public async Task<StoryEngineStatsResponseDto> GetStatsAsync(Guid userId, CancellationToken ct = default)
+    {
+        var userShowsQuery = _repository.Query().Where(x => x.UserId == userId);
+
+        var stats = await userShowsQuery
+            .Select(show => new
+            {
+                EpisodesCount = show.Episodes.Count,
+                ScenesCount = show.Episodes.SelectMany(e => e.Scenes).Count(),
+                CharactersCount = show.Characters.Count,
+                LocationsCount = show.Locations.Count
+            })
+            .ToListAsync(ct);
+
+        return new StoryEngineStatsResponseDto
+        {
+            TotalShows = stats.Count,
+            TotalEpisodes = stats.Sum(x => x.EpisodesCount),
+            TotalScenes = stats.Sum(x => x.ScenesCount),
+            TotalCharacters = stats.Sum(x => x.CharactersCount),
+            TotalLocations = stats.Sum(x => x.LocationsCount)
+        };
     }
 }

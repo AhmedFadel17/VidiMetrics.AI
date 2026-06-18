@@ -75,3 +75,10 @@ export interface Transcript extends BaseEntity {
 }
 
 
+export interface MediaStats {
+  totalVideos: number;
+  totalScripts: number;
+  totalImages: number;
+  totalGenerations: number;
+  totalUnlinked: number;
+}

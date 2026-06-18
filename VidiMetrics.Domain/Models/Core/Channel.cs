@@ -24,5 +24,6 @@ public class Channel : BaseEntity
 
     // Relationships
     public ICollection<ChannelPost> ChannelPosts { get; set; } = new List<ChannelPost>();
+    public virtual ICollection<ShowChannel> ShowChannels { get; set; } = new List<ShowChannel>();
     public virtual ChannelStat ChannelStat { get; set; } = null!;
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Shows;
+using VidiMetrics.Application.DTOs.StoryEngine.Stats;
 using VidiMetrics.Application.Interfaces.StoryEngine;
 using VidiMetrics.Domain.Enums;
 
@@ -60,5 +61,12 @@ public class ShowsController : ApiBaseController
     {
         await _service.DeleteAsync(CurrentUserGuid, id);
         return Ok(ApiResponseFactory.Success<object?>(null, "Show deleted successfully."));
+    }
+
+    [HttpGet("stats")]
+    public async Task<ActionResult<SuccessResponseDto<StoryEngineStatsResponseDto>>> GetStats(CancellationToken ct)
+    {
+        var result = await _service.GetStatsAsync(CurrentUserGuid, ct);
+        return Ok(ApiResponseFactory.Success(result, "Stats retrieved successfully."));
     }
 }

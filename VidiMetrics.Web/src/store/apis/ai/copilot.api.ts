@@ -4,6 +4,7 @@ import {
     CopilotChatDto,
     CopilotDraftDto,
     CopilotMessageDto,
+    CopilotStatsResponseDto,
     CreateCopilotChatRequestDto,
     ReviewCopilotDraftRequestDto,
     ReviewCopilotDraftResponseDto,
@@ -92,6 +93,10 @@ export const copilotApi = mainApi.injectEndpoints({
                     ]
                     : [{ type: 'CopilotDraft', id: `LIST-${chatId}` }],
         }),
+        getCopilotStats: builder.query<ApiResponse<CopilotStatsResponseDto>, void>({
+            query: () => `/api/copilot/stats`,
+            providesTags: (_result, _err) => [{ type: 'CopilotChat', id: 'STATS' }],
+        }),
     }),
 });
 
@@ -103,4 +108,5 @@ export const {
     useGetCopilotChatQuery,
     useGetCopilotChatMessagesQuery,
     useGetCopilotChatDraftsQuery,
+    useGetCopilotStatsQuery
 } = copilotApi;

@@ -73,4 +73,11 @@ public class CopilotController : ApiBaseController
     }
 
 
+    [HttpGet("stats")]
+    public async Task<ActionResult<List<CopilotStatsResponseDto>>> GetStats(CancellationToken ct)
+    {
+        var result = await _copilotService.GetStatsAsync(CurrentUserGuid, ct);
+        return Ok(ApiResponseFactory.Success(result, "Stats retrieved successfully.", 200));
+    }
+
 }

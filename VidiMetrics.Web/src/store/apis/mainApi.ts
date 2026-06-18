@@ -31,6 +31,7 @@ export const mainApi = createApi({
     'Channel',
     'Video',
     'ChannelPost',
+    'ShowChannel',
     // Ai
     'AiTask',
     'AiPromptTemplate',
@@ -38,6 +39,7 @@ export const mainApi = createApi({
     'Transcript',
     'AiImage',
     'AiScript',
+    'Media',
     // Copilot
     'CopilotChat',
     'CopilotMessage',

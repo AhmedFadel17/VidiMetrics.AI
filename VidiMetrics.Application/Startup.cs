@@ -41,12 +41,15 @@ namespace VidiMetrics.Application
             services.AddValidatorsFromAssemblyContaining<CreateChannelValidator>();
 
             // Service Registration
+            services.AddScoped<IMediaService, MediaService>();
             services.AddScoped<IAiPromptTemplatesService, AiPromptTemplatesService>();
             services.AddScoped<IAiTasksService, AiTasksService>();
             services.AddScoped<IAiImagesService, AiImagesService>();
             services.AddScoped<IAiScriptsService, AiScriptsService>();
             services.AddScoped<IAiVideosService, AiVideosService>();
             services.AddScoped<IChannelsService, ChannelsService>();
+            services.AddScoped<IChannelPostsService, ChannelPostsService>();
+            services.AddScoped<IShowChannelsService, ShowChannelsService>();
             services.AddScoped<ICharactersService, CharactersService>();
             services.AddScoped<ICompetitorVideosService, CompetitorVideosService>();
             services.AddScoped<IEpisodesService, EpisodesService>();

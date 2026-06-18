@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
@@ -14,6 +14,18 @@ import { useNavigate } from 'react-router-dom'
 import '@/css/Planner.css'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens'
+import {
+  useGetChannelPostsQuery,
+  useSchedulePostMutation,
+  useCreateChannelPostMutation,
+  usePublishPostMutation,
+  useDeleteChannelPostMutation,
+} from '@/store/apis/core/channelPosts.api'
+import { useGetMyChannelsQuery } from '@/store/apis/core/channels.api'
+import { ChannelPlatform, ChannelPostStatus } from '@/types/enums'
+import { Channel, ChannelPost } from '@/types/models/core'
+import { toast } from 'sonner'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,7 +37,7 @@ interface PlannerEvent {
   allDay?: boolean
   extendedProps: {
     thumbnail: string
-    status: 'live' | 'scheduled' | 'draft' | 'processing'
+    status: 'live' | 'scheduled' | 'draft' | 'processing' | 'failed'
     time: string
     platforms: string[]
     series: string
@@ -44,118 +56,6 @@ interface UnscheduledAsset {
   duration: string
 }
 
-// ─── Mock Data ─────────────────────────────────────────────────────────────────
-
-const MOCK_EVENTS: PlannerEvent[] = [
-  {
-    id: 'evt-1',
-    title: 'Neon Shadows - Ep 4',
-    start: '2026-06-03T18:00:00',
-    extendedProps: {
-      thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80',
-      status: 'scheduled',
-      time: '18:00',
-      platforms: ['TikTok', 'Instagram'],
-      series: 'Neon Shadows',
-      episode: 'Episode 4',
-      seriesId: 'series-1',
-      episodeId: 'ep-4',
-      description: 'A riveting episode where our protagonist discovers the underground neon city beneath the megastructure.',
-    },
-  },
-  {
-    id: 'evt-2',
-    title: 'Void Theory - Ep 1',
-    start: '2026-06-09T12:30:00',
-    extendedProps: {
-      thumbnail: 'https://images.unsplash.com/photo-1446776877081-d282a0f896e2?w=400&q=80',
-      status: 'processing',
-      time: '12:30',
-      platforms: ['YouTube'],
-      series: 'Void Theory',
-      episode: 'Episode 1',
-      seriesId: 'series-2',
-      episodeId: 'ep-1',
-      description: 'Pilot episode exploring the theoretical physics of parallel dimensions and what lies beyond the observable universe.',
-    },
-  },
-  {
-    id: 'evt-3',
-    title: 'Synth Quest - Ep 12',
-    start: '2026-06-24T21:00:00',
-    extendedProps: {
-      thumbnail: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80',
-      status: 'draft',
-      time: '21:00',
-      platforms: ['TikTok'],
-      series: 'Synth Quest',
-      episode: 'Episode 12',
-      seriesId: 'series-3',
-      episodeId: 'ep-12',
-      description: 'The season finale where Aria must choose between the synthetic world and her digital consciousness.',
-    },
-  },
-  {
-    id: 'evt-4',
-    title: 'Chrome Echoes - Ep 7',
-    start: '2026-06-17T14:30:00',
-    extendedProps: {
-      thumbnail: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80',
-      status: 'scheduled',
-      time: '14:30',
-      platforms: ['YouTube', 'TikTok'],
-      series: 'Chrome Echoes',
-      episode: 'Episode 7',
-      seriesId: 'series-4',
-      episodeId: 'ep-7',
-      description: 'In the chrome cities of tomorrow, our heroes face the AI uprising from within the network.',
-    },
-  },
-]
-
-const MOCK_UNSCHEDULED: UnscheduledAsset[] = [
-  {
-    id: 'unsch-1',
-    title: 'Alien Horizon - Ep 3',
-    thumbnail: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=300&q=80',
-    series: 'Alien Horizon',
-    duration: '12:45',
-  },
-  {
-    id: 'unsch-2',
-    title: 'Neural Grid - Ep 8',
-    thumbnail: 'https://images.unsplash.com/photo-1527430253228-e93688616381?w=300&q=80',
-    series: 'Neural Grid',
-    duration: '08:30',
-  },
-  {
-    id: 'unsch-3',
-    title: 'Bio Forge - Ep 2',
-    thumbnail: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?w=300&q=80',
-    series: 'Bio Forge',
-    duration: '15:20',
-  },
-]
-
-const ALL_SEARCHABLE = [
-  ...MOCK_EVENTS.map(e => ({
-    id: e.id,
-    title: e.title,
-    thumbnail: e.extendedProps.thumbnail,
-    status: e.extendedProps.status,
-    type: 'scheduled' as const,
-    event: e,
-  })),
-  ...MOCK_UNSCHEDULED.map(a => ({
-    id: a.id,
-    title: a.title,
-    thumbnail: a.thumbnail,
-    status: 'unscheduled' as const,
-    type: 'unscheduled' as const,
-    asset: a,
-  })),
-]
-
 // ─── Helpers ───────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG: Record<string, { color: string; label: string; glow: string }> = {
@@ -163,6 +63,7 @@ const STATUS_CONFIG: Record<string, { color: string; label: string; glow: string
   scheduled: { color: 'bg-primary', label: 'Scheduled', glow: 'shadow-primary/40' },
   draft: { color: 'bg-yellow-400', label: 'Draft', glow: 'shadow-yellow-400/40' },
   processing: { color: 'bg-orange-400', label: 'Processing', glow: 'shadow-orange-400/40' },
+  failed: { color: 'bg-red-400', label: 'Failed', glow: 'shadow-red-400/40' },
   unscheduled: { color: 'bg-white/40', label: 'Unscheduled', glow: '' },
 }
 
@@ -178,6 +79,60 @@ const VIEW_LABELS: Record<string, string> = {
   timeGridWeek: 'Week',
   timeGridDay: 'Day',
 }
+
+const mapPostToEvent = (post: ChannelPost, channelMap: Record<string, Channel>): PlannerEvent => {
+  const channel = channelMap[post.channelId];
+  const platformName = channel?.platform !== undefined ? ChannelPlatform[channel.platform] : 'YouTube';
+  
+  let status: 'live' | 'scheduled' | 'draft' | 'processing' | 'failed' = 'draft';
+  if (post.status === ChannelPostStatus.Published) {
+    status = 'live';
+  } else if (post.status === ChannelPostStatus.Queued) {
+    status = 'scheduled';
+  } else if (post.status === ChannelPostStatus.Failed) {
+    status = 'failed';
+  }
+
+  const dateStr = post.scheduledAt || post.publishedAt || post.createdAt || '';
+  const dateObj = dateStr ? new Date(dateStr) : new Date();
+  const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+  let series = 'Custom';
+  if (post.sourceEntityType === 2) {
+    series = 'Episode';
+  } else if (post.sourceEntityType === 3) {
+    series = 'Scene';
+  } else if (post.sourceEntityType === 1) {
+    series = 'Show';
+  }
+
+  return {
+    id: post.id,
+    title: post.title,
+    start: dateStr,
+    extendedProps: {
+      thumbnail: post.thumbnailUrl || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80',
+      status,
+      time: timeStr,
+      platforms: [platformName],
+      series: series,
+      episode: post.description ? (post.description.length > 50 ? post.description.substring(0, 50) + '...' : post.description) : 'Channel Post',
+      seriesId: post.sourceEntityId || '',
+      episodeId: post.sourceEntityId || '',
+      description: post.description || 'No description provided.',
+    }
+  };
+};
+
+const mapPostToUnscheduled = (post: ChannelPost): UnscheduledAsset => {
+  return {
+    id: post.id,
+    title: post.title,
+    thumbnail: post.thumbnailUrl || 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=300&q=80',
+    series: post.sourceEntityType === 2 ? 'Episode' : post.sourceEntityType === 3 ? 'Scene' : 'Custom Draft',
+    duration: '00:00'
+  };
+};
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
@@ -223,9 +178,16 @@ export default function Planner() {
   const calendarRef = useRef<FullCalendar>(null)
   const draggableContainerRef = useRef<HTMLDivElement>(null)
 
+  // ── Queries & Mutations ──
+  const { data: postsRes, isLoading: postsLoading, error: postsError } = useGetChannelPostsQuery({ pageSize: 1000 })
+  const { data: channelsRes, isLoading: channelsLoading, error: channelsError } = useGetMyChannelsQuery()
+
+  const [schedulePost] = useSchedulePostMutation()
+  const [createChannelPost, { isLoading: isCreating }] = useCreateChannelPostMutation()
+  const [publishPost, { isLoading: isPublishing }] = usePublishPostMutation()
+  const [deleteChannelPost] = useDeleteChannelPostMutation()
+
   // ── State ──
-  const [events, setEvents] = useState<PlannerEvent[]>(MOCK_EVENTS)
-  const [unscheduled, setUnscheduled] = useState<UnscheduledAsset[]>(MOCK_UNSCHEDULED)
   const [currentView, setCurrentView] = useState<string>('dayGridMonth')
   const [currentTitle, setCurrentTitle] = useState<string>('')
   const [autoPilot, setAutoPilot] = useState<boolean>(true)
@@ -235,10 +197,63 @@ export default function Planner() {
   const [showModal, setShowModal] = useState<boolean>(false)
   const [showScheduleModal, setShowScheduleModal] = useState<boolean>(false)
   const [pendingDate, setPendingDate] = useState<string>('')
+  const [selectedChannelId, setSelectedChannelId] = useState<string>('')
+
+  // ── Data Processing ──
+  const channels = useMemo(() => channelsRes?.data || [], [channelsRes])
+  const channelMap = useMemo(() => {
+    const map: Record<string, Channel> = {}
+    channels.forEach(c => {
+      map[c.id] = c
+    })
+    return map
+  }, [channels])
+
+  const posts = useMemo(() => postsRes?.data?.items || [], [postsRes])
+
+  const events = useMemo(() => {
+    return posts
+      .filter(p => p.scheduledAt)
+      .map(p => mapPostToEvent(p, channelMap))
+  }, [posts, channelMap])
+
+  const unscheduled = useMemo(() => {
+    return posts
+      .filter(p => !p.scheduledAt)
+      .map(p => mapPostToUnscheduled(p))
+  }, [posts])
+
+  // Set default channel when channels load
+  useEffect(() => {
+    if (channels.length > 0 && !selectedChannelId) {
+      setSelectedChannelId(channels[0].id)
+    }
+  }, [channels, selectedChannelId])
 
   // ── Search ──
+  const allSearchable = useMemo(() => {
+    return [
+      ...events.map(e => ({
+        id: e.id,
+        title: e.title,
+        thumbnail: e.extendedProps.thumbnail,
+        status: e.extendedProps.status,
+        type: 'scheduled' as const,
+        event: e,
+      })),
+      ...unscheduled.map(a => ({
+        id: a.id,
+        title: a.title,
+        thumbnail: a.thumbnail,
+        status: 'unscheduled' as const,
+        type: 'unscheduled' as const,
+        asset: a,
+      })),
+    ]
+  }, [events, unscheduled])
+
   const filteredSearch = searchQuery.trim().length > 0
-    ? ALL_SEARCHABLE.filter(item =>
+    ? allSearchable.filter(item =>
       item.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
     : []
@@ -249,19 +264,19 @@ export default function Planner() {
     const draggable = new Draggable(draggableContainerRef.current, {
       itemSelector: '[data-event]',
       eventData: (el) => ({
-        id: `new-${Date.now()}`,
+        id: el.getAttribute('data-asset-id') ?? `new-${Date.now()}`,
         title: el.getAttribute('data-title') ?? '',
         duration: { hours: 1 },
         extendedProps: {
           thumbnail: el.getAttribute('data-thumbnail') ?? '',
           status: 'draft',
           time: '12:00',
-          platforms: ['YouTube'],
+          platforms: [],
           series: el.getAttribute('data-series') ?? '',
-          episode: 'Episode 1',
-          seriesId: 'series-new',
-          episodeId: 'ep-new',
-          description: 'Newly scheduled video.',
+          episode: 'Draft Video',
+          seriesId: '',
+          episodeId: '',
+          description: 'Ready to schedule.',
         },
       }),
     })
@@ -275,7 +290,6 @@ export default function Planner() {
   }, [])
 
   useEffect(() => {
-    // Initial title
     setTimeout(updateTitle, 100)
   }, [updateTitle])
 
@@ -304,38 +318,53 @@ export default function Planner() {
     calendarRef.current?.getApi().unselect()
   }
 
-  const handleEventDrop = (arg: EventDropArg) => {
+  const handleEventDrop = async (arg: EventDropArg) => {
     const newStart = arg.event.startStr
-    setEvents(prev => prev.map(e =>
-      e.id === arg.event.id
-        ? { ...e, start: newStart }
-        : e
-    ))
+    try {
+      await schedulePost({ id: arg.event.id, scheduledAt: newStart }).unwrap()
+      toast.success('Post rescheduled successfully.')
+    } catch (err) {
+      console.error('Failed to reschedule post:', err)
+      toast.error('Failed to reschedule post.')
+      arg.revert()
+    }
   }
 
-  const handleExternalDrop = (info: { dateStr: string; draggedEl: HTMLElement; event: EventInput }) => {
+  const handleExternalDrop = async (info: { dateStr: string; draggedEl: HTMLElement; event: EventInput }) => {
     const assetId = info.draggedEl.getAttribute('data-asset-id')
     if (assetId) {
-      const asset = unscheduled.find(a => a.id === assetId)
-      if (asset) {
-        const newEvt: PlannerEvent = {
-          id: `evt-${Date.now()}`,
-          title: asset.title,
-          start: info.dateStr,
-          extendedProps: {
-            thumbnail: asset.thumbnail,
-            status: 'draft',
-            time: '12:00',
-            platforms: ['YouTube'],
-            series: asset.series,
-            episode: 'Episode 1',
-            seriesId: 'series-new',
-            episodeId: 'ep-new',
-            description: 'Newly scheduled from vault.',
-          },
-        }
-        setEvents(prev => [...prev, newEvt])
-        setUnscheduled(prev => prev.filter(a => a.id !== assetId))
+      try {
+        await schedulePost({ id: assetId, scheduledAt: info.dateStr }).unwrap()
+        toast.success('Post scheduled successfully.')
+      } catch (err) {
+        console.error('Failed to schedule asset:', err)
+        toast.error('Failed to schedule post.')
+      }
+    }
+  }
+
+  const handlePublishNow = async () => {
+    if (!selectedEvent) return
+    try {
+      await publishPost(selectedEvent.id).unwrap()
+      toast.success('Post published successfully.')
+      setShowModal(false)
+    } catch (err) {
+      console.error('Failed to publish post:', err)
+      toast.error('Failed to publish post.')
+    }
+  }
+
+  const handleDeletePost = async () => {
+    if (!selectedEvent) return
+    if (confirm('Are you sure you want to cancel and delete this channel post?')) {
+      try {
+        await deleteChannelPost(selectedEvent.id).unwrap()
+        toast.success('Post deleted successfully.')
+        setShowModal(false)
+      } catch (err) {
+        console.error('Failed to delete post:', err)
+        toast.error('Failed to delete post.')
       }
     }
   }
@@ -353,14 +382,24 @@ export default function Planner() {
   }, [])
 
   // ── Full calendar events ──
-  const fcEvents: EventInput[] = events.map(e => ({
-    id: e.id,
-    title: e.title,
-    start: e.start,
-    end: e.end,
-    allDay: false,
-    extendedProps: e.extendedProps,
-  }))
+  const fcEvents: EventInput[] = useMemo(() => {
+    return events.map(e => ({
+      id: e.id,
+      title: e.title,
+      start: e.start,
+      end: e.end,
+      allDay: false,
+      extendedProps: e.extendedProps,
+    }))
+  }, [events])
+
+  if (postsLoading || channelsLoading) {
+    return <LoadingScreen message="Accessing Content Planner..." accentColor="purple" />
+  }
+
+  if (postsError || channelsError) {
+    return <ErrorScreen title="Planner Offline" message="Unable to load scheduled posts or channels. Please check your connection." />
+  }
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -378,7 +417,6 @@ export default function Planner() {
         />
         <div>
           <div className="flex items-center gap-3 flex-wrap mb-3">
-
 
             {/* ── Calendar Navigation ── */}
             <div className="flex items-center bg-surface-container-low rounded-xl p-1 border border-outline-variant/10">
@@ -496,8 +534,6 @@ export default function Planner() {
           </div>
         </div>
 
-
-
       </div>
 
       {/* ── Main Grid ── */}
@@ -524,7 +560,6 @@ export default function Planner() {
               select={handleDateSelect}
               eventDrop={handleEventDrop}
               drop={(info) => {
-                // Handle external draggable drop
                 handleExternalDrop({
                   dateStr: info.dateStr,
                   draggedEl: info.dragEl,
@@ -551,7 +586,6 @@ export default function Planner() {
           <div className="glass-card rounded-3xl p-5 border border-outline-variant/10">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-headline font-bold text-base text-on-surface">Unscheduled</h3>
-              <button className="text-[10px] font-bold text-primary hover:underline transition-colors">View All</button>
             </div>
 
             <div ref={draggableContainerRef} className="grid grid-cols-2 gap-3">
@@ -577,7 +611,10 @@ export default function Planner() {
                   </div>
                 </div>
               ))}
-              <button className="aspect-square rounded-xl border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center text-on-surface-variant/40 hover:border-primary/50 hover:text-primary/60 transition-all cursor-pointer gap-1">
+              <button
+                onClick={() => { setPendingDate(new Date().toISOString().split('T')[0]); setShowScheduleModal(true) }}
+                className="aspect-square rounded-xl border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center text-on-surface-variant/40 hover:border-primary/50 hover:text-primary/60 transition-all cursor-pointer gap-1"
+              >
                 <span className="material-symbols-outlined text-xl">add</span>
                 <span className="text-[8px] font-bold uppercase tracking-wide">New</span>
               </button>
@@ -703,7 +740,8 @@ export default function Planner() {
                   ${selectedEvent.extendedProps.status === 'scheduled' ? 'bg-primary/20 border-primary/30 text-primary' :
                     selectedEvent.extendedProps.status === 'live' ? 'bg-green-400/20 border-green-400/30 text-green-400' :
                       selectedEvent.extendedProps.status === 'processing' ? 'bg-orange-400/20 border-orange-400/30 text-orange-400' :
-                        'bg-yellow-400/20 border-yellow-400/30 text-yellow-400'}`}>
+                        selectedEvent.extendedProps.status === 'failed' ? 'bg-red-400/20 border-red-400/30 text-red-400' :
+                          'bg-yellow-400/20 border-yellow-400/30 text-yellow-400'}`}>
                   <div className={`w-1.5 h-1.5 rounded-full ${STATUS_CONFIG[selectedEvent.extendedProps.status]?.color}`} />
                   {STATUS_CONFIG[selectedEvent.extendedProps.status]?.label}
                 </div>
@@ -764,19 +802,27 @@ export default function Planner() {
 
               {/* Actions */}
               <div className="flex gap-3 pt-1">
+                {selectedEvent.extendedProps.status !== 'live' && (
+                  <button
+                    onClick={handlePublishNow}
+                    disabled={isPublishing}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 text-white font-bold text-xs hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all duration-200 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                  >
+                    <span className="material-symbols-outlined text-sm">publish</span>
+                    {isPublishing ? 'Publishing...' : 'Publish Now'}
+                  </button>
+                )}
+                
                 <button
-                  onClick={() => {
-                    setShowModal(false)
-                    navigate(`/dashboard/series/${selectedEvent.extendedProps.seriesId}/episodes/${selectedEvent.extendedProps.episodeId}`)
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-br from-primary to-secondary text-on-primary font-bold text-xs hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all duration-200 shadow-lg shadow-primary/20"
+                  onClick={handleDeletePost}
+                  className="px-4 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-semibold text-xs hover:text-red-300 hover:bg-red-500/25 transition-all border border-red-500/20"
                 >
-                  <span className="material-symbols-outlined text-sm">open_in_new</span>
-                  View Full Details
+                  Delete Post
                 </button>
+
                 <button
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2.5 rounded-xl bg-surface-container text-on-surface-variant font-semibold text-xs hover:text-on-surface hover:bg-surface-container-high transition-all border border-outline-variant/20"
+                  className="px-4 py-2.5 rounded-xl bg-surface-container text-on-surface-variant font-semibold text-xs hover:text-on-surface hover:bg-surface-container-high transition-all border border-outline-variant/20 ml-auto"
                 >
                   Close
                 </button>
@@ -822,6 +868,36 @@ export default function Planner() {
                   className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all"
                 />
               </div>
+
+              <div>
+                <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60 block mb-2">Publishing Channel</label>
+                {channels.length === 0 ? (
+                  <p className="text-xs text-red-400">No channels connected. Please connect a channel first.</p>
+                ) : (
+                  <select
+                    value={selectedChannelId}
+                    onChange={e => setSelectedChannelId(e.target.value)}
+                    className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+                  >
+                    {channels.map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.name} ({c.platform !== undefined ? ChannelPlatform[c.platform] : 'YouTube'})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div>
+                <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60 block mb-2">Description</label>
+                <textarea
+                  id="schedule-description"
+                  placeholder="Enter video description..."
+                  rows={3}
+                  className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 transition-all resize-none"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60 block mb-2">Time</label>
@@ -832,50 +908,48 @@ export default function Planner() {
                     className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
                   />
                 </div>
-                <div>
-                  <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant/60 block mb-2">Platform</label>
-                  <select
-                    id="schedule-platform"
-                    className="w-full bg-surface-container border border-outline-variant/20 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
-                  >
-                    <option value="YouTube">YouTube</option>
-                    <option value="TikTok">TikTok</option>
-                    <option value="Instagram">Instagram</option>
-                  </select>
-                </div>
               </div>
 
               <button
-                onClick={() => {
+                disabled={channels.length === 0 || isCreating}
+                onClick={async () => {
                   const titleInput = document.getElementById('schedule-title') as HTMLInputElement
                   const timeInput = document.getElementById('schedule-time') as HTMLInputElement
-                  const platformInput = document.getElementById('schedule-platform') as HTMLSelectElement
+                  const descInput = document.getElementById('schedule-description') as HTMLTextAreaElement
                   const title = titleInput?.value.trim()
-                  if (!title) return
+                  if (!title || !selectedChannelId) return
 
-                  const newEvt: PlannerEvent = {
-                    id: `evt-${Date.now()}`,
-                    title,
-                    start: `${pendingDate}T${timeInput?.value ?? '12:00'}:00`,
-                    extendedProps: {
-                      thumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80',
-                      status: 'scheduled',
-                      time: timeInput?.value ?? '12:00',
-                      platforms: [platformInput?.value ?? 'YouTube'],
-                      series: 'Custom',
-                      episode: 'Episode 1',
-                      seriesId: 'series-custom',
-                      episodeId: 'ep-custom',
-                      description: 'Manually scheduled video.',
-                    },
+                  const time = timeInput?.value ?? '12:00'
+                  const desc = descInput?.value.trim()
+                  const scheduledAt = `${pendingDate}T${time}:00`
+
+                  try {
+                    await createChannelPost({
+                      title,
+                      description: desc || undefined,
+                      videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                      thumbnailUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=80',
+                      channelId: selectedChannelId,
+                      scheduledAt,
+                      status: ChannelPostStatus.Queued,
+                    }).unwrap()
+                    toast.success('Post scheduled successfully.')
+                    setShowScheduleModal(false)
+                  } catch (err) {
+                    console.error('Failed to create channel post:', err)
+                    toast.error('Failed to schedule post.')
                   }
-                  setEvents(prev => [...prev, newEvt])
-                  setShowScheduleModal(false)
                 }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-on-primary font-bold text-sm hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all duration-200 shadow-lg shadow-primary/20"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-br from-primary to-secondary text-on-primary font-bold text-sm hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all duration-200 shadow-lg shadow-primary/20 disabled:opacity-50 disabled:scale-100 disabled:pointer-events-none"
               >
-                <span className="material-symbols-outlined text-sm">event_available</span>
-                Add to Calendar
+                {isCreating ? (
+                  <span>Scheduling...</span>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-sm">event_available</span>
+                    Add to Calendar
+                  </>
+                )}
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 using System;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.Application.DTOs.Core.ChannelPosts
 {
@@ -10,6 +10,6 @@ namespace VidiMetrics.Application.DTOs.Core.ChannelPosts
         public string? ThumbnailUrl { get; set; }
         public string? VideoUrl { get; set; }
         public DateTime? ScheduledAt { get; set; }
-        public PostStatus? Status { get; set; }
+        public ChannelPostStatus? Status { get; set; }
     }
 }

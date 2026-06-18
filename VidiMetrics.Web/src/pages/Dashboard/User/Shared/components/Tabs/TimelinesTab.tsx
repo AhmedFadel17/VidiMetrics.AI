@@ -1,172 +1,722 @@
+import { useState, useMemo } from 'react'
+import {
+  useGetShowChannelsQuery,
+  useConnectShowToChannelMutation,
+  useDisconnectShowFromChannelMutation,
+  useUpdateShowChannelSettingsMutation,
+} from '@/store/apis/core/showChannels.api'
+import { useGetMyChannelsQuery } from '@/store/apis/core/channels.api'
+import {
+  useGetChannelPostsQuery,
+  useCreateDraftEpisodePostMutation,
+  useCreateDraftScenePostMutation,
+  useDeleteChannelPostMutation,
+  usePublishPostMutation,
+} from '@/store/apis/core/channelPosts.api'
+import { useGetEpisodesQuery } from '@/store/apis/storyEngine/episodes.api'
+import { useGetScenesQuery } from '@/store/apis/storyEngine/scenes.api'
+import { ChannelPlatform, ChannelPostStatus } from '@/types/enums'
+import { ShowChannel, Channel, ChannelPost } from '@/types/models/core'
+import { toast } from 'sonner'
+
 interface TimelinesTabProps {
-    showId: string;
+  showId: string;
 }
 
 export default function TimelinesTab({ showId }: TimelinesTabProps) {
-    return (
-        <div className="space-y-8">
-            {/* Distribution Channels */}
-            <div className="glass-card rounded-[3rem] p-10 border border-white/5 space-y-8 relative overflow-hidden">
-                <div className="flex justify-between items-center relative z-10">
-                    <div>
-                        <h3 className="text-2xl font-headline font-bold text-white tracking-tight flex items-center gap-3">
-                            <span className="material-symbols-outlined text-accent-cyan">hub</span>
-                            Linked Channels
-                        </h3>
-                        <p className="text-white/40 text-sm mt-1">Manage automated distribution points.</p>
-                    </div>
-                    <button className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-all border border-white/10 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm">add</span> Add Channel
-                    </button>
-                </div>
+  // ── Queries ──
+  const { data: showChannelsRes, isLoading: showChannelsLoading } = useGetShowChannelsQuery(showId)
+  const { data: myChannelsRes, isLoading: myChannelsLoading } = useGetMyChannelsQuery()
+  const { data: postsRes, isLoading: postsLoading } = useGetChannelPostsQuery({ showId, pageSize: 50 })
+  const { data: episodesRes, isLoading: episodesLoading } = useGetEpisodesQuery({ showId, pageSize: 50 })
+  const { data: scenesRes, isLoading: scenesLoading } = useGetScenesQuery({ showId, pageSize: 50 })
 
-                <div className="grid grid-cols-3 gap-6 relative z-10">
-                    {/* YouTube */}
-                    <div className="glass-card p-6 rounded-2xl border border-white/5 border-l-4 border-l-red-500 hover:bg-white/[0.04] transition-all flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-red-500">
-                                <span className="material-symbols-outlined">smart_display</span>
-                            </div>
-                            <div>
-                                <h4 className="text-white font-bold text-sm">CyberKyoto Official</h4>
-                                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1">YouTube</p>
-                            </div>
-                        </div>
-                        <div className="w-10 h-5 bg-accent-cyan/20 rounded-full flex items-center p-1 cursor-pointer">
-                            <div className="w-3 h-3 bg-accent-cyan rounded-full shadow-[0_0_10px_#00f2ff] transform translate-x-5"></div>
-                        </div>
-                    </div>
+  // ── Mutations ──
+  const [connectShowToChannel] = useConnectShowToChannelMutation()
+  const [disconnectShowFromChannel] = useDisconnectShowFromChannelMutation()
+  const [updateShowChannelSettings, { isLoading: isUpdatingSettings }] = useUpdateShowChannelSettingsMutation()
+  const [createDraftEpisodePost, { isLoading: isSchedulingEpisode }] = useCreateDraftEpisodePostMutation()
+  const [createDraftScenePost, { isLoading: isSchedulingScene }] = useCreateDraftScenePostMutation()
+  const [publishPost] = usePublishPostMutation()
+  const [deleteChannelPost] = useDeleteChannelPostMutation()
 
-                    {/* TikTok */}
-                    <div className="glass-card p-6 rounded-2xl border border-white/5 border-l-4 border-l-accent-pink hover:bg-white/[0.04] transition-all flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-accent-pink">
-                                <span className="material-symbols-outlined">music_video</span>
-                            </div>
-                            <div>
-                                <h4 className="text-white font-bold text-sm">@NeonSymphony</h4>
-                                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1">TikTok</p>
-                            </div>
-                        </div>
-                        <div className="w-10 h-5 bg-accent-cyan/20 rounded-full flex items-center p-1 cursor-pointer">
-                            <div className="w-3 h-3 bg-accent-cyan rounded-full shadow-[0_0_10px_#00f2ff] transform translate-x-5"></div>
-                        </div>
-                    </div>
+  // ── UI States ──
+  const [showAddChannelModal, setShowAddChannelModal] = useState(false)
+  const [editingShowChannel, setEditingShowChannel] = useState<ShowChannel | null>(null)
+  const [schedulingAsset, setSchedulingAsset] = useState<{ type: 'episode' | 'scene'; id: string; title: string } | null>(null)
+  const [selectedScheduleChannelId, setSelectedScheduleChannelId] = useState<string>('')
+  const [reelStudioTab, setReelStudioTab] = useState<'episodes' | 'scenes'>('episodes')
 
-                    {/* Instagram */}
-                    <div className="glass-card p-6 rounded-2xl border border-white/5 border-l-4 border-l-orange-400 hover:bg-white/[0.04] transition-all flex justify-between items-center">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center text-orange-400">
-                                <span className="material-symbols-outlined">photo_camera</span>
-                            </div>
-                            <div>
-                                <h4 className="text-white font-bold text-sm">Neon Symphony</h4>
-                                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1">Instagram</p>
-                            </div>
-                        </div>
-                        <div className="w-10 h-5 bg-white/10 rounded-full flex items-center p-1 cursor-pointer">
-                            <div className="w-3 h-3 bg-white/30 rounded-full transform translate-x-0"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  // ── Data Processing ──
+  const showChannels = useMemo(() => showChannelsRes?.data || [], [showChannelsRes])
+  const myChannels = useMemo(() => myChannelsRes?.data || [], [myChannelsRes])
+  const posts = useMemo(() => postsRes?.data?.items || [], [postsRes])
+  const episodes = useMemo(() => episodesRes?.data?.items || [], [episodesRes])
+  const scenes = useMemo(() => scenesRes?.data?.items || [], [scenesRes])
 
-            {/* Posting & Reel Studio Grid */}
-            <div className="grid grid-cols-12 gap-8">
-                {/* Reel Studio / Content Splitting */}
-                <div className="col-span-7 glass-card rounded-[3rem] p-10 border border-white/5 relative overflow-hidden">
-                    <div className="flex justify-between items-center mb-8">
-                        <div>
-                            <h3 className="text-2xl font-headline font-bold text-white tracking-tight flex items-center gap-3">
-                                <span className="material-symbols-outlined text-accent-purple">content_cut</span>
-                                Reel Studio
-                            </h3>
-                            <p className="text-white/40 text-sm mt-1">Process full episodes into short-form content.</p>
-                        </div>
-                    </div>
+  const channelMap = useMemo(() => {
+    const map: Record<string, Channel> = {}
+    myChannels.forEach(c => {
+      map[c.id] = c
+    })
+    return map
+  }, [myChannels])
 
-                    <div className="space-y-4">
-                        {/* Ready to cut items */}
-                        <div className="glass-card p-4 rounded-2xl border border-white/5 flex gap-4 items-center group">
-                            <div className="w-24 h-16 rounded-xl overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60" alt="S02E01" className="w-full h-full object-cover opacity-60" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-dashboard-bg/80 to-transparent"></div>
-                                <span className="absolute bottom-1 right-1 text-[8px] font-bold text-white px-1 bg-black/50 rounded">28:45</span>
-                            </div>
-                            <div className="flex-grow">
-                                <h4 className="text-sm font-bold text-white">S02 E01: The Ghost Signal</h4>
-                                <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mt-1">Ready for extraction</p>
-                            </div>
-                            <button className="px-4 py-2 bg-gradient-to-r from-accent-purple to-accent-pink text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-[0_0_15px_rgba(138,43,226,0.3)] hover:scale-105">
-                                AI Auto-Cut
-                            </button>
-                        </div>
+  const connectedChannelIds = useMemo(() => new Set(showChannels.map(sc => sc.channelId)), [showChannels])
+  const unlinkedChannels = useMemo(() => myChannels.filter(c => !connectedChannelIds.has(c.id)), [myChannels, connectedChannelIds])
 
-                        {/* Processing item */}
-                        <div className="glass-card p-4 rounded-2xl border border-accent-cyan/20 flex gap-4 items-center bg-accent-cyan/5">
-                            <div className="w-24 h-16 rounded-xl overflow-hidden relative">
-                                <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800&auto=format&fit=crop&q=60" alt="S02E02" className="w-full h-full object-cover opacity-40 grayscale" />
-                            </div>
-                            <div className="flex-grow">
-                                <div className="flex justify-between items-center mb-1">
-                                    <h4 className="text-sm font-bold text-white">S01 E12 Recap Reel</h4>
-                                    <span className="text-xs font-bold text-accent-cyan">74%</span>
-                                </div>
-                                <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden">
-                                     <div className="h-full bg-accent-cyan shadow-[0_0_8px_#00f2ff] w-[74%]"></div>
-                                </div>
-                                <p className="text-accent-cyan/60 text-[10px] uppercase font-black tracking-widest mt-2 animate-pulse">Generating Captions...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  const upcomingPosts = useMemo(() => {
+    return posts
+      .filter(p => p.status === ChannelPostStatus.Queued && p.scheduledAt)
+      .sort((a, b) => new Date(a.scheduledAt!).getTime() - new Date(b.scheduledAt!).getTime())
+  }, [posts])
 
-                {/* Posting Schedule */}
-                <div className="col-span-5 glass-card rounded-[3rem] p-10 border border-white/5 relative">
-                     <div className="flex justify-between items-center mb-8">
-                        <div>
-                            <h3 className="text-2xl font-headline font-bold text-white tracking-tight flex items-center gap-3">
-                                <span className="material-symbols-outlined text-accent-pink">schedule</span>
-                                Upcoming Schedule
-                            </h3>
-                        </div>
-                    </div>
+  // ── Handlers ──
+  const handleConnectChannel = async (channelId: string) => {
+    try {
+      await connectShowToChannel({ showId, channelId }).unwrap()
+      toast.success('Channel linked to series successfully.')
+      setShowAddChannelModal(false)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to link channel.')
+    }
+  }
 
-                    <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent pl-8">
-                        
-                        {/* Timeline Item 1 */}
-                        <div className="relative">
-                            <div className="absolute -left-11 w-6 h-6 rounded-full bg-dashboard-bg border-2 border-accent-cyan flex items-center justify-center shadow-[0_0_10px_rgba(0,242,255,0.3)]">
-                                <div className="w-2 h-2 bg-accent-cyan rounded-full"></div>
-                            </div>
-                            <div className="glass-card p-4 rounded-xl border border-white/5 hover:border-white/20 transition-all cursor-pointer group">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-[10px] font-black text-accent-cyan uppercase tracking-widest">Today, 18:00</span>
-                                    <span className="material-symbols-outlined text-sm text-white/40 group-hover:text-white">smart_display</span>
-                                </div>
-                                <h4 className="text-sm font-bold text-white mb-1">Trailer: Neon Symphony Pt 2</h4>
-                                <p className="text-xs text-white/40">YouTube • TikTok</p>
-                            </div>
-                        </div>
+  const handleDisconnectChannel = async (channelId: string) => {
+    if (confirm('Are you sure you want to disconnect this channel from this series?')) {
+      try {
+        await disconnectShowFromChannel({ showId, channelId }).unwrap()
+        toast.success('Channel unlinked successfully.')
+        setEditingShowChannel(null)
+      } catch (err) {
+        console.error(err)
+        toast.error('Failed to unlink channel.')
+      }
+    }
+  }
 
-                         {/* Timeline Item 2 */}
-                         <div className="relative">
-                            <div className="absolute -left-11 w-6 h-6 rounded-full bg-dashboard-bg border-2 border-accent-purple flex items-center justify-center shadow-[0_0_10px_rgba(138,43,226,0.3)]">
-                                <div className="w-2 h-2 bg-accent-purple rounded-full"></div>
-                            </div>
-                            <div className="glass-card p-4 rounded-xl border border-white/5 hover:border-white/20 transition-all cursor-pointer group">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Tomorrow, 12:30</span>
-                                    <span className="material-symbols-outlined text-sm text-white/40 group-hover:text-white">music_video</span>
-                                </div>
-                                <h4 className="text-sm font-bold text-white mb-1">BTS: Environment Forge</h4>
-                                <p className="text-xs text-white/40">TikTok</p>
-                            </div>
-                        </div>
+  const handleToggleActive = async (sc: ShowChannel) => {
+    try {
+      await updateShowChannelSettings({
+        showChannelId: sc.id,
+        body: {
+          isActive: !sc.isActive,
+          autoPostEpisodes: sc.autoPostEpisodes,
+          autoPostScenes: sc.autoPostScenes,
+          autoGenerateTitles: sc.autoGenerateTitles,
+          autoGenerateDescriptions: sc.autoGenerateDescriptions,
+          defaultPublishDelayMinutes: sc.defaultPublishDelayMinutes,
+          preferredPublishTime: sc.preferredPublishTime,
+          defaultTitleTemplate: sc.defaultTitleTemplate,
+          defaultDescriptionTemplate: sc.defaultDescriptionTemplate,
+          tags: sc.tags,
+        }
+      }).unwrap()
+      toast.success(`${channelMap[sc.channelId]?.name || 'Channel'} status updated.`)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to update channel settings.')
+    }
+  }
 
-                    </div>
-                </div>
-            </div>
+  const handleSaveSettings = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!editingShowChannel) return
+
+    const formData = new FormData(e.currentTarget)
+    const body = {
+      isActive: editingShowChannel.isActive,
+      autoPostEpisodes: formData.get('autoPostEpisodes') === 'on',
+      autoPostScenes: formData.get('autoPostScenes') === 'on',
+      autoGenerateTitles: formData.get('autoGenerateTitles') === 'on',
+      autoGenerateDescriptions: formData.get('autoGenerateDescriptions') === 'on',
+      defaultPublishDelayMinutes: formData.get('defaultPublishDelayMinutes') ? parseInt(formData.get('defaultPublishDelayMinutes') as string) : undefined,
+      preferredPublishTime: (formData.get('preferredPublishTime') as string) || undefined,
+      defaultTitleTemplate: (formData.get('defaultTitleTemplate') as string) || undefined,
+      defaultDescriptionTemplate: (formData.get('defaultDescriptionTemplate') as string) || undefined,
+      tags: (formData.get('tags') as string) || undefined,
+    }
+
+    try {
+      await updateShowChannelSettings({
+        showChannelId: editingShowChannel.id,
+        body
+      }).unwrap()
+      toast.success('Channel settings updated.')
+      setEditingShowChannel(null)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to update channel settings.')
+    }
+  }
+
+  const handleScheduleAssetSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!schedulingAsset || !selectedScheduleChannelId) return
+
+    const formData = new FormData(e.currentTarget)
+    const date = formData.get('scheduledDate') as string
+    const time = formData.get('scheduledTime') as string
+    
+    let scheduledAt: string | undefined = undefined
+    if (date && time) {
+      scheduledAt = `${date}T${time}:00`
+    }
+
+    try {
+      if (schedulingAsset.type === 'episode') {
+        await createDraftEpisodePost({
+          channelId: selectedScheduleChannelId,
+          episodeId: schedulingAsset.id,
+          scheduledAt
+        }).unwrap()
+      } else {
+        await createDraftScenePost({
+          channelId: selectedScheduleChannelId,
+          sceneId: schedulingAsset.id,
+          scheduledAt
+        }).unwrap()
+      }
+      toast.success(`${schedulingAsset.type === 'episode' ? 'Episode' : 'Scene'} scheduled successfully.`)
+      setSchedulingAsset(null)
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to schedule post.')
+    }
+  }
+
+  const handlePublishImmediately = async (postId: string) => {
+    try {
+      await publishPost(postId).unwrap()
+      toast.success('Post published successfully.')
+    } catch (err) {
+      console.error(err)
+      toast.error('Failed to publish post.')
+    }
+  }
+
+  const handleDeletePost = async (postId: string) => {
+    if (confirm('Are you sure you want to cancel and delete this scheduled post?')) {
+      try {
+        await deleteChannelPost(postId).unwrap()
+        toast.success('Scheduled post cancelled.')
+      } catch (err) {
+        console.error(err)
+        toast.error('Failed to cancel scheduled post.')
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Distribution Channels */}
+      <div className="glass-card rounded-[3rem] p-10 border border-white/5 space-y-8 relative overflow-hidden">
+        <div className="flex justify-between items-center relative z-10">
+          <div>
+            <h3 className="text-2xl font-headline font-bold text-white tracking-tight flex items-center gap-3">
+              <span className="material-symbols-outlined text-accent-cyan">hub</span>
+              Linked Channels
+            </h3>
+            <p className="text-white/40 text-sm mt-1">Manage automated distribution points for this series.</p>
+          </div>
+          <button
+            onClick={() => setShowAddChannelModal(true)}
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-all border border-white/10 flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-sm">add</span> Add Channel
+          </button>
         </div>
-    )
+
+        {showChannelsLoading || myChannelsLoading ? (
+          <div className="text-center py-6 text-white/40">Loading linked channels...</div>
+        ) : showChannels.length === 0 ? (
+          <div className="text-center py-10 border border-dashed border-white/10 rounded-2xl text-white/40 text-sm relative z-10">
+            No channels linked to this series. Click "Add Channel" to connect.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+            {showChannels.map(sc => {
+              const channel = channelMap[sc.channelId]
+              const platformName = channel?.platform !== undefined ? ChannelPlatform[channel.platform] : 'YouTube'
+              
+              let platformColor = 'border-l-red-500'
+              let icon = 'smart_display'
+              let iconColor = 'text-red-500'
+
+              if (channel?.platform === ChannelPlatform.TikTok) {
+                platformColor = 'border-l-accent-pink'
+                icon = 'music_video'
+                iconColor = 'text-accent-pink'
+              } else if (channel?.platform === ChannelPlatform.Instagram) {
+                platformColor = 'border-l-orange-400'
+                icon = 'photo_camera'
+                iconColor = 'text-orange-400'
+              } else if (channel?.platform === ChannelPlatform.X) {
+                platformColor = 'border-l-sky-400'
+                icon = 'hub'
+                iconColor = 'text-sky-400'
+              }
+
+              return (
+                <div
+                  key={sc.id}
+                  className={`glass-card p-6 rounded-2xl border border-white/5 border-l-4 ${platformColor} hover:bg-white/[0.04] transition-all flex justify-between items-center`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-10 h-10 bg-white/5 rounded-full flex items-center justify-center ${iconColor}`}>
+                      <span className="material-symbols-outlined">{icon}</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-bold text-sm truncate max-w-[150px]">{channel?.name || 'Channel'}</h4>
+                      <p className="text-white/40 text-[10px] font-black uppercase tracking-widest mt-1">{platformName}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setEditingShowChannel(sc)}
+                      className="p-1.5 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-lg transition-colors material-symbols-outlined text-sm"
+                      title="Settings"
+                    >
+                      settings
+                    </button>
+                    <div
+                      onClick={() => handleToggleActive(sc)}
+                      className={`w-10 h-5 rounded-full flex items-center p-1 cursor-pointer transition-all duration-300 ${sc.isActive ? 'bg-accent-cyan/20' : 'bg-white/10'}`}
+                    >
+                      <div className={`w-3 h-3 rounded-full transition-all duration-300 ${sc.isActive ? 'bg-accent-cyan shadow-[0_0_10px_#00f2ff] translate-x-5' : 'bg-white/30 translate-x-0'}`}></div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Posting & Reel Studio Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Reel Studio / Content Splitting */}
+        <div className="lg:col-span-7 glass-card rounded-[3rem] p-10 border border-white/5 relative overflow-hidden">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-2xl font-headline font-bold text-white tracking-tight flex items-center gap-3">
+                <span className="material-symbols-outlined text-accent-purple">content_cut</span>
+                Reel Studio
+              </h3>
+              <p className="text-white/40 text-sm mt-1">Select and schedule episodes or scenes for social media posting.</p>
+            </div>
+            
+            <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
+              <button
+                onClick={() => setReelStudioTab('episodes')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${reelStudioTab === 'episodes' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white'}`}
+              >
+                Episodes
+              </button>
+              <button
+                onClick={() => setReelStudioTab('scenes')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${reelStudioTab === 'scenes' ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white'}`}
+              >
+                Scenes
+              </button>
+            </div>
+          </div>
+
+          {episodesLoading || scenesLoading ? (
+            <div className="text-center py-10 text-white/40">Loading assets...</div>
+          ) : reelStudioTab === 'episodes' ? (
+            <div className="space-y-4">
+              {episodes.length === 0 ? (
+                <div className="text-center py-10 border border-dashed border-white/10 rounded-2xl text-white/40 text-sm">
+                  No episodes found for this series.
+                </div>
+              ) : (
+                episodes.map(ep => (
+                  <div key={ep.id} className="glass-card p-4 rounded-2xl border border-white/5 flex gap-4 items-center group">
+                    <div className="w-24 h-16 rounded-xl overflow-hidden relative">
+                      <img src={ep.thumbnailUrl || "https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=800&auto=format&fit=crop&q=60"} alt={ep.title} className="w-full h-full object-cover opacity-60" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-dashboard-bg/80 to-transparent"></div>
+                      <span className="absolute bottom-1 right-1 text-[8px] font-bold text-white px-1 bg-black/50 rounded">Ep {ep.episodeNumber}</span>
+                    </div>
+                    <div className="flex-grow">
+                      <h4 className="text-sm font-bold text-white">{ep.title}</h4>
+                      <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mt-1">Ready for distribution</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (showChannels.length === 0) {
+                          toast.error('Please link at least one channel first.')
+                          return
+                        }
+                        setSelectedScheduleChannelId(showChannels[0].channelId)
+                        setSchedulingAsset({ type: 'episode', id: ep.id, title: ep.title })
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-accent-purple to-accent-pink text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-[0_0_15px_rgba(138,43,226,0.3)] hover:scale-105"
+                    >
+                      Schedule Post
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {scenes.length === 0 ? (
+                <div className="text-center py-10 border border-dashed border-white/10 rounded-2xl text-white/40 text-sm">
+                  No scenes found for this series.
+                </div>
+              ) : (
+                scenes.map((scene) => (
+                  <div key={scene.id} className="glass-card p-4 rounded-2xl border border-white/5 flex gap-4 items-center group">
+                    <div className="w-24 h-16 rounded-xl overflow-hidden relative bg-white/5 flex items-center justify-center">
+                      <span className="material-symbols-outlined text-white/20 text-2xl">movie</span>
+                      <span className="absolute bottom-1 right-1 text-[8px] font-bold text-white px-1 bg-black/50 rounded">Scene {scene.order}</span>
+                    </div>
+                    <div className="flex-grow">
+                      <h4 className="text-sm font-bold text-white">Scene {scene.order}</h4>
+                      <p className="text-white/40 text-[10px] uppercase font-black tracking-widest mt-1">Ready for extraction</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        if (showChannels.length === 0) {
+                          toast.error('Please link at least one channel first.')
+                          return
+                        }
+                        setSelectedScheduleChannelId(showChannels[0].channelId)
+                        setSchedulingAsset({ type: 'scene', id: scene.id, title: `Scene ${scene.order}` })
+                      }}
+                      className="px-4 py-2 bg-gradient-to-r from-accent-purple to-accent-pink text-white text-xs font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-[0_0_15px_rgba(138,43,226,0.3)] hover:scale-105"
+                    >
+                      Schedule Post
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Posting Schedule */}
+        <div className="lg:col-span-5 glass-card rounded-[3rem] p-10 border border-white/5 relative">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h3 className="text-2xl font-headline font-bold text-white tracking-tight flex items-center gap-3">
+                <span className="material-symbols-outlined text-accent-pink">schedule</span>
+                Upcoming Schedule
+              </h3>
+            </div>
+          </div>
+
+          {postsLoading ? (
+            <div className="text-center py-6 text-white/40">Loading schedule...</div>
+          ) : upcomingPosts.length === 0 ? (
+            <div className="text-center py-10 text-white/30 text-xs italic">
+              No upcoming scheduled posts.
+            </div>
+          ) : (
+            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-white/10 before:to-transparent pl-8">
+              {upcomingPosts.map(post => {
+                const channel = channelMap[post.channelId]
+                const platformName = channel?.platform !== undefined ? ChannelPlatform[channel.platform] : 'YouTube'
+                const scheduledDate = new Date(post.scheduledAt!)
+                const dateLabel = scheduledDate.toLocaleDateString([], { month: 'short', day: 'numeric' })
+                const timeLabel = scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+                
+                return (
+                  <div key={post.id} className="relative group">
+                    <div className="absolute -left-11 w-6 h-6 rounded-full bg-dashboard-bg border-2 border-accent-cyan flex items-center justify-center shadow-[0_0_10px_rgba(0,242,255,0.3)]">
+                      <div className="w-2 h-2 bg-accent-cyan rounded-full"></div>
+                    </div>
+                    <div className="glass-card p-4 rounded-xl border border-white/5 hover:border-white/20 transition-all group-hover:bg-white/[0.02]">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black text-accent-cyan uppercase tracking-widest">
+                          {dateLabel}, {timeLabel}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handlePublishImmediately(post.id)}
+                            className="p-1 hover:bg-white/5 rounded text-green-400 hover:text-green-300 transition-colors material-symbols-outlined text-xs"
+                            title="Publish Now"
+                          >
+                            publish
+                          </button>
+                          <button
+                            onClick={() => handleDeletePost(post.id)}
+                            className="p-1 hover:bg-white/5 rounded text-red-400 hover:text-red-300 transition-colors material-symbols-outlined text-xs"
+                            title="Cancel Schedule"
+                          >
+                            delete
+                          </button>
+                        </div>
+                      </div>
+                      <h4 className="text-sm font-bold text-white mb-1 truncate">{post.title}</h4>
+                      <p className="text-xs text-white/40">{platformName} · {channel?.name || 'Channel'}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Add Channel Modal ── */}
+      {showAddChannelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowAddChannelModal(false)} />
+          <div className="relative z-10 w-full max-w-md glass-card rounded-[2rem] border border-white/10 shadow-2xl p-8 space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-headline font-bold text-white">Link Channel</h3>
+                <p className="text-xs text-white/40 mt-1">Select a channel to connect to this series.</p>
+              </div>
+              <button
+                onClick={() => setShowAddChannelModal(false)}
+                className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors material-symbols-outlined text-white text-sm"
+              >
+                close
+              </button>
+            </div>
+            
+            {unlinkedChannels.length === 0 ? (
+              <div className="text-center py-6 space-y-3">
+                <span className="material-symbols-outlined text-4xl text-white/20">link_off</span>
+                <p className="text-sm text-white/40">No available channels to connect. Manage your channels under Social Links.</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                {unlinkedChannels.map(c => (
+                  <button
+                    key={c.id}
+                    onClick={() => handleConnectChannel(c.id)}
+                    className="w-full flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all text-left group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white font-bold text-xs">
+                        {c.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-white group-hover:text-accent-cyan transition-colors">{c.name}</p>
+                        <p className="text-[10px] text-white/40 font-black uppercase tracking-widest">{c.platform !== undefined ? ChannelPlatform[c.platform] : 'YouTube'}</p>
+                      </div>
+                    </div>
+                    <span className="material-symbols-outlined text-white/40 group-hover:text-accent-cyan text-sm transition-colors">link</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Channel Settings Modal ── */}
+      {editingShowChannel && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setEditingShowChannel(null)} />
+          <div className="relative z-10 w-full max-w-lg glass-card rounded-[2rem] border border-white/10 shadow-2xl p-8 space-y-6 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-headline font-bold text-white">Channel Settings</h3>
+                <p className="text-xs text-white/40 mt-1">Configure automation settings for this connection.</p>
+              </div>
+              <button
+                onClick={() => setEditingShowChannel(null)}
+                className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors material-symbols-outlined text-white text-sm"
+              >
+                close
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveSettings} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-3.5 bg-white/5 rounded-xl border border-white/5">
+                  <label className="text-xs font-semibold text-white/70">Auto-Post Episodes</label>
+                  <input
+                    type="checkbox"
+                    defaultChecked={editingShowChannel.autoPostEpisodes}
+                    name="autoPostEpisodes"
+                    className="w-4 h-4 accent-accent-cyan cursor-pointer"
+                  />
+                </div>
+                <div className="flex items-center justify-between p-3.5 bg-white/5 rounded-xl border border-white/5">
+                  <label className="text-xs font-semibold text-white/70">Auto-Post Scenes</label>
+                  <input
+                    type="checkbox"
+                    defaultChecked={editingShowChannel.autoPostScenes}
+                    name="autoPostScenes"
+                    className="w-4 h-4 accent-accent-cyan cursor-pointer"
+                  />
+                </div>
+                <div className="flex items-center justify-between p-3.5 bg-white/5 rounded-xl border border-white/5">
+                  <label className="text-xs font-semibold text-white/70">Generate Titles</label>
+                  <input
+                    type="checkbox"
+                    defaultChecked={editingShowChannel.autoGenerateTitles}
+                    name="autoGenerateTitles"
+                    className="w-4 h-4 accent-accent-cyan cursor-pointer"
+                  />
+                </div>
+                <div className="flex items-center justify-between p-3.5 bg-white/5 rounded-xl border border-white/5">
+                  <label className="text-xs font-semibold text-white/70">Generate Desc</label>
+                  <input
+                    type="checkbox"
+                    defaultChecked={editingShowChannel.autoGenerateDescriptions}
+                    name="autoGenerateDescriptions"
+                    className="w-4 h-4 accent-accent-cyan cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Publish Delay (Mins)</label>
+                  <input
+                    type="number"
+                    name="defaultPublishDelayMinutes"
+                    defaultValue={editingShowChannel.defaultPublishDelayMinutes}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Preferred Publish Time</label>
+                  <input
+                    type="time"
+                    name="preferredPublishTime"
+                    defaultValue={editingShowChannel.preferredPublishTime || ''}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Title Template</label>
+                <input
+                  type="text"
+                  name="defaultTitleTemplate"
+                  defaultValue={editingShowChannel.defaultTitleTemplate || ''}
+                  placeholder="e.g. {ShowTitle} - {EpisodeTitle}"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Description Template</label>
+                <textarea
+                  name="defaultDescriptionTemplate"
+                  defaultValue={editingShowChannel.defaultDescriptionTemplate || ''}
+                  placeholder="Enter default description template..."
+                  rows={3}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Default Tags</label>
+                <input
+                  type="text"
+                  name="tags"
+                  defaultValue={editingShowChannel.tags || ''}
+                  placeholder="e.g. scifi, cyberpunk, ai"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => handleDisconnectChannel(editingShowChannel.channelId)}
+                  className="px-4 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-semibold text-xs hover:bg-red-500/20 hover:text-red-300 transition-colors border border-red-500/20"
+                >
+                  Unlink Channel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingSettings}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-purple text-white font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_15px_rgba(0,242,255,0.2)] ml-auto"
+                >
+                  {isUpdatingSettings ? 'Saving...' : 'Save Settings'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ── Schedule Asset Modal ── */}
+      {schedulingAsset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setSchedulingAsset(null)} />
+          <div className="relative z-10 w-full max-w-md glass-card rounded-[2rem] border border-white/10 shadow-2xl p-8 space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h3 className="text-xl font-headline font-bold text-white capitalize">Schedule {schedulingAsset.type}</h3>
+                <p className="text-xs text-white/40 mt-1">{schedulingAsset.title}</p>
+              </div>
+              <button
+                onClick={() => setSchedulingAsset(null)}
+                className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors material-symbols-outlined text-white text-sm"
+              >
+                close
+              </button>
+            </div>
+
+            <form onSubmit={handleScheduleAssetSubmit} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Publishing Channel</label>
+                <select
+                  value={selectedScheduleChannelId}
+                  onChange={e => setSelectedScheduleChannelId(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                >
+                  {showChannels.map(sc => {
+                    const channel = channelMap[sc.channelId]
+                    const platformName = channel?.platform !== undefined ? ChannelPlatform[channel.platform] : 'YouTube'
+                    return (
+                      <option key={sc.channelId} value={sc.channelId} className="bg-dashboard-bg text-white">
+                        {channel?.name || 'Channel'} ({platformName})
+                      </option>
+                    )
+                  })}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Date (Optional)</label>
+                  <input
+                    type="date"
+                    name="scheduledDate"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-white/40 block mb-2">Time (Optional)</label>
+                  <input
+                    type="time"
+                    name="scheduledTime"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-accent-cyan transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="text-white/40 text-[10px] leading-relaxed italic">
+                * Note: If Date and Time are not specified, a draft post will be created under the Unscheduled list in your Planner.
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSchedulingEpisode || isSchedulingScene}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-gradient-to-r from-accent-cyan to-accent-purple text-white font-bold text-sm hover:scale-[1.02] active:scale-95 transition-all shadow-[0_0_15px_rgba(0,242,255,0.2)] disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-sm">event_available</span>
+                {isSchedulingEpisode || isSchedulingScene ? 'Processing...' : 'Confirm Schedule'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }

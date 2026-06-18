@@ -10,6 +10,7 @@ using VidiMetrics.Application.DTOs.Copilot;
 using VidiMetrics.Application.DTOs.Core.ChannelPosts;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.DTOs.Core.ChannelStats;
+using VidiMetrics.Application.DTOs.Core.ShowChannels;
 using VidiMetrics.Application.DTOs.Infra.CreditTransactionLedgers;
 using VidiMetrics.Application.DTOs.Infra.Notifications;
 using VidiMetrics.Application.DTOs.Infra.SubscriptionPlans;
@@ -144,6 +145,11 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<AiScript, VidiMetrics.Application.DTOs.Ai.AiScripts.AiScriptResponseDto>();
             CreateMap<ScriptLine, VidiMetrics.Application.DTOs.Ai.AiScripts.ScriptLineResponseDto>();
             CreateMap<VidiMetrics.Application.DTOs.Ai.ScriptLines.ScriptLineDto, ScriptLine>();
+
+
+            CreateMap<UpdateShowChannelSettingsDto, ShowChannel>();
+            CreateMap<ShowChannel, ShowChannelResponseDto>();
+
 
             CreateMap<CreateCopilotChatDto, CopilotChat>();
             CreateMap<CopilotChat, CopilotChatResponseDto>();
