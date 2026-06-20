@@ -1,5 +1,5 @@
 using VidiMetrics.Application.DTOs.Common;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Ai;
 
 namespace VidiMetrics.Application.DTOs.Ai.AiImages;
 

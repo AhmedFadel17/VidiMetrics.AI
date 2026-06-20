@@ -1,7 +1,7 @@
 using System;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.ChannelStats;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.Application.DTOs.Core.Channels
 {

@@ -16,7 +16,8 @@ using VidiMetrics.Application.Interfaces.Infra;
 using VidiMetrics.Application.Providers.ImageProviders;
 using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Ai;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Ai;
 
 namespace VidiMetrics.Application.Services.Ai;

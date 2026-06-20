@@ -14,7 +14,8 @@ using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.Application.Providers.VideoProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Ai;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Ai;
 
 namespace VidiMetrics.Application.Services.Ai;

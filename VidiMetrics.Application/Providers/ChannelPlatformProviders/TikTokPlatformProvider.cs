@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Retry;
 using VidiMetrics.Application.Interfaces;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Settings;
 

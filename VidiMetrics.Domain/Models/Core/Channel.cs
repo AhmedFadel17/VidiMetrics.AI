@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 using VidiMetrics.Domain.Models.Infra;
 
 namespace VidiMetrics.Domain.Models.Core;

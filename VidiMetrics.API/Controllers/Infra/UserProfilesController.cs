@@ -7,7 +7,7 @@ using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Infra.UserProfiles;
 using VidiMetrics.Application.Interfaces.Infra;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Infra;
 
 namespace VidiMetrics.API.Controllers.Infra
 {

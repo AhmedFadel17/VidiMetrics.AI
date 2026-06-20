@@ -7,7 +7,7 @@ using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.Core.Channels;
 using VidiMetrics.Application.Interfaces.Core;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.API.Controllers.Core
 {

@@ -1,5 +1,5 @@
 using System;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.StoryEngine;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Shows
 {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 using VidiMetrics.Application.Hubs;
 using VidiMetrics.DataAccess.Repositories;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Infra;
 
 

@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.API.Filters;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Infra;
 
 namespace VidiMetrics.API.Controllers
 {

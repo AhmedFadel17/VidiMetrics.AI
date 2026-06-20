@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.StoryEngine;
 using VidiMetrics.Domain.Models.Ai;
 using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;

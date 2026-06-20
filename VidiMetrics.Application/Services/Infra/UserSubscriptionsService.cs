@@ -15,7 +15,7 @@ using VidiMetrics.DataAccess.Repositories.Infra.SubscriptionPlans;
 using VidiMetrics.DataAccess.Repositories.Infra.UserCreditWallets;
 using VidiMetrics.DataAccess.Repositories.Infra.UserProfiles;
 using VidiMetrics.DataAccess.Repositories.Infra.UserSubscriptions;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Settings;
 

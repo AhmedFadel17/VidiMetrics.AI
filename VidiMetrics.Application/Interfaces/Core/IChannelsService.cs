@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using VidiMetrics.Application.DTOs.Core.Channels;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.Application.Interfaces.Core;
 

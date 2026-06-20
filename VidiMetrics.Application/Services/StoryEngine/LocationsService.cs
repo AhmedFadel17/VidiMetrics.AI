@@ -13,7 +13,8 @@ using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Locations;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Ai;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine;

@@ -1,17 +1,6 @@
 import { ChannelPlatform, ChannelPostStatus } from "../enums";
 import { BaseEntity } from "./base";
 
-// ─── Video (abstract base) ───────────────────────────────────────────────────
-export interface Video extends BaseEntity {
-  title: string;
-  description?: string;
-  duration: string;
-  thumbnailUrl?: string;
-  currentRank: number;
-  lastRankCheck?: string;
-  channelId: string;
-}
-
 
 // ─── Channel ──────────────────────────────────────────────────────────────────
 export interface Channel extends BaseEntity {

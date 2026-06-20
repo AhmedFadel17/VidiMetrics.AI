@@ -3,7 +3,6 @@ using VidiMetrics.Domain.Models.Ai;
 using VidiMetrics.Domain.Models.Copilot;
 using VidiMetrics.Domain.Models.Core;
 using VidiMetrics.Domain.Models.Infra;
-using VidiMetrics.Domain.Models.Seo;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.DataAccess.Data
@@ -15,7 +14,6 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<ChannelPost> ChannelPosts { get; set; }
         public DbSet<ChannelStat> ChannelStats { get; set; }
         public DbSet<ShowChannel> ShowChannels { get; set; }
-        public DbSet<Video> Videos { get; set; }
 
         // Copilot
         public DbSet<CopilotChat> CopilotChats { get; set; }
@@ -23,12 +21,9 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<CopilotDraft> CopilotDrafts { get; set; }
 
         // Ai
-        public DbSet<AiPromptTemplate> AiPromptTemplates { get; set; }
-        public DbSet<AiTask> AiTasks { get; set; }
         public DbSet<AiImage> AiImages { get; set; }
         public DbSet<AiScript> AiScripts { get; set; }
         public DbSet<AiVideo> AiVideos { get; set; }
-        public DbSet<Transcript> Transcripts { get; set; }
 
         // Infra
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
@@ -38,14 +33,6 @@ namespace VidiMetrics.DataAccess.Data
         public DbSet<CreditCostRule> CreditCostRules { get; set; }
         public DbSet<CreditTransactionLedger> CreditTransactionLedgers { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-
-
-        // Seo
-        public DbSet<CompetitorVideo> CompetitorVideos { get; set; }
-        public DbSet<Keyword> Keywords { get; set; }
-        public DbSet<KeywordRanking> KeywordRankings { get; set; }
-        public DbSet<SeoAudit> SeoAudits { get; set; }
-        public DbSet<VideoTag> VideoTags { get; set; }
 
         // StoryEngine
         public DbSet<Character> Characters { get; set; }

@@ -4,7 +4,7 @@ using VidiMetrics.DataAccess.Repositories.Infra.CreditCostRules;
 
 using VidiMetrics.DataAccess.Repositories.Infra.CreditTransactionLedgers;
 using VidiMetrics.DataAccess.Repositories.Infra.UserCreditWallets;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Infra;
 
 namespace VidiMetrics.Application.Services.Infra;

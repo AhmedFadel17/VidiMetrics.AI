@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using VidiMetrics.Application.Interfaces.Core;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.API.Controllers.Core;
 

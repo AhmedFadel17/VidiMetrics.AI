@@ -1,4 +1,4 @@
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Ai;
 
 using VidiMetrics.Domain.Models.StoryEngine;
 

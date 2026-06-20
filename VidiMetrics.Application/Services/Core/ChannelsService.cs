@@ -10,7 +10,8 @@ using VidiMetrics.Application.Interfaces.Core;
 using VidiMetrics.Application.Providers.ChannelPlatformProviders;
 using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.Core.Channels;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Core;
 
 namespace VidiMetrics.Application.Services.Core

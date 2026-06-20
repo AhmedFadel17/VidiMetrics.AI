@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.DataAccess.Data;
-using VidiMetrics.Domain.Enums; // 🌟 Added for CreditActionType
+using VidiMetrics.Domain.Enums.Infra;
 using VidiMetrics.Domain.Models.Infra;
 using VidiMetrics.Domain.Settings;
 

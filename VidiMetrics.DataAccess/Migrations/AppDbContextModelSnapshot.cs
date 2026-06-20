@@ -68,47 +68,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.ToTable("AiImages");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiPromptTemplate", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ModelTarget")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SystemPrompt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("Temperature")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserPromptTemplate")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AiPromptTemplates");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiScript", b =>
                 {
                     b.Property<Guid>("Id")
@@ -153,50 +112,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("AiScripts");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiTask", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("InputData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OutputData")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TaskType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VideoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VideoId");
-
-                    b.ToTable("AiTasks");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiVideo", b =>
@@ -291,49 +206,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.HasIndex("CharacterId");
 
                     b.ToTable("ScriptLine");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.Transcript", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CleanedText")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LanguageCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RawText")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TimestampsJson")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VideoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VideoId");
-
-                    b.ToTable("Transcripts");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.VoiceProfile", b =>
@@ -760,53 +632,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.ToTable("ShowChannels");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Video", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ChannelId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CurrentRank")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<TimeSpan>("Duration")
-                        .HasColumnType("time");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastRankCheck")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ThumbnailUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChannelId");
-
-                    b.ToTable("Videos");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.CreditCostRule", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1063,196 +888,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSubscriptions");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.CompetitorVideo", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ChannelName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CurrentRank")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("TargetKeywordId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("YouTubeVideoId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TargetKeywordId");
-
-                    b.ToTable("CompetitorVideos");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.Keyword", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<double>("CompetitionScore")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("MonthlySearchVolume")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Text")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VideoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VideoId");
-
-                    b.ToTable("Keywords");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.KeywordRanking", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CapturedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("KeywordId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Rank")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("KeywordId");
-
-                    b.ToTable("KeywordRankings");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.SeoAudit", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CriticalIssues")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("HasClosedCaptions")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDescriptionOptimized")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsTitleOptimized")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OptimizationSuggestions")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("OverallScore")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VideoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VideoId");
-
-                    b.ToTable("SeoAudits");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.VideoTag", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("RelevanceScore")
-                        .HasColumnType("float");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VideoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("VideoId");
-
-                    b.ToTable("VideoTags");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Character", b =>
@@ -1537,17 +1172,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("Location");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.AiTask", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Video");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.ScriptLine", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.Ai.AiScript", "AiScript")
@@ -1563,17 +1187,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("AiScript");
 
                     b.Navigation("Character");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Ai.Transcript", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.Copilot.CopilotDraft", b =>
@@ -1656,17 +1269,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("Show");
                 });
 
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Core.Video", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Channel", "Channel")
-                        .WithMany()
-                        .HasForeignKey("ChannelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Channel");
-                });
-
             modelBuilder.Entity("VidiMetrics.Domain.Models.Infra.CreditTransactionLedger", b =>
                 {
                     b.HasOne("VidiMetrics.Domain.Models.Infra.UserProfile", "UserProfile")
@@ -1723,61 +1325,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("SubscriptionPlan");
 
                     b.Navigation("UserProfile");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.CompetitorVideo", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Seo.Keyword", "TargetKeyword")
-                        .WithMany()
-                        .HasForeignKey("TargetKeywordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TargetKeyword");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.Keyword", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Video");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.KeywordRanking", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Seo.Keyword", "Keyword")
-                        .WithMany("Rankings")
-                        .HasForeignKey("KeywordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Keyword");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.SeoAudit", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Video");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.VideoTag", b =>
-                {
-                    b.HasOne("VidiMetrics.Domain.Models.Core.Video", "Video")
-                        .WithMany()
-                        .HasForeignKey("VideoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Character", b =>
@@ -1941,11 +1488,6 @@ namespace VidiMetrics.DataAccess.Migrations
                     b.Navigation("Notifications");
 
                     b.Navigation("SubscriptionHistory");
-                });
-
-            modelBuilder.Entity("VidiMetrics.Domain.Models.Seo.Keyword", b =>
-                {
-                    b.Navigation("Rankings");
                 });
 
             modelBuilder.Entity("VidiMetrics.Domain.Models.StoryEngine.Character", b =>

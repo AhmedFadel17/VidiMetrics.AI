@@ -1,5 +1,5 @@
 import { BaseEntity } from "./base";
-import { AiTaskStatus, ModelTarget, ScriptLineType, AssetType } from "../enums";
+import { ScriptLineType, AssetType } from "../enums";
 import { Location } from "./storyEngine";
 
 // ─── AiImage ──────────────────────────────────────────────────────────────────
@@ -34,25 +34,6 @@ export interface ScriptLine extends BaseEntity {
   aiScriptId: string;
 }
 
-// ─── AiPromptTemplate ────────────────────────────────────────────────────────
-export interface AiPromptTemplate extends BaseEntity {
-  name: string;
-  systemPrompt: string;
-  userPromptTemplate: string;
-  modelTarget: ModelTarget;
-  temperature: number;
-}
-
-// ─── AiTask ───────────────────────────────────────────────────────────────────
-export interface AiTask extends BaseEntity {
-  taskType: string;
-  status: AiTaskStatus;
-  inputData?: string;
-  outputData?: string;
-  errorMessage?: string;
-  videoId: string;
-}
-
 // ─── AiVideo ──────────────────────────────────────────────────────────────────
 export interface AiVideo extends BaseEntity {
   videoUrl: string;
@@ -65,16 +46,7 @@ export interface AiVideo extends BaseEntity {
   userId: string;
 }
 
-// ─── Transcript ───────────────────────────────────────────────────────────────
-export interface Transcript extends BaseEntity {
-  rawText: string;
-  cleanedText: string;
-  languageCode: string;
-  timestampsJson?: string;
-  videoId: string;
-}
-
-
+// ─── MediaStats ───────────────────────────────────────────────────────────────
 export interface MediaStats {
   totalVideos: number;
   totalScripts: number;

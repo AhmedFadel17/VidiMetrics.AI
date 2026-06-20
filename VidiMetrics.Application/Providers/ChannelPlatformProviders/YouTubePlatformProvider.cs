@@ -12,7 +12,7 @@ using Google.Apis.YouTube.v3;
 using Google.Apis.YouTube.v3.Data;
 using Microsoft.Extensions.Options;
 using VidiMetrics.Application.Interfaces;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 using VidiMetrics.Domain.Settings;
 using CoreModels = VidiMetrics.Domain.Models.Core;
 

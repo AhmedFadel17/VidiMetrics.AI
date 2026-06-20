@@ -52,7 +52,6 @@ export interface Scene extends BaseEntity {
   aiVideoId?: string;
   aiVideo?: AiVideo;
   characters?: Character[];
-  // Display fields (populated from aiScript or directly for Copilot card rendering)
   visualPrompt?: string;
   script?: string;
 }

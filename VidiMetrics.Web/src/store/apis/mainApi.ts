@@ -33,10 +33,7 @@ export const mainApi = createApi({
     'ChannelPost',
     'ShowChannel',
     // Ai
-    'AiTask',
-    'AiPromptTemplate',
     'AiVideo',
-    'Transcript',
     'AiImage',
     'AiScript',
     'Media',
@@ -44,12 +41,7 @@ export const mainApi = createApi({
     'CopilotChat',
     'CopilotMessage',
     'CopilotDraft',
-    // Seo
-    'Keyword',
-    'KeywordRanking',
-    'CompetitorVideo',
-    'SeoAudit',
-    'VideoTag',
+
   ],
   endpoints: () => ({}),
 });

@@ -1,4 +1,4 @@
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 using VidiMetrics.Domain.Models.Core;
 
 namespace VidiMetrics.Application.Providers.ChannelPlatformProviders;

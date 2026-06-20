@@ -1,5 +1,5 @@
 using System;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Core;
 
 namespace VidiMetrics.Application.DTOs.Core.Channels
 {

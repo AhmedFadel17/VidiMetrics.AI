@@ -1,5 +1,5 @@
 using System;
-using VidiMetrics.Domain.Enums;
+using VidiMetrics.Domain.Enums.Infra;
 
 namespace VidiMetrics.Application.DTOs.Infra.CreditTransactionLedgers
 {

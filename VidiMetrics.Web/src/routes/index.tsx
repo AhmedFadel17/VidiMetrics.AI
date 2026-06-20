@@ -139,6 +139,11 @@ export const AppUserRoutes: AppRoute[] = [
     element: <SocialLinksPage />,
   },
   {
+    path: "/dashboard/social-links/:id",
+    label: "Social Links",
+    element: <SocialLinksPage />,
+  },
+  {
     path: "/dashboard/account",
     label: "Account",
     element: <AccountPage />,
