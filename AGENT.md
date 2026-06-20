@@ -16,19 +16,19 @@ The system follows **Clean Architecture** principles coupled with decoupled serv
 
 ```mermaid
 graph TD
-    subgraph Core Application Ecosystem [Clean Architecture API]
+    subgraph API_Ecosystem [Core Application API]
         API[VidiMetrics.API] --> Application[VidiMetrics.Application]
         Application --> Domain[VidiMetrics.Domain]
         DataAccess[VidiMetrics.DataAccess] --> Domain
-        API --> DataAccess
+        DataAccess -->|Implements Repositories / Interfaces| Application
     end
 
-    subgraph Security Layer [Independent Auth Authority]
+    subgraph Security_Ecosystem [Independent Auth Authority]
         IdentityServer[VidiMetrics.IdentityServer] --> IdentityDB[(Isolated Identity DB)]
     end
 
-    %% Communication Flow
-    API -.->|Validates Tokens Via JWT/OIDC| IdentityServer
+    %% Runtime Token Validation
+    API -.->|Bearer Token Verification| IdentityServer
 ```
 
 ### 1. Clean Architecture Boundaries
