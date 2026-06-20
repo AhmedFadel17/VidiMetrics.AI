@@ -1,7 +1,12 @@
-# 🎬 VidiMetrics.AI - Full-Stack Developer Guide
+# 🎬 VidiMetrics.AI - Full-Stack Project Documentation & Guide
 
-Welcome to the **VidiMetrics.AI** developer guide. This repository contains the unified codebase for the VidiMetrics platform, integrating AI-enhanced storyboard orchestration, content workflows, and video metrics analytics.
+Welcome to the comprehensive system manual for the **VidiMetrics.AI** ecosystem. This unified repository powers an intelligent, multi-tenant digital production studio and content distribution pipeline. It automates generative AI media workflows, script orchestration, full-stack subscriber accounting, and immediate semantic syndication across major global visual networks.
 
+---
+
+## 🚀 1. Ecosystem Overview & Architecture
+
+VidiMetrics.AI bridges the gap between raw Generative AI frameworks and practical content management. Rather than interacting with disjointed image, text, and video models via disjointed browser tabs, creators use VidiMetrics as a centralized command center to script, generate, schedule, and measure automated episodic intellectual properties.
 ---
 ### 💼 1.1 Commercial Business & Monetization Engine
 The platform implements a predictable consumption-based **SaaS Subscription Matrix** augmented by a transactional **Cryptographic Credit Ledger** to support granular pay-as-you-go high-performance processing:
