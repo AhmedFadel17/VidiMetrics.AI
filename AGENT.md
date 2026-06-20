@@ -14,6 +14,7 @@ Always follow the architectural boundaries, coding rules, and conventions detail
 
 The system follows **Clean Architecture** principles coupled with decoupled services and repository patterns.
 
+```mermaid
 graph TD
     subgraph Core Application Ecosystem [Clean Architecture API]
         API[VidiMetrics.API] --> Application[VidiMetrics.Application]
@@ -28,6 +29,7 @@ graph TD
 
     %% Communication Flow
     API -.->|Validates Tokens Via JWT/OIDC| IdentityServer
+```
 
 ### 1. Clean Architecture Boundaries
 - **Domain Layer (`VidiMetrics.Domain`)**: Contains pure domain entities, custom enums, and configuration settings (e.g., `IdentityServerSettings`, `ApisSettings`). No dependencies on external frameworks or database logic.
