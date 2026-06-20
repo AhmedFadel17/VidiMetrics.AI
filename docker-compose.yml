@@ -1,0 +1,116 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: vidimetrics-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=VidiMetricsPass123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "VidiMetricsPass123!", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - vidimetrics-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: vidimetrics-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    networks:
+      - vidimetrics-net
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: vidimetrics-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - vidimetrics-net
+
+  vidimetrics-identity:
+    build:
+      context: .
+      dockerfile: VidiMetrics.IdentityServer/Dockerfile
+    container_name: vidimetrics-identity
+    ports:
+      - "5145:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsIdentityServerDb;User Id=sa;Password=VidiMetricsPass123!;TrustServerCertificate=True;
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - vidimetrics-net
+
+  vidimetrics-api:
+    build:
+      context: .
+      dockerfile: VidiMetrics.API/Dockerfile
+    container_name: vidimetrics-api
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsDb;User Id=sa;Password=VidiMetricsPass123!;TrustServerCertificate=True;
+      - ConnectionStrings__RedisConnection=redis:6379
+      - IdentityServerSettings__BaseUrl=http://localhost:5145
+      - FrontendSettings__BaseUrl=http://localhost:5173
+      - RabbitMQ__Host=rabbitmq
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    extra_hosts:
+      - "localhost:host-gateway"
+    networks:
+      - vidimetrics-net
+
+  vidimetrics-web:
+    build:
+      context: ./VidiMetrics.Web
+      dockerfile: Dockerfile
+    container_name: vidimetrics-web
+    ports:
+      - "5173:80"
+    depends_on:
+      - vidimetrics-api
+    networks:
+      - vidimetrics-net
+
+volumes:
+  sql-data:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  vidimetrics-net:
+    driver: bridge
