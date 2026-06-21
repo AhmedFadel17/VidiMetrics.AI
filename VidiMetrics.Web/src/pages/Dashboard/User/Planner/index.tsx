@@ -10,7 +10,6 @@ import type {
   EventContentArg,
   EventInput,
 } from '@fullcalendar/core'
-import { useNavigate } from 'react-router-dom'
 import '@/css/Planner.css'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -83,7 +82,7 @@ const VIEW_LABELS: Record<string, string> = {
 const mapPostToEvent = (post: ChannelPost, channelMap: Record<string, Channel>): PlannerEvent => {
   const channel = channelMap[post.channelId];
   const platformName = channel?.platform !== undefined ? ChannelPlatform[channel.platform] : 'YouTube';
-  
+
   let status: 'live' | 'scheduled' | 'draft' | 'processing' | 'failed' = 'draft';
   if (post.status === ChannelPostStatus.Published) {
     status = 'live';
@@ -174,7 +173,6 @@ function EventCard({ info }: { info: EventContentArg }) {
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export default function Planner() {
-  const navigate = useNavigate()
   const calendarRef = useRef<FullCalendar>(null)
   const draggableContainerRef = useRef<HTMLDivElement>(null)
 
@@ -562,7 +560,7 @@ export default function Planner() {
               drop={(info) => {
                 handleExternalDrop({
                   dateStr: info.dateStr,
-                  draggedEl: info.dragEl,
+                  draggedEl: info.draggedEl,
                   event: {},
                 })
               }}
@@ -812,7 +810,7 @@ export default function Planner() {
                     {isPublishing ? 'Publishing...' : 'Publish Now'}
                   </button>
                 )}
-                
+
                 <button
                   onClick={handleDeletePost}
                   className="px-4 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-semibold text-xs hover:text-red-300 hover:bg-red-500/25 transition-all border border-red-500/20"

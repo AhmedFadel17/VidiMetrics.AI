@@ -15,7 +15,7 @@ export default function LinkStatusBox({ assetType }: { assetType: AssetType }) {
             icon = "person"
             text = "Linked to Character"
             break;
-        case AssetType.Environment:
+        case AssetType.Location:
             color = "green-500/10"
             icon = "landscape"
             text = "Linked to Environment"

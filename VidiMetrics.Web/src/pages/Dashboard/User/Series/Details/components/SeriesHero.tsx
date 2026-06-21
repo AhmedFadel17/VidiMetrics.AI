@@ -1,4 +1,4 @@
-import { SeriesStatusBadge } from '@/components/ui/Badges/seriesStatusBadge';
+import { SeriesStatusBadge } from '@/components/ui/Badges/SeriesStatusBadge';
 import { Show } from '@/types/models/storyEngine';
 import { formatDate } from '@/utils/dateFormatter';
 

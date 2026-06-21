@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useGetShowByIdQuery, useGetEpisodeByIdQuery } from '@/store/apis'
 import { useGetCharactersLookupQuery } from '@/store/apis/storyEngine/characters.api'
@@ -14,7 +14,6 @@ import StepVideoPreview from './steps/StepVideoPreview'
 
 export default function SceneSetup() {
   const { showId, episodeId } = useParams<{ showId: string; episodeId: string }>()
-  const navigate = useNavigate()
 
   // Master Step Orchestrator State
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1)
@@ -24,7 +23,7 @@ export default function SceneSetup() {
   const [visualPrompt, setVisualPrompt] = useState<string>('')
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([])
   const [selectedLocationId, setSelectedLocationId] = useState<string>('')
-  const [scriptLines, setScriptLines] = useState<ScriptLine[]>([])
+  const scriptLines = [] as ScriptLine[];
 
   // Step 2 to Step 3 Shared State
   const [videoId, setVideoId] = useState<string>('')

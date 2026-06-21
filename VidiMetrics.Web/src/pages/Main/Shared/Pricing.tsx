@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button';
+import { PricingPlan } from '@/types/pricing';
 
 const plans: PricingPlan[] = [
     {

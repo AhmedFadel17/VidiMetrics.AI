@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,17 +15,10 @@ const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   visualDescription: z.string().min(10, 'Description must be detailed'),
   atmosphere: z.string().min(5, 'Atmosphere must be specified'),
-  aiImageId: z.string().min(1, 'Please generate an image first'),
+  aiImageId: z.string().optional(),
   referenceImageUrl: z.string().url().optional(),
 })
 
-
-// ─── Framer Motion variants ───────────────────────────────────────────────────
-const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
-  center: { x: 0, opacity: 1, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } },
-  exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0, transition: { duration: 0.25 } }),
-}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function LocationSetup() {
@@ -45,13 +37,13 @@ export default function LocationSetup() {
       name: '',
       visualDescription: '',
       atmosphere: '',
-      aiImageId: '',
-      referenceImageUrl: '',
+      aiImageId: null as any,
+      referenceImageUrl: null as any,
     },
     mode: 'onChange',
   })
 
-  const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = form
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form
 
   const locationName = watch('name')
   const visualDescription = watch('visualDescription')

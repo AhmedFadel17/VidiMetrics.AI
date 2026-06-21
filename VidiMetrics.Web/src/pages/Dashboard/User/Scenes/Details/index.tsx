@@ -2,8 +2,7 @@ import { useState } from 'react'
 import SceneHero from './components/SceneHero'
 import SceneInfoTab from './components/SceneInfoTab'
 import OverviewTab from './components/OverviewTab'
-import CharactersTab from '../../Shared/components/Tabs/CharactersTab'
-import LocationsTab from '../../Shared/components/Tabs/LocationsTab'
+
 
 export default function SceneDetails() {
     type TabType = 'Overview' | "Info" | 'Characters' | 'Locations'

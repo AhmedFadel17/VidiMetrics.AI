@@ -8,10 +8,7 @@ export interface AiVideoFilterDto extends PaginationFilter {
 }
 
 export interface CreateSceneVideoDto {
-  scenePrompt: string;
-  weather: string;
-  environmentName: string;
-  mood: string;
+  scriptId: string;
 }
 
 export interface UpdateAiVideoDto {

@@ -9,7 +9,7 @@ export interface CreateCharacterRequest {
   personalityTraits: string;
   role: string;
   voiceProfileId?: string;
-  aiImageId: string;
+  aiImageId?: string;
   showId: string;
 }
 

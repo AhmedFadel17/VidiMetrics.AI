@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { toast } from 'sonner'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, Variants } from 'framer-motion'
 import { useCreateCharacterMutation } from '@/store/apis/storyEngine/characters.api'
 import { useGetShowByIdQuery } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
@@ -38,11 +38,27 @@ const STEPS = [
 ]
 
 // ─── Framer Motion variants ───────────────────────────────────────────────────
-const slideVariants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 80 : -80, opacity: 0 }),
-  center: { x: 0, opacity: 1, transition: { duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] } },
-  exit: (dir: number) => ({ x: dir > 0 ? -80 : 80, opacity: 0, transition: { duration: 0.25 } }),
-}
+const getSlideVariants = (dir: number): Variants => ({
+  enter: {
+    x: dir > 0 ? 80 : -80,
+    opacity: 0,
+  },
+  center: {
+    x: 0,
+    opacity: 1,
+    transition: {
+      duration: 0.35,
+      ease: [0.25, 0.46, 0.45, 0.94],
+    },
+  },
+  exit: {
+    x: dir > 0 ? -80 : 80,
+    opacity: 0,
+    transition: {
+      duration: 0.25,
+    },
+  },
+});
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function CharacterSetup() {
@@ -220,8 +236,7 @@ export default function CharacterSetup() {
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentStep}
-                custom={direction}
-                variants={slideVariants}
+                variants={getSlideVariants(direction)}
                 initial="enter"
                 animate="center"
                 exit="exit"

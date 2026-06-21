@@ -2,7 +2,6 @@ import { useGetCharacterByIdQuery, useGetShowByIdQuery, useDeleteCharacterMutati
 import { useParams, useNavigate } from 'react-router-dom'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens'
-import { toast } from 'sonner'
 import { useState } from 'react'
 import ConfirmationDialog from '@/components/ui/Feedback/ConfirmationDialog'
 import { showToast } from '@/utils/toast'

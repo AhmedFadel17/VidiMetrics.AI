@@ -34,7 +34,6 @@ export default function EpisodeInfoTab({ episode }: EpisodeInfoTabProps) {
                     plotSummary: formData.plotSummary,
                     episodeNumber: formData.episodeNumber,
                     showId: episode.showId,
-                    videoId: episode.videoId || "",
                 }
             }).unwrap();
 
@@ -61,8 +60,8 @@ export default function EpisodeInfoTab({ episode }: EpisodeInfoTabProps) {
                     onClick={isEditing ? handleSave : () => setIsEditing(true)}
                     disabled={isUpdating}
                     className={`px-6 py-2.5 rounded-xl text-xs uppercase tracking-widest font-bold flex items-center gap-2 transition-all duration-300 ${isEditing
-                            ? 'bg-accent-cyan text-on-surface shadow-[0_0_15px_rgba(0,242,255,0.4)]'
-                            : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'
+                        ? 'bg-accent-cyan text-on-surface shadow-[0_0_15px_rgba(0,242,255,0.4)]'
+                        : 'bg-white/5 text-white hover:bg-white/10 border border-white/10'
                         } ${isUpdating ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                     <span className={`material-symbols-outlined text-sm ${isUpdating ? 'animate-spin' : ''}`}>

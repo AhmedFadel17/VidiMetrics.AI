@@ -16,7 +16,7 @@ import {
 import { useGetEpisodesQuery } from '@/store/apis/storyEngine/episodes.api'
 import { useGetScenesQuery } from '@/store/apis/storyEngine/scenes.api'
 import { ChannelPlatform, ChannelPostStatus } from '@/types/enums'
-import { ShowChannel, Channel, ChannelPost } from '@/types/models/core'
+import { ShowChannel, Channel } from '@/types/models/core'
 import { toast } from 'sonner'
 
 interface TimelinesTabProps {
@@ -158,7 +158,7 @@ export default function TimelinesTab({ showId }: TimelinesTabProps) {
     const formData = new FormData(e.currentTarget)
     const date = formData.get('scheduledDate') as string
     const time = formData.get('scheduledTime') as string
-    
+
     let scheduledAt: string | undefined = undefined
     if (date && time) {
       scheduledAt = `${date}T${time}:00`
@@ -239,7 +239,7 @@ export default function TimelinesTab({ showId }: TimelinesTabProps) {
             {showChannels.map(sc => {
               const channel = channelMap[sc.channelId]
               const platformName = channel?.platform !== undefined ? ChannelPlatform[channel.platform] : 'YouTube'
-              
+
               let platformColor = 'border-l-red-500'
               let icon = 'smart_display'
               let iconColor = 'text-red-500'
@@ -307,7 +307,7 @@ export default function TimelinesTab({ showId }: TimelinesTabProps) {
               </h3>
               <p className="text-white/40 text-sm mt-1">Select and schedule episodes or scenes for social media posting.</p>
             </div>
-            
+
             <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
               <button
                 onClick={() => setReelStudioTab('episodes')}
@@ -423,7 +423,7 @@ export default function TimelinesTab({ showId }: TimelinesTabProps) {
                 const scheduledDate = new Date(post.scheduledAt!)
                 const dateLabel = scheduledDate.toLocaleDateString([], { month: 'short', day: 'numeric' })
                 const timeLabel = scheduledDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
-                
+
                 return (
                   <div key={post.id} className="relative group">
                     <div className="absolute -left-11 w-6 h-6 rounded-full bg-dashboard-bg border-2 border-accent-cyan flex items-center justify-center shadow-[0_0_10px_rgba(0,242,255,0.3)]">
@@ -479,7 +479,7 @@ export default function TimelinesTab({ showId }: TimelinesTabProps) {
                 close
               </button>
             </div>
-            
+
             {unlinkedChannels.length === 0 ? (
               <div className="text-center py-6 space-y-3">
                 <span className="material-symbols-outlined text-4xl text-white/20">link_off</span>

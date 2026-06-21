@@ -1,9 +1,6 @@
 import { toast } from 'sonner'
 
-interface ToastOptions {
-  title: string
-  description?: string
-}
+
 
 /**
  * Premium toast utility for VidiMetrics.AI

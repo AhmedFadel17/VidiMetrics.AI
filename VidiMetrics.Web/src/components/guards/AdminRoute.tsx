@@ -5,7 +5,7 @@ const AdminRoute = () => {
   const auth = useAuth();
   const user = auth.user;
 
-  if (!user || user.claims.role !== 'Admin') {
+  if (!user || user?.profile?.role !== 'Admin') {
     // If not admin, redirect to dashboard or home
     return <Navigate to="/dashboard" replace />;
   }

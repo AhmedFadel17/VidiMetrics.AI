@@ -1,6 +1,6 @@
 import DashboardStatCard from "@/components/ui/Cards/DashboardStatCard";
 import { ErrorScreen, LoadingScreen } from "@/components/ui/Feedback/StatusScreens";
-import { useGetCopilotStatsQuery, useGetMyChannelsQuery } from "@/store/apis"
+import { useGetCopilotStatsQuery } from "@/store/apis"
 import { useNavigate } from "react-router-dom";
 
 export default function AICopilotActivityCenter() {

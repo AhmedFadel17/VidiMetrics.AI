@@ -1,12 +1,10 @@
-import { useDeleteAiScriptMutation, useDeleteAiVideoMutation, useGetAiScriptsQuery, useGetAiVideosQuery } from '@/store/apis';
-import { AssetType } from '@/types';
 import { useState } from 'react';
 import Pagination from '@/components/ui/Pagination';
-import VideoCard from './VideoCard';
 import ConfirmationDialog from '@/components/ui/Feedback/ConfirmationDialog'
 import { showToast } from '@/utils/toast'
 import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens';
 import ScriptCard from './ScriptCard';
+import { useGetAiScriptsQuery, useDeleteAiScriptMutation } from '@/store/apis';
 
 
 export default function ScriptsGrid() {

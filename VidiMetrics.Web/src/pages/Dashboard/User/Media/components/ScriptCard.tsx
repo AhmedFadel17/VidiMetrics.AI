@@ -1,6 +1,5 @@
 import { AiScript } from "@/types/models/ai";
 import { formatDate } from "@/utils/dateFormatter";
-import LinkStatusBox from "./LinkStatusBox";
 
 interface ScriptCardProps {
     script: AiScript;
@@ -10,11 +9,11 @@ interface ScriptCardProps {
     handleDownload: (src: string) => void;
 }
 export default function ScriptCard({ script, selected = false, handleDelete, handleDownload }: ScriptCardProps) {
-    const { id, weather, storyEnvironment, scriptLines, createdAt, isLinked } = script;
+    const { id, weather, location, scriptLines, createdAt, isLinked } = script;
     const createdAtRelative = formatDate(createdAt);
 
 
-    const { referenceImageUrl } = storyEnvironment!;
+    const { referenceImageUrl } = location!;
     const linesCount = scriptLines?.length || 0;
     return (
         <div

@@ -20,7 +20,7 @@ export default function ImagesGrid() {
         searchTerm: searchQuery,
         assetType: activeTab
     })
-    const [deleteVideo, { isLoading: isDeleting }] = useDeleteAiImageMutation();
+    const [deleteImage, { isLoading: isDeleting }] = useDeleteAiImageMutation();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const handleDelete = async () => {
@@ -28,10 +28,10 @@ export default function ImagesGrid() {
             return;
         }
         try {
-            await deleteVideo(selectedId).unwrap();
-            showToast.success('Video Deleted', `Video has been removed successfully.`);
+            await deleteImage(selectedId).unwrap();
+            showToast.success('Image Deleted', `Image has been removed successfully.`);
         } catch (error: any) {
-            showToast.error('Deletion Failed', error.data?.message || 'A system error occurred while trying to remove the video.');
+            showToast.error('Deletion Failed', error.data?.message || 'A system error occurred while trying to remove the image.');
         } finally {
             setIsDeleteDialogOpen(false);
         }
@@ -115,10 +115,10 @@ export default function ImagesGrid() {
                                     Characters
                                 </button>
                                 <button
-                                    onClick={() => setActiveTab(AssetType.Environment)}
-                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === AssetType.Environment ? 'bg-surface-container-highest text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
+                                    onClick={() => setActiveTab(AssetType.Location)}
+                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${activeTab === AssetType.Location ? 'bg-surface-container-highest text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
                                 >
-                                    Environments
+                                    Locations
                                 </button>
                                 <button
                                     onClick={() => setActiveTab(AssetType.Unlinked)}

@@ -1,5 +1,5 @@
+import { CharacterFormValues } from '@/types'
 import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from 'react-hook-form'
-import { CharacterFormValues } from '../types'
 import { useCreateCharacterImageMutation } from '@/store/apis/ai/aiImages.api'
 import { toast } from 'sonner'
 

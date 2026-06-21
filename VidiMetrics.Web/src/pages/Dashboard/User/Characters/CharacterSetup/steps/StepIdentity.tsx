@@ -1,5 +1,5 @@
+import { CharacterFormValues } from '@/types'
 import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form'
-import { CharacterFormValues } from '../types'
 
 const IMPORTANCE_OPTIONS = ['Main', 'Supporting', 'Extra']
 

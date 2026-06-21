@@ -1,6 +1,5 @@
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { motion, AnimatePresence } from 'framer-motion'
 
 interface ConfirmationDialogProps {
   isOpen: boolean

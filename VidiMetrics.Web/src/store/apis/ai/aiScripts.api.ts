@@ -1,6 +1,6 @@
 import { mainApi } from '../mainApi';
 import { ApiResponse, PaginationFilter, PaginationResponse } from '@/types/api';
-import { AiScript, ScriptLine } from '@/types/models/ai';
+import { AiScript } from '@/types/models/ai';
 
 export interface AiScriptFilterDto extends PaginationFilter {
   isLinked?: boolean | null;
@@ -8,10 +8,17 @@ export interface AiScriptFilterDto extends PaginationFilter {
 export interface CreateAiScriptDto {
   weather: string;
   environmentDescription: string;
-  visualPrompt: string;
   locationId: string;
   characterIds: string[];
-  scriptLines: ScriptLine[];
+  scriptLines: CreateScriptLine[];
+}
+
+export interface CreateScriptLine {
+  sequence: number;
+  type: number;
+  characterId: string;
+  characterStatus: string;
+  content: string;
 }
 
 export interface UpdateAiScriptDto {

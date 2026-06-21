@@ -31,11 +31,10 @@ export default function EpisodeDetails() {
 
     // Synthesis Form States
     const [transitionType, setTransitionType] = useState('Glitch Zoom');
-    const [narratorVoice, setNarratorVoice] = useState('Cinematic Narrator');
-    const [scenePacing, setScenePacing] = useState(5); // seconds per scene
+    const scenePacing = 5;
     const [backgroundMusic, setBackgroundMusic] = useState('Cyberpunk Synthwave');
     const [aspectRatio, setAspectRatio] = useState('16:9 Landscape');
-    const [enhancements, setEnhancements] = useState<string[]>(['Depth of Field', 'HDR Grading']);
+    const enhancements = ['Depth of Field', 'HDR Grading'];
 
     // Synthesis Process States
     const [isSynthesizing, setIsSynthesizing] = useState(false);
@@ -43,7 +42,6 @@ export default function EpisodeDetails() {
     const [synthesisStatus, setSynthesisStatus] = useState('');
 
     // Creation Workspace Modes & Scene Timeline Ordering
-    const [creationMode, setCreationMode] = useState<'single' | 'scenes'>('single');
     const [orderedScenes, setOrderedScenes] = useState<any[]>([]);
 
     useEffect(() => {
@@ -158,12 +156,6 @@ export default function EpisodeDetails() {
         return "";
     };
 
-    // Toggle toggleEnhancement check state
-    const toggleEnhancement = (name: string) => {
-        setEnhancements(prev =>
-            prev.includes(name) ? prev.filter(item => item !== name) : [...prev, name]
-        );
-    };
 
     // Handle Inline Edit Saving
     const handleSaveDetails = async () => {
@@ -176,7 +168,6 @@ export default function EpisodeDetails() {
                     plotSummary: plotInput,
                     episodeNumber: episode.episodeNumber,
                     showId: episode.showId,
-                    videoId: episode.videoId || ""
                 }
             }).unwrap();
             toast.success('Episode specifications updated.');
@@ -221,7 +212,6 @@ export default function EpisodeDetails() {
                             plotSummary: episode.plotSummary,
                             episodeNumber: episode.episodeNumber,
                             showId: episode.showId,
-                            videoId: "https://assets.mixkit.co/videos/preview/mixkit-futuristic-subway-station-with-neon-lights-43956-large.mp4"
                         }
                     }).unwrap();
                     toast.success('Episode video synthesized successfully!');
@@ -762,7 +752,7 @@ export default function EpisodeDetails() {
                                         </div>
                                         <div className="p-4 flex flex-col gap-2 flex-1 justify-between">
                                             <h4 className="font-label font-bold text-white text-sm group-hover:text-[#ddb7ff] transition-colors line-clamp-1">
-                                                {scene.aiScript?.storyEnvironment?.name || `Sequence Event ${scene.order}`}
+                                                {scene.aiScript?.location?.name || `Sequence Event ${scene.order}`}
                                             </h4>
                                             <p className="text-xs text-white/50 line-clamp-2 leading-relaxed font-body">
                                                 {visualDescription}

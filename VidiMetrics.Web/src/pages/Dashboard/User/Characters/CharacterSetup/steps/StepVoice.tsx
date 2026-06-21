@@ -1,5 +1,5 @@
+import { CharacterFormValues } from '@/types'
 import { UseFormSetValue, UseFormWatch } from 'react-hook-form'
-import { CharacterFormValues } from '../types'
 
 const VOICE_PROFILES = [
   {
@@ -62,16 +62,14 @@ export default function StepVoice({ setValue, watch }: Props) {
             <div
               key={voice.id}
               onClick={() => setValue('voiceProfileId', voice.id)}
-              className={`relative flex items-center gap-5 p-5 rounded-xl border cursor-pointer transition-all duration-300 group ${
-                isSelected
+              className={`relative flex items-center gap-5 p-5 rounded-xl border cursor-pointer transition-all duration-300 group ${isSelected
                   ? `border-white/20 bg-white/5 ${voice.glow}`
                   : 'border-white/10 bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04]'
-              }`}
+                }`}
             >
               {/* Icon */}
-              <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
-                isSelected ? 'bg-white/10' : 'bg-white/5'
-              }`}>
+              <div className={`w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${isSelected ? 'bg-white/10' : 'bg-white/5'
+                }`}>
                 <span className={`material-symbols-outlined text-2xl ${isSelected ? voice.color : 'text-white/30'}`}
                   style={{ fontVariationSettings: "'FILL' 1" }}>
                   {voice.icon}
@@ -103,11 +101,10 @@ export default function StepVoice({ setValue, watch }: Props) {
                   e.stopPropagation()
                   // TODO: wire to actual audio preview
                 }}
-                className={`flex-shrink-0 w-10 h-10 rounded-full border flex items-center justify-center transition-all ${
-                  isSelected
+                className={`flex-shrink-0 w-10 h-10 rounded-full border flex items-center justify-center transition-all ${isSelected
                     ? `border-white/20 text-white hover:bg-white/10 ${voice.glow}`
                     : 'border-white/10 text-white/30 hover:border-white/20 hover:text-white/60'
-                }`}
+                  }`}
                 title="Preview voice"
               >
                 <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
@@ -116,9 +113,8 @@ export default function StepVoice({ setValue, watch }: Props) {
               </button>
 
               {/* Selection indicator */}
-              <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full transition-all duration-300 ${
-                isSelected ? voice.color.replace('text-', 'bg-') : 'bg-transparent'
-              }`} />
+              <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full transition-all duration-300 ${isSelected ? voice.color.replace('text-', 'bg-') : 'bg-transparent'
+                }`} />
             </div>
           )
         })}

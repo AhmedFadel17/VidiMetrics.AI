@@ -1,6 +1,6 @@
 import { useState } from 'react'
+import { CharacterFormValues } from '@/types'
 import { UseFormRegister, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form'
-import { CharacterFormValues } from '../types'
 
 const TRAIT_TAGS = [
   'Stoic', 'Impulsive', 'Analytical', 'Empathetic', 'Ruthless',
@@ -55,9 +55,8 @@ export default function StepPersonality({ register, errors, setValue, watch }: P
             {...register('personalityTraits')}
             rows={5}
             placeholder="Describe their temper, motivations, and internal conflicts..."
-            className={`w-full bg-white/5 border rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-purple/40 focus:border-accent-purple/40 focus:outline-none transition-all font-body resize-none ${
-              errors.personalityTraits ? 'border-red-500/60' : 'border-white/10'
-            }`}
+            className={`w-full bg-white/5 border rounded-xl py-4 pl-12 pr-4 text-white placeholder:text-white/20 focus:ring-2 focus:ring-accent-purple/40 focus:border-accent-purple/40 focus:outline-none transition-all font-body resize-none ${errors.personalityTraits ? 'border-red-500/60' : 'border-white/10'
+              }`}
           />
         </div>
         {errors.personalityTraits && (
@@ -76,11 +75,10 @@ export default function StepPersonality({ register, errors, setValue, watch }: P
               key={trait}
               type="button"
               onClick={() => toggleTrait(trait)}
-              className={`px-4 py-1.5 rounded-full text-xs font-label font-semibold border transition-all duration-200 ${
-                selectedTraits.includes(trait)
+              className={`px-4 py-1.5 rounded-full text-xs font-label font-semibold border transition-all duration-200 ${selectedTraits.includes(trait)
                   ? 'bg-accent-purple/20 border-accent-purple text-accent-purple shadow-[0_0_12px_rgba(138,43,226,0.3)]'
                   : 'bg-white/5 border-white/10 text-white/50 hover:border-accent-purple/40 hover:text-white/80'
-              }`}
+                }`}
             >
               {selectedTraits.includes(trait) && (
                 <span className="mr-1 text-accent-purple">✓</span>

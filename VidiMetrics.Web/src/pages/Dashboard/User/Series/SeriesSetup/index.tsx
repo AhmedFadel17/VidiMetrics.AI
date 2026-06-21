@@ -54,7 +54,7 @@ export default function SeriesSetup() {
     mode: 'onChange',
   })
 
-  const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = form
+  const { register, setValue, watch, formState: { errors } } = form
 
   // ─── Navigation ──────────────────────────────────────────────────────────────
   const goToStep2 = () => {

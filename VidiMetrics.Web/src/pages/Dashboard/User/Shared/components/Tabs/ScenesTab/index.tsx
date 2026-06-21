@@ -45,7 +45,7 @@ export default function ScenesTab({ episodeId, showId }: ScenesTabProps) {
                     </div>
                 ) : (
                     scenes.map((ep, index) => (
-                        <></>
+                        <>{ep.id}----{index}</>
                     ))
                 )}
             </div>

@@ -6,9 +6,9 @@ export type CharacterFormValues = {
     insightLevel: number
     physicalDescription: string
     clothingStyle: string
-    voiceProfileId: string
-    aiImageId: string
-    referenceImageUrl: string
+    voiceProfileId?: string
+    aiImageId?: string
+    referenceImageUrl?: string
 }
 
 export type SeriesFormValues = {
@@ -16,14 +16,14 @@ export type SeriesFormValues = {
     description: string
     visualStyle: string
     targetAudience: string
-    aiImageId: string
-    referenceImageUrl: string
+    aiImageId?: string
+    referenceImageUrl?: string
 }
 
 export type LocationFormValues = {
     name: string
     visualDescription: string
     atmosphere: string
-    aiImageId: string
-    referenceImageUrl: string
+    aiImageId?: string
+    referenceImageUrl?: string
 }
