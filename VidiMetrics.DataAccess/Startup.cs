@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using VidiMetrics.DataAccess.Data;
 using VidiMetrics.DataAccess.Providers.Cashing;
 using VidiMetrics.DataAccess.Repositories;
-
 using VidiMetrics.DataAccess.Repositories.Ai.AiImages;
 using VidiMetrics.DataAccess.Repositories.Ai.AiScripts;
 using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
@@ -26,7 +26,6 @@ using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Locations;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Scenes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
-
 namespace VidiMetrics.DataAccess
 {
     public static class Startup
@@ -35,7 +34,11 @@ namespace VidiMetrics.DataAccess
         {
 
             // Database Context
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                options.ConfigureWarnings(w => w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            });
 
             // Caching
             services.AddStackExchangeRedisCache(options =>

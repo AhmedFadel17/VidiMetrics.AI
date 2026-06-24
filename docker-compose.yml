@@ -10,8 +10,8 @@ services:
     volumes:
       - sql-data:/var/opt/mssql
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "VidiMetricsPass123!", "-Q", "SELECT 1"]
-      interval: 10s
+      test: [ "CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/1433' || exit 1" ]
+      interval: 8s
       timeout: 5s
       retries: 5
       start_period: 15s
@@ -26,7 +26,7 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 3
@@ -42,7 +42,7 @@ services:
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: [ "CMD-SHELL", "rabbitmq-diagnostics check_port_connectivity" ]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -67,6 +67,8 @@ services:
         condition: service_healthy
     networks:
       - vidimetrics-net
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
 
   vidimetrics-api:
     build:
@@ -74,14 +76,21 @@ services:
       dockerfile: VidiMetrics.API/Dockerfile
     container_name: vidimetrics-api
     ports:
-      - "5000:8080"
+      - "7264:8081"
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:8081;http://+:8080
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=VidiMetricsPass123!
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/VidiMetrics.API.pfx
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsDb;User Id=sa;Password=VidiMetricsPass123!;TrustServerCertificate=True;
       - ConnectionStrings__RedisConnection=redis:6379
       - IdentityServerSettings__BaseUrl=http://localhost:5145
       - FrontendSettings__BaseUrl=http://localhost:5173
       - RabbitMQ__Host=rabbitmq
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${USERPROFILE}/.aspnet/https:/home/app/.aspnet/https:ro
     depends_on:
       sqlserver:
         condition: service_healthy

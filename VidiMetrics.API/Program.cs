@@ -13,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 // Add services to the container.
+var apisSettings = new ApisSettings();
+builder.Configuration.GetSection("ApisSettings").Bind(apisSettings);
+builder.Services.AddSingleton(Microsoft.Extensions.Options.Options.Create(apisSettings));
 builder.Services.Configure<ApisSettings>(builder.Configuration.GetSection("ApisSettings"));
 builder.Services.Configure<SubscriptionSettings>(builder.Configuration.GetSection("SubscriptionSettings"));
 
