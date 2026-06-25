@@ -1,6 +1,8 @@
 import Pricing from "../Shared/Pricing";
 import { Button } from '@/components/ui/Button';
-
+import homeStory1 from '@/assets/images/home/home-story-1.png';
+import homeStory2 from '@/assets/images/home/home-story-2.png';
+import homeStory3 from '@/assets/images/home/home-story-3.png';
 
 export default function Home() {
   return (
@@ -84,11 +86,11 @@ export default function Home() {
                   Transform scripts into visual masterpieces. Our AI generates consistent characters, breathtaking scenes, and cohesive episodes in seconds.
                 </p>
                 <div className="flex gap-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex-1 aspect-[4/3] rounded-xl overflow-hidden border border-white/10">
+                  {[homeStory1, homeStory2, homeStory3].map((image, index) => (
+                    <div key={index} className="flex-1 aspect-[4/3] rounded-xl overflow-hidden border border-white/10">
                       <img
                         className="w-full h-full object-cover grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
-                        src={`/src/assets/images/home/home-story-${i}.png`}
+                        src={image}
                         alt="Storyboard sample"
                       />
                     </div>

@@ -1,13 +1,18 @@
 import { footerData } from "@/routes/footer";
+import logo from "@/assets/images/logos/logo.png";
 
 export default function Footer() {
   return (
-    <footer className="w-full pt-20 pb-10 px-8 bg-[#0b1326] border-t border-white/5">
+    <footer className="w-full pt-20 pb-10 px-8 bg-surface-dim border-t border-white/5">
       <div className="max-w-screen-2xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
           <div className="md:col-span-6 space-y-6">
-            <div className="text-primary font-headline font-bold text-2xl tracking-tight">
-              VidiMetrics<span className="text-primary-light">.Ai</span>
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="logo" className='w-10 h-10' />
+              <div className="font-headline font-bold text-2xl tracking-tight">
+                <span className='text-primary-light'>VidiMetrics</span>
+                <span className="text-primary">.Ai</span>
+              </div>
             </div>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs font-body">
               {footerData.description}
