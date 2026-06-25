@@ -4,7 +4,7 @@ services:
     container_name: vidimetrics-sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=VidiMetricsPass123!
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
     ports:
       - "1433:1433"
     volumes:
@@ -58,7 +58,7 @@ services:
       - "5145:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsIdentityServerDb;User Id=sa;Password=VidiMetricsPass123!;TrustServerCertificate=True;
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsIdentityServerDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;
       - RabbitMQ__Host=rabbitmq
     depends_on:
       sqlserver:
@@ -68,7 +68,7 @@ services:
     networks:
       - vidimetrics-net
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets/${IDENTITY_USER_SECRETS_ID}/secrets.json:ro
 
   vidimetrics-api:
     build:
@@ -82,14 +82,48 @@ services:
       - ASPNETCORE_URLS=https://+:8081;http://+:8080
       - ASPNETCORE_Kestrel__Certificates__Default__Password=VidiMetricsPass123!
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/app/.aspnet/https/VidiMetrics.API.pfx
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsDb;User Id=sa;Password=VidiMetricsPass123!;TrustServerCertificate=True;
-      - ConnectionStrings__RedisConnection=redis:6379
-      - IdentityServerSettings__BaseUrl=http://localhost:5145
-      - FrontendSettings__BaseUrl=http://localhost:5173
+
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=VidiMetricsDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;
+      - ConnectionStrings__RedisConnection=vidimetrics-redis:6379
       - RabbitMQ__Host=rabbitmq
+
+      - IdentityServerSettings__BaseUrl=${IdentityServerSettings__BaseUrl}
+      - FrontendSettings__BaseUrl=${FrontendSettings__BaseUrl}
+
+      - IdentityServerSettings__ClientSecret=${IdentityServerSettings__ClientSecret}
+      - IdentityServerSettings__ClientId=${IdentityServerSettings__ClientId}
+
+      - SubscriptionSettings__FreePlan__Id=${SubscriptionSettings__FreePlan__Id}
+      - SubscriptionSettings__FreePlan__Name=${SubscriptionSettings__FreePlan__Name}
+      - SubscriptionSettings__FreePlan__Description=${SubscriptionSettings__FreePlan__Description}
+      - SubscriptionSettings__FreePlan__MonthlyPrice=${SubscriptionSettings__FreePlan__MonthlyPrice}
+      - SubscriptionSettings__FreePlan__MaxChannelsAllowed=${SubscriptionSettings__FreePlan__MaxChannelsAllowed}
+      - SubscriptionSettings__FreePlan__DailyApiQuotaLimit=${SubscriptionSettings__FreePlan__DailyApiQuotaLimit}
+      - SubscriptionSettings__FreePlan__IsActive=${SubscriptionSettings__FreePlan__IsActive}
+
+      - ApisSettings__Youtube__Name=${ApisSettings__Youtube__Name}
+      - ApisSettings__Youtube__ClientId=${ApisSettings__Youtube__ClientId}
+      - ApisSettings__Youtube__ClientSecret=${ApisSettings__Youtube__ClientSecret}
+      - ApisSettings__Youtube__RedirectUri=${ApisSettings__Youtube__RedirectUri}
+      - ApisSettings__Youtube__AuthUrl=${ApisSettings__Youtube__AuthUrl}
+      - ApisSettings__Youtube__BaseUrl=${ApisSettings__Youtube__BaseUrl}
+
+      - ApisSettings__Tiktok__Name=${ApisSettings__Tiktok__Name}
+      - ApisSettings__Tiktok__ClientId=${ApisSettings__Tiktok__ClientId}
+      - ApisSettings__Tiktok__ClientSecret=${ApisSettings__Tiktok__ClientSecret}
+      - ApisSettings__Tiktok__RedirectUri=${ApisSettings__Tiktok__RedirectUri}
+      - ApisSettings__Tiktok__BaseUrl=${ApisSettings__Tiktok__BaseUrl}
+      - ApisSettings__Tiktok__AuthUrl=${ApisSettings__Tiktok__AuthUrl}
+
+      - ApisSettings__Cloudinary__Name=${ApisSettings__Cloudinary__Name}
+      - ApisSettings__Cloudinary__ApiKey=${ApisSettings__Cloudinary__ApiKey}
+      - ApisSettings__Cloudinary__ClientSecret=${ApisSettings__Cloudinary__ClientSecret}
+
+      - ApisSettings__Pollinations__Name=${ApisSettings__Pollinations__Name}
+      - ApisSettings__Pollinations__ApiKey=${ApisSettings__Pollinations__ApiKey}
+      - ApisSettings__Pollinations__BaseUrl=${ApisSettings__Pollinations__BaseUrl}
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets/${API_USER_SECRETS_ID}/secrets.json:ro
       - ${USERPROFILE}/.aspnet/https:/home/app/.aspnet/https:ro
     depends_on:
       sqlserver:
@@ -107,6 +141,13 @@ services:
     build:
       context: ./VidiMetrics.Web
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+        - VITE_API_NGROK_URL=${VITE_API_NGROK_URL}
+        - VITE_IDENTITY_SERVER_URL=${VITE_IDENTITY_SERVER_URL}
+        - VITE_IDENTITY_CLIENT_ID=${VITE_IDENTITY_CLIENT_ID}
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+        - VITE_TIKTOK_CLIENT_KEY=${VITE_TIKTOK_CLIENT_KEY}
     container_name: vidimetrics-web
     ports:
       - "5173:80"
