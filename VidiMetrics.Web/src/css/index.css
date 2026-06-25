@@ -45,19 +45,19 @@
   }
 
   .premium-toast.success {
-    @apply !border-primary/30 !text-on-surface;
+    @apply !border-green-500 !bg-green-100/90 !text-green-700;
   }
 
   .premium-toast.error {
-    @apply !border-error/30 !text-on-surface;
+    @apply !border-red-400 !bg-red-200/90 !text-red-500;
   }
 
   .premium-toast.warning {
-    @apply !border-yellow-500/30 !text-on-surface;
+    @apply !border-yellow-700 !bg-yellow-100/90 !text-yellow-700;
   }
 
   .premium-toast.info {
-    @apply !border-secondary/30 !text-on-surface;
+    @apply !border-gray-400 !bg-gray-100/90 !text-gray-500;
   }
 
   .btn-premium {
