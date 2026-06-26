@@ -1,9 +1,17 @@
-import { Link, useLocation } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SidebarRoutes } from '@/routes/sidebar';
 import { useGetBalanceQuery } from '@/store/apis';
+import logo from '@/assets/images/logos/logo.png';
 
-export default function Sidebar() {
+export default function Sidebar({
+  isCollapsed,
+}: {
+  isCollapsed: boolean;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { data, isLoading, isError } = useGetBalanceQuery();
 
   const wallet = data?.data;
@@ -14,34 +22,46 @@ export default function Sidebar() {
   const fillPercentage = total > 0 ? (remaining / total) * 100 : 0;
 
   return (
-    <aside className="h-screen w-72 fixed left-0 top-0 z-40 bg-dashboard-bg border-r border-white/5 flex flex-col py-8 overflow-y-auto">
+    <aside
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`h-screen fixed left-0 top-0 z-40 bg-dashboard-bg border-r border-white/5 flex flex-col py-8 overflow-y-auto transition-all duration-300 ease-in-out hidden lg:flex
+        ${isCollapsed && !isHovered ? 'w-20' : 'w-72'}`}
+    >
       {/* Logo Section */}
-      <div className="px-8 mb-8">
-        <Link to="/">
-          <h1 className="text-white font-headline font-bold text-2xl tracking-tight flex items-center gap-2">
-            VidiMetrics.Ai
-          </h1>
-        </Link>
+      <div className={`mb-8 transition-all duration-300 ${isCollapsed && !isHovered ? 'px-5' : 'px-8'}`}>
+        <div className="text-2xl font-headline font-bold text-white tracking-tight flex items-center">
+          <div className={`flex items-center gap-2 cursor-pointer ${isCollapsed && !isHovered ? 'justify-center w-full' : ''}`} onClick={() => navigate('/')}>
+            <img src={logo} alt="logo" className='w-10 h-10 flex-shrink-0' />
+            <div className={`flex transition-all duration-300 overflow-hidden ${isCollapsed && !isHovered ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+              <span className='text-primary-light whitespace-nowrap'>VidiMetrics</span>
+              <span className="text-primary whitespace-nowrap">.Ai</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className={`flex-1 space-y-1 transition-all duration-300 ${isCollapsed && !isHovered ? 'px-2' : 'px-4'}`}>
         {SidebarRoutes.map((item) => {
           const isActive = pathname === item.path;
           return (
             <Link
               key={item.path}
               to={item.path}
-              className={`flex items-center gap-4 px-6 py-2 rounded-xl transition-all duration-300 group
+              className={`flex items-center rounded-xl transition-all duration-300 group
+                ${isCollapsed && !isHovered ? 'justify-center px-0 py-3 gap-0' : 'px-6 py-2 gap-4'}
                 ${isActive
                   ? 'bg-accent-purple/10 text-white border border-accent-purple/20 shadow-[0_0_20px_rgba(138,43,226,0.1)]'
                   : 'text-white/40 hover:bg-white/5 hover:text-white/80'}`}
             >
-              <span className={`material-symbols-outlined text-2xl transition-colors ${isActive ? 'text-accent-purple' : 'group-hover:text-white/60'}`}>
+              <span className={`material-symbols-outlined text-2xl transition-colors flex-shrink-0 ${isActive ? 'text-accent-purple' : 'group-hover:text-white/60'}`}>
                 {item.icon}
               </span>
-              <span className="font-bold text-[13px] tracking-wide">{item.label}</span>
-              {isActive && (
+              <span className={`font-bold text-[13px] tracking-wide transition-all duration-300 overflow-hidden ${isCollapsed && !isHovered ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                {item.label}
+              </span>
+              {isActive && !(isCollapsed && !isHovered) && (
                 <div className="ml-auto w-1.5 h-6 bg-accent-purple rounded-full shadow-[0_0_10px_#8a2be2]"></div>
               )}
             </Link>
@@ -50,7 +70,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Credit Wallet Information Box Footer */}
-      <div className="px-4 mt-8 mb-6">
+      <div className={`transition-all duration-300 overflow-hidden ${isCollapsed && !isHovered ? 'opacity-0 scale-95 h-0 my-0 pointer-events-none' : 'px-4 mt-8 mb-6 h-auto opacity-100'}`}>
         <div className="bg-white/[0.02] rounded-3xl p-5 relative overflow-hidden group border border-white/5">
           <div className="absolute top-0 right-0 w-24 h-24 bg-accent-purple/5 blur-3xl -mr-8 -mt-8 group-hover:bg-accent-purple/10 transition-all duration-500"></div>
 
