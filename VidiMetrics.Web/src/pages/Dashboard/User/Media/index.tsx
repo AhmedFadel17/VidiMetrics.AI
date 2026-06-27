@@ -31,22 +31,22 @@ export default function MediaLibrary() {
                     <div className='flex items-center gap-3 flex-wrap mb-3'>
                         {/* ── Tab Navigation ── */}
                         <div>
-                            <div className="flex items-center gap-2 p-1 bg-surface-container-low rounded-full">
+                            <div className="flex items-center gap-2 p-1 bg-surface-container-low rounded-2xl">
                                 <button
                                     onClick={() => setActiveTab('videos')}
-                                    className={`px-10 py-2 rounded-full text-md font-medium transition-all ${activeTab === 'videos' ? 'bg-primary-container shadow-lg' : 'text-on-surface-variant hover:text-on-surface'}`}
+                                    className={`px-10 py-2 rounded-2xl text-md font-medium transition-all ${activeTab === 'videos' ? 'bg-primary-container shadow-lg' : 'text-on-surface-variant hover:text-on-surface'}`}
                                 >
                                     Videos
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('images')}
-                                    className={`px-10 py-2 rounded-full text-md font-medium transition-all flex items-center gap-2 ${activeTab === 'images' ? 'bg-primary-container shadow-lg' : 'text-on-surface-variant hover:text-on-surface'}`}
+                                    className={`px-10 py-2 rounded-2xl text-md font-medium transition-all flex items-center gap-2 ${activeTab === 'images' ? 'bg-primary-container shadow-lg' : 'text-on-surface-variant hover:text-on-surface'}`}
                                 >
                                     Images
                                 </button>
                                 <button
                                     onClick={() => setActiveTab('scripts')}
-                                    className={`px-10 py-2 rounded-full text-md font-medium transition-all ${activeTab === 'scripts' ? 'bg-primary-container shadow-lg' : 'text-on-surface-variant hover:text-on-surface'}`}
+                                    className={`px-10 py-2 rounded-2xl text-md font-medium transition-all ${activeTab === 'scripts' ? 'bg-primary-container shadow-lg' : 'text-on-surface-variant hover:text-on-surface'}`}
                                 >
                                     Scripts
                                 </button>

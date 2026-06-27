@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/Button";
 import InviteCard from "@/components/ui/Cards/InviteCard";
 import { ErrorScreen, LoadingScreen } from "@/components/ui/Feedback/StatusScreens";
 import { useGetUserProfileQuery, useUpdateUserProfileMutation } from "@/store/apis";
@@ -11,14 +12,12 @@ export default function ProfileTab() {
 
   const profile = profileData?.data;
 
-  // Initialize with empty strings to keep inputs controlled from mount state forward
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     bio: "",
   });
 
-  // 🌟 Sync structural data state once the RTK-Query cache resolution updates
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -34,7 +33,6 @@ export default function ProfileTab() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // 🌟 Handles wiping modified form memory back to the database snapshot baseline
   const handleDiscard = () => {
     if (profile) {
       setFormData({
@@ -66,29 +64,28 @@ export default function ProfileTab() {
   if (profileError) return <ErrorScreen title="Profile Error" message="Failed to load profile" />;
 
   return (
-    <div className="grid grid-cols-12 gap-6">
+    <div className="grid grid-cols-12 flex flex-col gap-6">
       <div className="lg:col-span-8 space-y-8">
-        <div className="glass-panel p-8 rounded-3xl space-y-8 border border-white/5 bg-white/[0.01]">
+        <div className="glass-panel p-8 rounded-xl space-y-8 border border-white/5 bg-white/[0.01]">
 
           <div className="flex justify-between items-center">
             <h3 className="text-xl font-display font-bold text-white">
               Personal Information
             </h3>
 
-            {/* Contextual top button toggle */}
             {!isEditing && (
-              <button
+              <Button
+                variant="outline"
                 onClick={() => setIsEditing(true)}
-                className="px-5 py-2 bg-white/5 text-white hover:bg-white/10 border border-white/10 text-xs uppercase tracking-widest font-bold flex items-center gap-2 rounded-xl transition-all"
+                className="flex items-center"
               >
-                <span className="material-symbols-outlined text-sm">edit</span>
+                <span className="material-symbols-outlined text-sm pr-3">edit</span>
                 Edit Details
-              </button>
+              </Button>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Full Name Field */}
             <div className="space-y-2">
               <label className="text-xs font-label uppercase tracking-widest text-white/40 ml-1">
                 Full Name
@@ -127,7 +124,6 @@ export default function ProfileTab() {
               </div>
             </div>
 
-            {/* Bio Field */}
             <div className="md:col-span-2 space-y-2">
               <label className="text-xs font-label uppercase tracking-widest text-white/40 ml-1">
                 Bio
@@ -148,7 +144,6 @@ export default function ProfileTab() {
             </div>
           </div>
 
-          {/* 🌟 Action Interface Panel footer (slides/appears during active session changes) */}
           {isEditing && (
             <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5 animation-fade-in">
               <button
@@ -184,7 +179,6 @@ export default function ProfileTab() {
         </div>
       </div>
 
-      {/* Sidebar Section */}
       <div className="lg:col-span-4 space-y-8">
         <InviteCard />
       </div>

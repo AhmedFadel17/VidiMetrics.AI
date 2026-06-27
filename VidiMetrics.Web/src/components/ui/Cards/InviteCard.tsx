@@ -33,7 +33,7 @@ export default function InviteCard() {
 
     return (
         <div className="lg:col-span-4 space-y-8">
-            <div className="glass-panel p-6 rounded-3xl relative overflow-hidden border border-white/5 bg-gradient-to-br from-accent-purple/[0.05] via-transparent to-transparent shadow-xl">
+            <div className="glass-panel p-6 rounded-xl relative overflow-hidden border border-white/5 bg-gradient-to-br from-accent-purple/[0.05] via-transparent to-transparent shadow-xl">
                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-accent-purple/10 rounded-full blur-2xl pointer-events-none"></div>
 
                 <div className="mb-5">
