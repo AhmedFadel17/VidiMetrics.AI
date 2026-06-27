@@ -152,7 +152,15 @@ namespace VidiMetrics.DataAccess.Repositories
 
         private void EvictCacheEntry(T entity)
         {
-            var idProperty = entity.GetType().GetProperty("Id");
+            var primaryKeyName = _context.Model.FindEntityType(typeof(T))
+                ?.FindPrimaryKey()
+                ?.Properties
+                ?.Select(x => x.Name)
+                ?.FirstOrDefault();
+
+            if (string.IsNullOrEmpty(primaryKeyName)) return;
+
+            var idProperty = entity.GetType().GetProperty(primaryKeyName);
             if (idProperty == null) return;
 
             var idValue = idProperty.GetValue(entity)?.ToString();
