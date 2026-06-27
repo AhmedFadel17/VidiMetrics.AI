@@ -29,7 +29,7 @@ export default function StepVisuals({ register, errors, watch, setValue }: Props
         name: characterName,
         physicalDescription: physicalDesc,
         clothingStyle: clothingStyle,
-        personalityTraits: personalityTraits,
+        personalityTraits: Array.isArray(personalityTraits) ? personalityTraits.join(', ') : (personalityTraits || ''),
         role: characterRole
       }).unwrap()
 

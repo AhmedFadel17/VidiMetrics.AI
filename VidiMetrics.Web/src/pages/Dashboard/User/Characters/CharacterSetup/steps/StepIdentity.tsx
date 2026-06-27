@@ -1,18 +1,19 @@
 import { CharacterFormValues } from '@/types'
-import { UseFormRegister, FieldErrors, UseFormWatch } from 'react-hook-form'
+import { UseFormRegister, FieldErrors } from 'react-hook-form'
+import { CharacterImportance } from '@/types'
 
-const IMPORTANCE_OPTIONS = ['Main', 'Supporting', 'Extra']
+const IMPORTANCE_OPTIONS = [
+  { key: CharacterImportance.Main, label: 'Main' },
+  { key: CharacterImportance.Supporting, label: 'Supporting' },
+  { key: CharacterImportance.Minor, label: 'Minor' }]
 
 interface Props {
   register: UseFormRegister<CharacterFormValues>
   errors: FieldErrors<CharacterFormValues>
-  watch: UseFormWatch<CharacterFormValues>
 }
 
-export default function StepIdentity({ register, errors, watch }: Props) {
-  const name = watch('name')
-  const role = watch('role')
-  const importance = watch('importance')
+export default function StepIdentity({ register, errors }: Props) {
+
   return (
     <div className="space-y-8">
       <div>
@@ -75,32 +76,18 @@ export default function StepIdentity({ register, errors, watch }: Props) {
               star_rate
             </span>
             <select
-              {...register('importance')}
+              {...register('importance', { valueAsNumber: true })}
               className="w-full bg-white/5 border border-white/10 rounded-xl py-4 pl-12 pr-10 text-white focus:ring-2 focus:ring-accent-cyan/40 focus:border-accent-cyan/40 focus:outline-none transition-all font-body appearance-none cursor-pointer"
             >
               {IMPORTANCE_OPTIONS.map((opt) => (
-                <option key={opt} value={opt} className="bg-[#0b1326] text-white">
-                  {opt}
+                <option key={opt.key} value={opt.key} className="bg-[#0b1326] text-white">
+                  {opt.label}
                 </option>
               ))}
             </select>
             <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-white/30 text-xl">
               expand_more
             </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Preview Card */}
-      <div className="mt-4 p-5 rounded-xl border border-white/5 bg-white/[0.03]">
-        <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2 font-label">Identity Preview</p>
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent-cyan/30 to-accent-purple/30 border border-white/10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-white/60">person</span>
-          </div>
-          <div>
-            <p className="text-white font-display font-bold text-lg leading-tight">{name || "Orion Thorne"}</p>
-            <p className="text-accent-cyan text-xs font-label tracking-widest uppercase">{role || "Rogue Specialist"} · {importance || "Main"}</p>
           </div>
         </div>
       </div>

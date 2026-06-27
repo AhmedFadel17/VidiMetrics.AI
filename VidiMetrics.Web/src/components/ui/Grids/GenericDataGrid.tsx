@@ -175,7 +175,7 @@ export function GenericDataGrid<T>({
     return (
         <div className="space-y-6 w-full">
             {(searchOption || filterOptions || sortOption) && (
-                <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#16171d]/80 to-[#0b0c10]/90 border border-white/5 backdrop-blur-xl shadow-lg relative z-30">
+                <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#16171d]/80 to-[#0b0c10]/90 border border-white/5 backdrop-blur-xl shadow-lg relative">
                     <div className="flex-1 max-w-md relative">
                         {searchOption && (
                             <>

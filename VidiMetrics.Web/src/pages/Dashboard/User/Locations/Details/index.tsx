@@ -44,7 +44,7 @@ export default function LocationDetails() {
         <div className="space-y-10 pb-20">
             {/* Top Navigation / Breadcrumbs */}
             <Breadcrumbs items={[
-                { label: 'Home', path: '/' },
+                { label: 'Home', path: '/dashboard' },
                 { label: 'Series Library', path: '/dashboard/series' },
                 { label: show.title, path: `/dashboard/series/${show.id}` },
                 { label: 'Locations', path: `/dashboard/series/${show.id}?tab=Locations` },

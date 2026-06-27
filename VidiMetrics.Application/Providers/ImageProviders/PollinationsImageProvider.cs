@@ -41,7 +41,7 @@ public class PollinationsImageProvider : IImageProvider
             throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
 
         string encodedPrompt = Uri.EscapeDataString(prompt);
-        string targetUrl = $"{_settings.BaseUrl}/image/{encodedPrompt}?seed={seed}&width={width}&height={height}&nologo=true&enhance=true";
+        string targetUrl = $"{_settings.BaseUrl}/image/{encodedPrompt}?model=flux&seed={seed}&width={width}&height={height}&nologo=true&enhance=true";
 
         byte[] imageBytes;
 

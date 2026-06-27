@@ -1,8 +1,10 @@
+import { CharacterImportance } from "./enums"
+
 export type CharacterFormValues = {
     name: string
     role: string
-    importance: 'Main' | 'Supporting' | 'Extra'
-    personalityTraits: string
+    importance: CharacterImportance
+    personalityTraits: string[]
     insightLevel: number
     physicalDescription: string
     clothingStyle: string

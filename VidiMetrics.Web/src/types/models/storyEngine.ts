@@ -1,5 +1,5 @@
 import { BaseEntity } from "./base";
-import { ShowStatus } from "../enums";
+import { CharacterImportance, ShowStatus } from "../enums";
 import { AiScript, AiVideo } from "./ai";
 
 // ─── Show ─────────────────────────────────────────────────────────────────────
@@ -23,7 +23,8 @@ export interface Character extends BaseEntity {
   name: string;
   physicalDescription: string;
   clothingStyle: string;
-  personalityTraits: string;
+  personalityTraits: string[];
+  importance: CharacterImportance;
   role: string;
   insightLevel: number;
   voiceId?: string;

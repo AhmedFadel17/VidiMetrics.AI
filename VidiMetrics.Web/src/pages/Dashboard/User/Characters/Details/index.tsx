@@ -5,6 +5,7 @@ import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScree
 import { useState } from 'react'
 import ConfirmationDialog from '@/components/ui/Feedback/ConfirmationDialog'
 import { showToast } from '@/utils/toast'
+import { CharacterImportance } from '@/types'
 
 export default function CharacterDetails() {
     const { showId, id: characterId } = useParams<{ showId: string, id: string }>();
@@ -21,7 +22,8 @@ export default function CharacterDetails() {
     if (isShowLoading || isCharacterLoading) return <LoadingScreen message="Accessing Character Archives..." accentColor="purple" />
     if (!show || !character) return <ErrorScreen title="Series Connection Lost" message="Unable to retrieve character details for character placement." />
 
-    const traits = character.personalityTraits?.split(',').map(t => t.trim()).filter(Boolean) || [];
+    const traits = character.personalityTraits;
+    const importanceLabel = CharacterImportance[character.importance] ?? "";
     const formattedDate = new Date(character.createdAt).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
@@ -45,7 +47,7 @@ export default function CharacterDetails() {
         <div className="space-y-10 pb-20">
             {/* Top Navigation / Breadcrumbs */}
             <Breadcrumbs items={[
-                { label: 'Home', path: '/' },
+                { label: 'Home', path: '/dashboard/' },
                 { label: 'Series Library', path: '/dashboard/series' },
                 { label: show.title, path: `/dashboard/series/${show.id}` },
                 { label: 'Characters', path: `/dashboard/series/${show.id}?tab=Characters` },
@@ -149,7 +151,7 @@ export default function CharacterDetails() {
                                         <div className="space-y-6">
                                             <div>
                                                 <label className="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold block mb-2">Role in Series</label>
-                                                <p className="text-lg text-on-surface leading-relaxed">{character.role}</p>
+                                                <p className="text-lg text-on-surface leading-relaxed">{importanceLabel + " - " + character.role}</p>
                                             </div>
                                             <div>
                                                 <label className="text-[10px] uppercase tracking-widest text-on-surface-variant/60 font-bold block mb-2">Personality Traits</label>

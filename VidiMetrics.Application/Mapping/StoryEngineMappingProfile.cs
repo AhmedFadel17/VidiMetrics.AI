@@ -32,10 +32,15 @@ namespace VidiMetrics.Application.Mapping
             CreateMap<Location, LocationResponseDto>();
 
             // Characters
-            CreateMap<CreateCharacterDto, Character>();
+            CreateMap<CreateCharacterDto, Character>()
+                .ForMember(dest => dest.TraitsList, opt => opt.MapFrom(src => src.PersonalityTraits))
+                .ForMember(dest => dest.PersonalityTraits, opt => opt.Ignore());
             CreateMap<UpdateCharacterDto, Character>()
+                .ForMember(dest => dest.TraitsList, opt => opt.MapFrom(src => src.PersonalityTraits))
+                .ForMember(dest => dest.PersonalityTraits, opt => opt.Ignore())
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<Character, CharacterResponseDto>();
+            CreateMap<Character, CharacterResponseDto>()
+                .ForMember(dest => dest.PersonalityTraits, opt => opt.MapFrom(src => src.TraitsList));
 
             // Scenes
             CreateMap<CreateSceneDto, Scene>()

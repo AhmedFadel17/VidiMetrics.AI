@@ -9,7 +9,7 @@ import { useCreateCharacterMutation } from '@/store/apis/storyEngine/characters.
 import { useGetShowByIdQuery } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { LoadingScreen, ErrorScreen } from '@/components/ui/Feedback/StatusScreens'
-import { CharacterFormValues } from '@/types'
+import { CharacterFormValues, CharacterImportance } from '@/types'
 import StepIdentity from './steps/StepIdentity'
 import StepPersonality from './steps/StepPersonality'
 import StepVisuals from './steps/StepVisuals'
@@ -19,8 +19,8 @@ import StepVoice from './steps/StepVoice'
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   role: z.string().min(2, 'Role must be defined'),
-  importance: z.enum(['Main', 'Supporting', 'Extra']),
-  personalityTraits: z.string().min(5, 'Personality traits must be specified'),
+  importance: z.nativeEnum(CharacterImportance),
+  personalityTraits: z.array(z.string()).min(3, 'Personality traits must be specified'),
   insightLevel: z.number().min(1).max(100),
   physicalDescription: z.string().min(10, 'Description must be detailed'),
   clothingStyle: z.string().min(5, 'Clothing style must be specified'),
@@ -75,7 +75,8 @@ export default function CharacterSetup() {
   const form = useForm<CharacterFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      importance: 'Main',
+      importance: CharacterImportance.Main,
+      personalityTraits: [],
       insightLevel: 60,
       voiceProfileId: '',
       aiImageId: '',
@@ -242,7 +243,7 @@ export default function CharacterSetup() {
                 exit="exit"
               >
                 {currentStep === 1 && (
-                  <StepIdentity register={register} errors={errors} watch={watch} />
+                  <StepIdentity register={register} errors={errors} />
                 )}
                 {currentStep === 2 && (
                   <StepPersonality register={register} errors={errors} setValue={setValue} watch={watch} />

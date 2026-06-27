@@ -25,7 +25,7 @@ export default function MediaLibrary() {
                     chipText="Media Library"
                     titlePrefix="Media "
                     gradientText="Assets"
-                    description="Manage, download, or link your AI video generations, B-rolls, and scenes."
+                    description="Manage, download, or link your AI generations, B-rolls, and scenes."
                 />
                 <div>
                     <div className='flex items-center gap-3 flex-wrap mb-3'>

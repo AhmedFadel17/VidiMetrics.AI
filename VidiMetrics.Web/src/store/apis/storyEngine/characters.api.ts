@@ -1,3 +1,4 @@
+import { CharacterImportance } from '@/types';
 import { mainApi } from '../mainApi';
 import { ApiResponse, PaginationResponse, PaginationFilter, Lookup } from '@/types/api';
 import { Character } from '@/types/models/storyEngine';
@@ -6,7 +7,8 @@ export interface CreateCharacterRequest {
   name: string;
   physicalDescription: string;
   clothingStyle: string;
-  personalityTraits: string;
+  personalityTraits: string[];
+  importance: CharacterImportance;
   role: string;
   voiceProfileId?: string;
   aiImageId?: string;

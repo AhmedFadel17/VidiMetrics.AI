@@ -115,7 +115,7 @@ export default function LocationSetup() {
       {/* ── Breadcrumbs + header ── */}
       <div className="space-y-3 mb-10">
         <Breadcrumbs items={[
-          { label: 'Home', path: '/' },
+          { label: 'Home', path: '/dashboard' },
           { label: 'Series Library', path: '/dashboard/series' },
           { label: show.title, path: `/dashboard/series/${show.id}` },
           { label: 'Locations', path: `/dashboard/series/${show.id}?tab=Locations` },
