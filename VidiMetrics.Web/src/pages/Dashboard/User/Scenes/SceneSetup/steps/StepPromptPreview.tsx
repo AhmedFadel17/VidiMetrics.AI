@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useCreateSceneVideoMutation } from '@/store/apis/ai/aiVideos.api'
+import { InputField } from '@/components/ui/Inputs/InputField'
 
 interface StepPromptPreviewProps {
   scriptId: string
@@ -9,12 +10,11 @@ interface StepPromptPreviewProps {
   environmentAtmosphere?: string
   castNames: string[]
   onBack: () => void
-  onNext: (videoId: string, mood: string, order: number) => void
+  onNext: (videoId: string, sceneName: string, order: number) => void
   initialOrder?: number
-  initialMood?: string
+  initialSceneName?: string
 }
 
-const MOODS = ['CYBER-NOIR', 'NEON-RETRO', 'BIO-GLITCH', 'VOID-SILENCE', 'TECHNO-DREAM', 'DUST-WAVE']
 
 export default function StepPromptPreview({
   scriptId,
@@ -25,12 +25,12 @@ export default function StepPromptPreview({
   onBack,
   onNext,
   initialOrder = 1,
-  initialMood = 'CYBER-NOIR',
+  initialSceneName = 'Scene',
 }: StepPromptPreviewProps) {
   const [createSceneVideo, { isLoading: isCreatingVideo }] = useCreateSceneVideoMutation()
 
   const [order, setOrder] = useState<number>(initialOrder)
-  const [selectedMood, setSelectedMood] = useState<string>(initialMood)
+  const [selectedSceneName, setSelectedSceneName] = useState<string>(initialSceneName)
 
   const handleGenerateVideo = async () => {
     try {
@@ -42,7 +42,7 @@ export default function StepPromptPreview({
         toast.success('Video Pipeline Triggered', {
           description: 'Neural render engine accepted script parameters. Generating video frame buffer...',
         })
-        onNext(response.data.id, selectedMood, order)
+        onNext(response.data.id, selectedSceneName, order)
       }
     } catch (err: any) {
       toast.error('Video Generation Failed', {
@@ -72,55 +72,9 @@ export default function StepPromptPreview({
           </div>
         </section>
 
-        {/* Mood selection config */}
-        <section className="glass-panel ghost-border rounded-lg p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="material-symbols-outlined text-secondary">palette</span>
-            <h2 className="font-headline text-xl font-bold uppercase tracking-widest text-white">Cinematic Color Palette</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {MOODS.map(m => (
-              <label
-                key={m}
-                className={`relative flex items-center justify-between p-4 rounded-lg ghost-border cursor-pointer transition-all ${selectedMood === m
-                  ? 'bg-secondary/20 border-secondary text-white shadow-[0_0_15px_rgba(221,183,255,0.15)] font-bold'
-                  : 'bg-surface-container-lowest/40 hover:bg-surface-container-low/60 border-white/5 text-white/60'
-                  }`}
-              >
-                <input
-                  type="radio"
-                  name="mood"
-                  value={m}
-                  checked={selectedMood === m}
-                  onChange={() => setSelectedMood(m)}
-                  className="sr-only"
-                />
-                <span className="font-mono text-xs uppercase tracking-wider">{m}</span>
-                {selectedMood === m && (
-                  <span className="material-symbols-outlined text-secondary text-sm">radio_button_checked</span>
-                )}
-              </label>
-            ))}
-          </div>
-        </section>
 
-        {/* Sequence Order */}
-        <section className="glass-panel ghost-border rounded-lg p-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="material-symbols-outlined text-accent-cyan">grid_goldenratio</span>
-            <h2 className="font-headline text-xl font-bold uppercase tracking-widest text-white">Sequence & Sorting</h2>
-          </div>
-          <div className="flex items-center gap-4 max-w-xs">
-            <label className="text-white/60 text-sm font-mono uppercase tracking-wider flex-shrink-0">Scene Order:</label>
-            <input
-              type="number"
-              value={order}
-              onChange={e => setOrder(parseInt(e.target.value) || 1)}
-              min={1}
-              className="w-24 bg-surface-container-lowest border-none rounded py-2 px-3 text-center ghost-border focus:ring-2 focus:ring-accent-cyan/20 font-mono text-white"
-            />
-          </div>
-        </section>
+
+
 
         {/* Navigation Actions */}
         <div className="flex gap-4">
@@ -158,6 +112,25 @@ export default function StepPromptPreview({
             <span className="material-symbols-outlined text-sm">list_alt</span>
             Script Composition
           </h3>
+
+          <div className="py-3 space-y-2">
+            <InputField
+              label="Scene Name"
+              type="text"
+              name="name"
+              value={selectedSceneName}
+              onChange={e => setSelectedSceneName(e.target.value)}
+            />
+
+            <InputField
+              label='Scene Order'
+              type="number"
+              name='order'
+              value={order}
+              onChange={e => setOrder(parseInt(e.target.value) || 1)}
+              min={1}
+            />
+          </div>
 
           {/* Selected Environment */}
           <div className="mb-6">

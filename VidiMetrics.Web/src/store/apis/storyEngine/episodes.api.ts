@@ -69,6 +69,26 @@ export const episodesApi = mainApi.injectEndpoints({
         { type: 'Episode', id: 'LIST' },
       ],
     }),
+
+    generateEpisodeVideo: builder.mutation<ApiResponse<Episode>, string>({
+      query: (id) => ({ url: `/api/episodes/${id}/generate-video`, method: 'POST' }),
+      invalidatesTags: (_result, _err, id) => [
+        { type: 'Episode', id },
+        { type: 'Episode', id: 'LIST' },
+      ],
+    }),
+
+    reorderScenes: builder.mutation<ApiResponse<boolean>, { episodeId: string; sceneIds: string[] }>({
+      query: ({ episodeId, sceneIds }) => ({
+        url: `/api/episodes/${episodeId}/scenes/reorder`,
+        method: 'PUT',
+        body: { sceneIds },
+      }),
+      invalidatesTags: (_result, _err, { episodeId }) => [
+        { type: 'Scene', id: 'LIST' },
+        { type: 'Episode', id: episodeId },
+      ],
+    }),
   }),
 });
 
@@ -78,4 +98,6 @@ export const {
   useCreateEpisodeMutation,
   useUpdateEpisodeMutation,
   useDeleteEpisodeMutation,
+  useGenerateEpisodeVideoMutation,
+  useReorderScenesMutation,
 } = episodesApi;

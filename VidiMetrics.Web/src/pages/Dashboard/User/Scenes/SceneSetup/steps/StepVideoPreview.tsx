@@ -11,7 +11,7 @@ interface StepVideoPreviewProps {
   showId: string
   characterIds: string[]
   environmentName?: string
-  mood: string
+  name: string
   order: number
   onBackToPrompt: () => void
 }
@@ -23,7 +23,7 @@ export default function StepVideoPreview({
   showId,
   characterIds,
   environmentName = 'unknown',
-  mood,
+  name,
   order,
   onBackToPrompt,
 }: StepVideoPreviewProps) {
@@ -66,6 +66,7 @@ export default function StepVideoPreview({
     try {
       await createScene({
         order: order,
+        name: name,
         episodeId: episodeId,
         characterIds: characterIds,
         aiScriptId: scriptId,
@@ -152,7 +153,7 @@ export default function StepVideoPreview({
               </div>
               <div className="flex gap-2">
                 <span className="px-3 py-1.5 bg-secondary/15 rounded text-[10px] font-mono font-bold text-secondary uppercase border border-secondary/20">
-                  {mood}
+                  {name}
                 </span>
                 <span className="px-3 py-1.5 bg-accent-cyan/15 rounded text-[10px] font-mono font-bold text-accent-cyan uppercase border border-accent-cyan/20">
                   {environmentName}

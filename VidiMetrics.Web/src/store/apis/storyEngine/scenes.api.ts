@@ -4,6 +4,7 @@ import { Scene } from '@/types/models/storyEngine';
 
 export interface CreateSceneRequest {
   order: number;
+  name: string;
   episodeId: string;
   characterIds?: string[];
   aiScriptId?: string;

@@ -175,7 +175,7 @@ export function GenericDataGrid<T>({
     return (
         <div className="space-y-6 w-full">
             {(searchOption || filterOptions || sortOption) && (
-                <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#16171d]/80 to-[#0b0c10]/90 border border-white/5 backdrop-blur-xl shadow-lg relative">
+                <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-4 rounded-xl bg-gradient-to-r from-[#16171d]/80 to-[#0b0c10]/90 border border-white/5 backdrop-blur-xl shadow-lg relative z-10">
                     <div className="flex-1 max-w-md relative">
                         {searchOption && (
                             <>
@@ -215,7 +215,7 @@ export function GenericDataGrid<T>({
                                 </button>
 
                                 {isSortOpen && (
-                                    <div className="absolute right-0 mt-2 w-56 rounded-lg bg-[#0b0c10] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="absolute right-0 mt-2 w-56 rounded-lg bg-[#0b0c10] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl p-3 z-10 animate-in fade-in slide-in-from-top-2 duration-200">
                                         <div className="text-[10px] font-black tracking-widest text-white/30 uppercase mb-2 px-2">
                                             Sort Dataset By
                                         </div>
@@ -267,7 +267,7 @@ export function GenericDataGrid<T>({
                                 </button>
 
                                 {isFilterOpen && (
-                                    <div className="absolute right-0 mt-2 w-[24rem] rounded-xl bg-[#0b0c10] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200 space-y-4">
+                                    <div className="absolute right-0 mt-2 w-[24rem] rounded-xl bg-[#0b0c10] border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl p-4 z-10 animate-in fade-in slide-in-from-top-2 duration-200 space-y-4">
                                         <div className="max-h-[24rem] overflow-y-auto pr-1 custom-scrollbar space-y-4">
                                             {filterOptions.fields.map((field) => (
                                                 <div key={field.id} className="space-y-1.5">
@@ -276,7 +276,7 @@ export function GenericDataGrid<T>({
                                                     </label>
 
                                                     {field.type === 'radio' && field.options && (
-                                                        <div className="flex flex-wrap gap-1 justify-between">
+                                                        <div className="flex flex-wrap gap-1">
                                                             {field.options.map((opt) => {
                                                                 const currentVal = tempFilterValues[field.id] ?? 'all';
                                                                 const isSelected = currentVal === opt.value;
@@ -362,12 +362,12 @@ export function GenericDataGrid<T>({
             )}
 
             {items.length === 0 ? (
-                <div className="w-full h-64 flex flex-col items-center justify-center gap-2 glass-card rounded-xl border border-white/5 bg-white/5 text-white/30 text-center p-6 relative z-10">
+                <div className="w-full h-64 flex flex-col items-center justify-center gap-2 glass-card rounded-xl border border-white/5 bg-white/5 text-white/30 text-center p-6 relative">
                     <span className="material-symbols-outlined text-4xl text-white/20">search_off</span>
                     <p className="text-sm font-medium">{emptyStateMessage}</p>
                 </div>
             ) : (
-                <div className={`${className || colStyles} relative z-10`}>
+                <div className={`${className || colStyles} relative`}>
                     {items.map((item, index) => (
                         <React.Fragment key={(item as any).id || index}>
                             {renderItem(item)}
@@ -377,7 +377,7 @@ export function GenericDataGrid<T>({
             )}
 
             {paginationData && paginationData.totalPages > 1 && (
-                <div className="pt-2 relative z-10">
+                <div className="pt-2 relative">
                     <Pagination
                         page={paginationData.pageNumber}
                         totalPages={paginationData.totalPages}

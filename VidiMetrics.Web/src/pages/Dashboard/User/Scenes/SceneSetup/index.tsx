@@ -27,7 +27,7 @@ export default function SceneSetup() {
 
   // Step 2 to Step 3 Shared State
   const [videoId, setVideoId] = useState<string>('')
-  const [mood, setMood] = useState<string>('CYBER-NOIR')
+  const [sceneName, setSceneName] = useState<string>('Scene')
   const [order, setOrder] = useState<number>(1)
 
   // Context Queries
@@ -65,9 +65,9 @@ export default function SceneSetup() {
     setCurrentStep(2)
   }
 
-  const handleStep2Complete = (newVideoId: string, selectedMood: string, sceneOrder: number) => {
+  const handleStep2Complete = (newVideoId: string, sceneName: string, sceneOrder: number) => {
     setVideoId(newVideoId)
-    setMood(selectedMood)
+    setSceneName(sceneName)
     setOrder(sceneOrder)
     setCurrentStep(3)
   }
@@ -126,7 +126,7 @@ export default function SceneSetup() {
             visualPrompt={visualPrompt}
             environmentName={selectedLocation?.name}
             castNames={selectedCharacters.map(c => c.name)}
-            initialMood={mood}
+            initialSceneName={sceneName}
             initialOrder={order}
             onBack={() => setCurrentStep(1)}
             onNext={handleStep2Complete}
@@ -142,7 +142,7 @@ export default function SceneSetup() {
             showId={showId || ''}
             characterIds={selectedCharacterIds}
             environmentName={selectedLocation?.name}
-            mood={mood}
+            name={sceneName}
             order={order}
             onBackToPrompt={() => setCurrentStep(2)}
           />

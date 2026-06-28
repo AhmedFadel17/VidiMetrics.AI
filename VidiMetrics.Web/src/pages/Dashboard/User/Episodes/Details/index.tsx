@@ -1,10 +1,14 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useGetShowByIdQuery, useGetEpisodeByIdQuery, useUpdateEpisodeMutation, useGetScenesQuery } from '@/store/apis'
+import { useGetShowByIdQuery, useGetEpisodeByIdQuery, useUpdateEpisodeMutation, useGetScenesQuery, useGenerateEpisodeVideoMutation, useReorderScenesMutation } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
-import { formatDate } from '@/utils/dateFormatter'
 import { toast } from 'sonner'
 import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens'
+import { PageHeader } from '@/components/ui/PageHeader'
+import VideoPlayer from '@/components/ui/VideoPlayer'
+import SceneCard from '@/components/ui/Cards/SceneCard'
+import VideoMetadataBox from './components/VideoMetadataBox'
+import { Button } from '@/components/ui/Button'
 
 export default function EpisodeDetails() {
     const { showId, id } = useParams<{ showId: string, id: string }>();
@@ -13,28 +17,19 @@ export default function EpisodeDetails() {
     // Queries & Mutations
     const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId || '');
     const { data: episodeResponse, isLoading: isEpisodeLoading } = useGetEpisodeByIdQuery(id || '');
-    const [updateEpisode, { isLoading: isUpdating }] = useUpdateEpisodeMutation();
+    const [generateEpisodeVideo, { isLoading: isGeneratingVideo }] = useGenerateEpisodeVideoMutation();
+    const [reorderScenes, { isLoading: isSavingOrder }] = useReorderScenesMutation();
     const { data: scenesResponse, isLoading: isScenesLoading } = useGetScenesQuery({
         episodeId: id || '',
         pageNumber: 1,
-        pageSize: 20
+        pageSize: 20,
+        orderBy: 'Order'
+
     });
 
     const show = showResponse?.data;
     const episode = episodeResponse?.data;
     const scenes = scenesResponse?.data?.items || [];
-
-    // Edit Details Form States
-    const [isEditing, setIsEditing] = useState(false);
-    const [titleInput, setTitleInput] = useState('');
-    const [plotInput, setPlotInput] = useState('');
-
-    // Synthesis Form States
-    const [transitionType, setTransitionType] = useState('Glitch Zoom');
-    const scenePacing = 5;
-    const [backgroundMusic, setBackgroundMusic] = useState('Cyberpunk Synthwave');
-    const [aspectRatio, setAspectRatio] = useState('16:9 Landscape');
-    const enhancements = ['Depth of Field', 'HDR Grading'];
 
     // Synthesis Process States
     const [isSynthesizing, setIsSynthesizing] = useState(false);
@@ -46,7 +41,8 @@ export default function EpisodeDetails() {
 
     useEffect(() => {
         if (scenes && scenes.length > 0) {
-            setOrderedScenes(scenes);
+            const sorted = [...scenes].sort((a, b) => a.order - b.order);
+            setOrderedScenes(sorted);
         }
     }, [scenes]);
 
@@ -68,172 +64,65 @@ export default function EpisodeDetails() {
         setOrderedScenes(newScenes);
     };
 
-    // Video Player States
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(0.8);
-    const [isMuted, setIsMuted] = useState(false);
-    const [showSubtitles, setShowSubtitles] = useState(true);
+    const isOrderChanged = JSON.stringify(orderedScenes.map(s => s.id)) !== JSON.stringify(scenes.map(s => s.id));
 
-    // Initialize edit inputs when episode loads
-    useEffect(() => {
-        if (episode) {
-            setTitleInput(episode.title);
-            setPlotInput(episode.plotSummary);
-        }
-    }, [episode]);
-
-    // Handle play/pause toggles
-    const togglePlay = () => {
-        if (!videoRef.current) return;
-        if (isPlaying) {
-            videoRef.current.pause();
-            setIsPlaying(false);
-        } else {
-            videoRef.current.play().catch(err => console.log("Play interrupted:", err));
-            setIsPlaying(true);
-        }
-    };
-
-    // Time update handler
-    const handleTimeUpdate = () => {
-        if (videoRef.current) {
-            setCurrentTime(videoRef.current.currentTime);
-        }
-    };
-
-    // Loaded metadata handler
-    const handleLoadedMetadata = () => {
-        if (videoRef.current) {
-            setDuration(videoRef.current.duration);
-        }
-    };
-
-    // Seek handler
-    const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const time = parseFloat(e.target.value);
-        if (videoRef.current) {
-            videoRef.current.currentTime = time;
-            setCurrentTime(time);
-        }
-    };
-
-    // Volume change handler
-    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const vol = parseFloat(e.target.value);
-        setVolume(vol);
-        if (videoRef.current) {
-            videoRef.current.volume = vol;
-            videoRef.current.muted = vol === 0;
-            setIsMuted(vol === 0);
-        }
-    };
-
-    // Toggle mute
-    const toggleMute = () => {
-        if (!videoRef.current) return;
-        const newMuted = !isMuted;
-        setIsMuted(newMuted);
-        videoRef.current.muted = newMuted;
-    };
-
-    // Double check formatting of time string
-    const formatTime = (time: number) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    };
-
-    // Synced Subtitles Generator
-    const getActiveSubtitle = (time: number) => {
-        if (time >= 0 && time < 3) return "Initializing Silent Protocol downlink...";
-        if (time >= 3 && time < 8) return "Warning: Sentinel presence detected in Sector 7.";
-        if (time >= 8 && time < 14) return "Sector breach confirmed. Commencing secondary sweep.";
-        if (time >= 14 && time < 20) return "We must reach the Undercity cooling shafts before sunrise.";
-        if (time >= 20 && time < 27) return "The Silent Protocol is active. Protect the core at all costs.";
-        return "";
-    };
-
-
-    // Handle Inline Edit Saving
-    const handleSaveDetails = async () => {
-        if (!episode) return;
+    const handleSaveOrder = async () => {
         try {
-            await updateEpisode({
-                id: episode.id,
-                body: {
-                    title: titleInput,
-                    plotSummary: plotInput,
-                    episodeNumber: episode.episodeNumber,
-                    showId: episode.showId,
-                }
+            await reorderScenes({
+                episodeId: id || '',
+                sceneIds: orderedScenes.map(s => s.id),
             }).unwrap();
-            toast.success('Episode specifications updated.');
-            setIsEditing(false);
+            toast.success('Sequence order saved successfully.');
         } catch (error) {
-            toast.error('Failed to commit parameters to storage.');
-            console.error('Update error:', error);
+            toast.error('Failed to save sequence order.');
         }
     };
+
+    const handleResetScenes = () => {
+        setOrderedScenes(scenes);
+    };
+
+
+
 
     // Synthesize Video workflow simulation
-    const handleSynthesize = () => {
+    const handleSynthesize = async () => {
         if (!episode) return;
         setIsSynthesizing(true);
         setSynthesisProgress(0);
         setSynthesisStatus('Initializing neural video canvas...');
 
-        const stages = [
-            { limit: 15, status: 'Analyzing scene sequence scripts and characters...' },
-            { limit: 35, status: 'Generating cinematic narrative vocal tracks with AI voiceover...' },
-            { limit: 55, status: `Applying dynamic ${transitionType} transitions between scenes...` },
-            { limit: 75, status: `Mixing high-fidelity background score: ${backgroundMusic}...` },
-            { limit: 90, status: `Adding visual filters: ${enhancements.join(', ') || 'Standard'}...` },
-            { limit: 98, status: `Rendering final 4K video frames (${aspectRatio})...` }
-        ];
+
 
         let currentPercent = 0;
-        const interval = setInterval(async () => {
+        const interval = setInterval(() => {
             currentPercent += Math.floor(Math.random() * 5) + 3;
-            if (currentPercent >= 100) {
-                currentPercent = 100;
-                clearInterval(interval);
-                setSynthesisProgress(100);
-                setSynthesisStatus('Synthesis complete! Finalizing link...');
-
-                try {
-                    // Update the episode videoId with a premium futuristic neon MP4 video loop
-                    await updateEpisode({
-                        id: episode.id,
-                        body: {
-                            title: episode.title,
-                            plotSummary: episode.plotSummary,
-                            episodeNumber: episode.episodeNumber,
-                            showId: episode.showId,
-                        }
-                    }).unwrap();
-                    toast.success('Episode video synthesized successfully!');
-                } catch (err) {
-                    toast.error('Failed to link video metadata, but preview is active!');
-                } finally {
-                    setIsSynthesizing(false);
-                }
-            } else {
-                setSynthesisProgress(currentPercent);
-                // Find matching stage
-                const matchedStage = stages.find(s => currentPercent <= s.limit);
-                if (matchedStage) {
-                    setSynthesisStatus(matchedStage.status);
-                }
+            if (currentPercent > 95) {
+                currentPercent = 95;
             }
-        }, 300);
+            setSynthesisProgress(currentPercent);
+            setSynthesisStatus('Rendering final video frames...');
+        }, 400);
+
+        try {
+            await generateEpisodeVideo(episode.id).unwrap();
+            clearInterval(interval);
+            setSynthesisProgress(100);
+            setSynthesisStatus('Synthesis complete!');
+            toast.success('Episode video synthesized successfully!');
+        } catch (err: any) {
+            clearInterval(interval);
+            toast.error(err?.data?.message || 'Failed to synthesize episode video.');
+            console.error('Video generation error:', err);
+        } finally {
+            setIsSynthesizing(false);
+        }
     };
     if (isShowLoading || isEpisodeLoading) return <LoadingScreen message="Accessing Episode Archives..." accentColor="purple" />
     if (!show || !episode) return <ErrorScreen title="Series Connection Lost" message="Unable to retrieve episode details for episode placement." />
 
-    const videoSource = null;
+    const episodeVideo = episode?.aiVideo;
+    const videoSource = episodeVideo?.videoUrl || null;
 
     return (
         <div className="space-y-10 pb-20 antialiased text-[#dae2fd]">
@@ -246,188 +135,30 @@ export default function EpisodeDetails() {
                 { label: `E${episode.episodeNumber}. ${episode.title}` },
             ]} />
 
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div className="flex flex-col gap-2">
-                    <span className="text-[#4cd7f6] font-label text-sm uppercase tracking-widest font-semibold">
-                        Episode {episode.episodeNumber.toString().padStart(2, '0')}
-                    </span>
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            value={titleInput}
-                            onChange={(e) => setTitleInput(e.target.value)}
-                            className="bg-[#131b2e]/60 border border-[#494456]/30 rounded-xl px-4 py-2 text-2xl font-headline font-bold text-white focus:outline-none focus:border-[#ddb7ff]/50"
-                        />
-                    ) : (
-                        <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-white">
-                            {episode.title}
-                        </h1>
-                    )}
-                </div>
-                <div className="flex items-center gap-4">
-                    {isEditing ? (
-                        <>
-                            <button
-                                onClick={() => setIsEditing(false)}
-                                className="bg-[#2d3449]/40 backdrop-blur-xl border border-[#494456]/20 text-[#dae2fd] hover:bg-[#2d3449]/80 transition-colors px-6 py-3 rounded-lg font-label font-medium flex items-center gap-2"
-                            >
-                                <span className="material-symbols-outlined text-[20px]">close</span>
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSaveDetails}
-                                disabled={isUpdating}
-                                className="bg-gradient-to-r from-[#ddb7ff] to-[#7818c6] text-white hover:opacity-90 transition-all px-6 py-3 rounded-lg font-label font-medium flex items-center gap-2 shadow-[0_0_20px_rgba(221,183,255,0.15)] disabled:opacity-50"
-                            >
-                                <span className="material-symbols-outlined text-[20px]">save</span>
-                                Save Specifications
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                onClick={() => setIsEditing(true)}
-                                className="bg-[#2d3449]/40 backdrop-blur-xl border border-[#494456]/20 text-[#dae2fd] hover:bg-[#222a3d] transition-colors px-6 py-3 rounded-lg font-label font-medium flex items-center gap-2"
-                            >
-                                <span className="material-symbols-outlined text-[20px]">edit</span>
-                                Edit Details
-                            </button>
-                            <button
-                                disabled={!videoSource}
-                                onClick={() => toast.success('Initializing full episode video download package...')}
-                                className="bg-gradient-to-r from-[#ddb7ff] to-[#7818c6] text-white hover:opacity-95 transition-all px-6 py-3 rounded-lg font-label font-medium flex items-center gap-2 shadow-[0_0_20px_rgba(221,183,255,0.15)] disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                                <span className="material-symbols-outlined text-[20px]">movie</span>
-                                Export Video
-                            </button>
-                        </>
-                    )}
-                </div>
+            <div>
+                <PageHeader
+                    chipText={`Series • ${show.title}`}
+                    titlePrefix={`Episode ${episode.episodeNumber.toString().padStart(2, '0')} • `}
+                    gradientText={`${episode.title}`}
+                    description="Full episode synthesis and reference video controls"
+                />
             </div>
 
+
+
             {/* Main Content Area: Two Columns */}
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Left Column (Wide) */}
-                <div className="flex-1 flex flex-col gap-8">
+                <div className="lg:col-span-8 flex flex-col gap-8">
                     {/* Video Player Container / Creative Suite */}
                     <div className="relative w-full aspect-video bg-[#131b2e] rounded-xl overflow-hidden group shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-[#494456]/15 flex items-center justify-center">
                         {videoSource ? (
                             /* Fully-featured Interactive Custom Video Player */
-                            <div className="relative w-full h-full bg-black group/player">
-                                <video
-                                    ref={videoRef}
-                                    src={videoSource}
-                                    onTimeUpdate={handleTimeUpdate}
-                                    onLoadedMetadata={handleLoadedMetadata}
-                                    onClick={togglePlay}
-                                    className="w-full h-full object-contain cursor-pointer"
-                                />
+                            <VideoPlayer videoSource={videoSource} />
 
-                                {/* Subtitles Overlay */}
-                                {showSubtitles && getActiveSubtitle(currentTime) && (
-                                    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-[#0b1326]/80 backdrop-blur-md px-6 py-2 rounded-lg border border-[#494456]/30 text-sm font-label font-semibold text-center text-[#dae2fd] max-w-[80%] animate-subtle-float">
-                                        <span className="text-[#ddb7ff] mr-2">✦</span>
-                                        {getActiveSubtitle(currentTime)}
-                                    </div>
-                                )}
-
-                                {/* Cinematic Top Overlay */}
-                                <div className="absolute top-0 left-0 right-0 p-6 flex justify-between items-start opacity-0 group-hover/player:opacity-100 transition-opacity duration-300 bg-gradient-to-b from-[#0b1326]/70 to-transparent">
-                                    <div className="bg-[#0b1326]/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-xs font-label text-[#dae2fd] border border-[#494456]/20">
-                                        FinalVideo_v2.mp4
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="bg-[#03b5d3]/20 text-[#4cd7f6] px-2.5 py-1 rounded text-xs font-black tracking-widest border border-[#4cd7f6]/20">4K</span>
-                                    </div>
-                                </div>
-
-                                {/* Center Play/Pause Indicator Button */}
-                                {!isPlaying && (
-                                    <button
-                                        onClick={togglePlay}
-                                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-[#ddb7ff]/90 hover:bg-[#ddb7ff] text-[#490080] rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-[0_0_30px_rgba(221,183,255,0.4)] backdrop-blur-sm"
-                                    >
-                                        <span className="material-symbols-outlined text-[32px] ml-1 fill-[1]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                                            play_arrow
-                                        </span>
-                                    </button>
-                                )}
-
-                                {/* Cinematic Bottom Controls Overlay */}
-                                <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col gap-3 opacity-0 group-hover/player:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-[#0b1326]/80 to-transparent">
-                                    {/* Custom Interactive Progress Bar */}
-                                    <div className="relative w-full flex items-center group/progress">
-                                        <input
-                                            type="range"
-                                            min={0}
-                                            max={duration || 100}
-                                            value={currentTime}
-                                            onChange={handleSeek}
-                                            className="w-full h-1.5 bg-[#494456]/30 hover:h-2 rounded-full appearance-none cursor-pointer accent-[#ddb7ff] transition-all"
-                                        />
-                                        <div
-                                            className="absolute left-0 top-1/2 -translate-y-1/2 h-1.5 bg-gradient-to-r from-[#ddb7ff] to-[#4cd7f6] rounded-full pointer-events-none"
-                                            style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
-                                        />
-                                    </div>
-
-                                    {/* Toolbar buttons */}
-                                    <div className="flex justify-between items-center text-[#dae2fd] px-1">
-                                        <div className="flex items-center gap-4">
-                                            <button onClick={togglePlay} className="hover:text-[#ddb7ff] transition-colors">
-                                                <span className="material-symbols-outlined text-[22px]">
-                                                    {isPlaying ? 'pause' : 'play_arrow'}
-                                                </span>
-                                            </button>
-
-                                            {/* Volume Controls */}
-                                            <div className="flex items-center gap-2 group/volume">
-                                                <button onClick={toggleMute} className="hover:text-[#ddb7ff] transition-colors">
-                                                    <span className="material-symbols-outlined text-[20px]">
-                                                        {isMuted || volume === 0 ? 'volume_off' : volume < 0.5 ? 'volume_down' : 'volume_up'}
-                                                    </span>
-                                                </button>
-                                                <input
-                                                    type="range"
-                                                    min={0}
-                                                    max={1}
-                                                    step={0.05}
-                                                    value={isMuted ? 0 : volume}
-                                                    onChange={handleVolumeChange}
-                                                    className="w-0 overflow-hidden group-hover/volume:w-16 h-1 rounded-full appearance-none cursor-pointer bg-[#494456]/50 accent-[#ddb7ff] transition-all duration-300"
-                                                />
-                                            </div>
-
-                                            <span className="text-xs font-label text-white/70">
-                                                {formatTime(currentTime)} / {formatTime(duration)}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-4">
-                                            <button
-                                                onClick={() => setShowSubtitles(!showSubtitles)}
-                                                className={`transition-colors ${showSubtitles ? 'text-[#4cd7f6]' : 'text-white/40 hover:text-[#dae2fd]'}`}
-                                                title="Toggle Subtitles"
-                                            >
-                                                <span className="material-symbols-outlined text-[20px]">closed_caption</span>
-                                            </button>
-                                            <button className="hover:text-[#ddb7ff] transition-colors">
-                                                <span className="material-symbols-outlined text-[20px]">settings</span>
-                                            </button>
-                                            <button
-                                                onClick={() => videoRef.current?.requestFullscreen()}
-                                                className="hover:text-[#ddb7ff] transition-colors"
-                                            >
-                                                <span className="material-symbols-outlined text-[20px]">fullscreen</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         ) : (
                             /* Creative Custom Suite to Synthesize Video from Scenes */
-                            <div className="absolute inset-0 bg-[#0b1326] p-8 flex flex-col justify-between overflow-y-auto">
+                            <div className="absolute inset-0 bg-surface-container-low/80 backdrop-blur-md border border-[#494456]/15 p-8 flex flex-col justify-between overflow-y-auto">
                                 {isSynthesizing ? (
                                     /* Active Synthesis Progress Overlay */
                                     <div className="flex-1 flex flex-col items-center justify-center space-y-8 p-12">
@@ -501,7 +232,7 @@ export default function EpisodeDetails() {
                                                 </div>
                                             ) : (
                                                 /* Reordering & Setup Grid */
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px] flex-1 min-h-0">
+                                                <div className="grid grid-cols-1 gap-4 text-[11px] flex-1 min-h-0">
                                                     {/* Left side: Scrollable order builder list */}
                                                     <div className="flex flex-col min-h-0 bg-[#070e20]/60 rounded-xl p-3 border border-[#494456]/15 h-[190px]">
                                                         <label className="text-[9px] uppercase font-bold text-white/50 pl-1 tracking-wider block mb-2">
@@ -515,10 +246,10 @@ export default function EpisodeDetails() {
                                                                 >
                                                                     <div className="flex items-center gap-2 min-w-0">
                                                                         <span className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold bg-[#1c2437] text-[#4cd7f6]">
-                                                                            S{idx + 1}
+                                                                            S{scene.order}
                                                                         </span>
                                                                         <span className="truncate font-semibold text-xs text-white">
-                                                                            {scene.characterName || 'Scene Action Block'}
+                                                                            {scene.name || 'Scene Action Block'}
                                                                         </span>
                                                                     </div>
 
@@ -543,58 +274,27 @@ export default function EpisodeDetails() {
                                                                 </div>
                                                             ))}
                                                         </div>
+                                                        <div className='flex items-center gap-4 mt-4'>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={handleResetScenes}
+                                                                disabled={isSavingOrder || !isOrderChanged}
+                                                            >
+                                                                Reset
+                                                            </Button>
+                                                            <Button
+                                                                variant="primary"
+                                                                size="sm"
+                                                                onClick={handleSaveOrder}
+                                                                disabled={isSavingOrder || !isOrderChanged}
+                                                            >
+                                                                Save
+                                                            </Button>
+                                                        </div>
                                                     </div>
 
-                                                    {/* Right side: Custom master parameters */}
-                                                    <div className="space-y-3">
-                                                        <div className="space-y-1">
-                                                            <label className="text-[9px] uppercase font-bold text-white/50 pl-1 tracking-wider block">Sequence Transition</label>
-                                                            <select
-                                                                value={transitionType}
-                                                                onChange={(e) => setTransitionType(e.target.value)}
-                                                                className="w-full bg-[#131b2e] border border-[#494456]/30 rounded-lg px-2.5 py-1.5 text-[#dae2fd] focus:outline-none focus:border-[#ddb7ff]/50 font-medium"
-                                                            >
-                                                                <option>Glitch Zoom</option>
-                                                                <option>Cross Fade</option>
-                                                                <option>Luma Wipe</option>
-                                                                <option>Cinematic Cut</option>
-                                                            </select>
-                                                        </div>
 
-                                                        <div className="space-y-1">
-                                                            <label className="text-[9px] uppercase font-bold text-white/50 pl-1 tracking-wider block">Atmospheric Soundtrack</label>
-                                                            <select
-                                                                value={backgroundMusic}
-                                                                onChange={(e) => setBackgroundMusic(e.target.value)}
-                                                                className="w-full bg-[#131b2e] border border-[#494456]/30 rounded-lg px-2.5 py-1.5 text-[#dae2fd] focus:outline-none focus:border-[#ddb7ff]/50 font-medium"
-                                                            >
-                                                                <option>Cyberpunk Synthwave</option>
-                                                                <option>Industrial Dark Ambient</option>
-                                                                <option>Epic Orchestral</option>
-                                                                <option>Lo-Fi Chill</option>
-                                                                <option>None</option>
-                                                            </select>
-                                                        </div>
-
-                                                        <div className="space-y-1">
-                                                            <label className="text-[9px] uppercase font-bold text-white/50 pl-1 tracking-wider block">Cinematic Canvas Aspect</label>
-                                                            <div className="flex gap-1.5">
-                                                                {['16:9 Landscape', '9:16 Vertical'].map((ratio) => (
-                                                                    <button
-                                                                        key={ratio}
-                                                                        type="button"
-                                                                        onClick={() => setAspectRatio(ratio)}
-                                                                        className={`flex-1 py-1.5 rounded-lg border text-center font-medium transition-all ${aspectRatio.includes(ratio.split(' ')[0])
-                                                                            ? 'bg-[#ddb7ff]/10 border-[#ddb7ff] text-[#ddb7ff] shadow-[0_0_10px_rgba(221,183,255,0.15)]'
-                                                                            : 'border-[#494456]/30 text-white/50 hover:border-white/20 hover:text-white'
-                                                                            }`}
-                                                                    >
-                                                                        {ratio}
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    </div>
                                                 </div>
                                             )}
 
@@ -615,90 +315,25 @@ export default function EpisodeDetails() {
                         )}
                     </div>
 
-                    {/* Narrative Arc Card */}
-                    <div className="bg-[#131b2e]/40 backdrop-blur-xl rounded-xl p-8 border border-[#494456]/15 relative overflow-hidden">
-                        {/* Decorative gradient blur */}
+                </div>
+
+                <div className="lg:col-span-4 flex flex-col gap-6">
+                    {episodeVideo && (
+                        <VideoMetadataBox episodeVideo={episodeVideo} />
+                    )}
+
+
+                    <div className="bg-surface-container-low/40 backdrop-blur-xl rounded-xl p-8 border border-[#494456]/15 relative overflow-hidden">
                         <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#ddb7ff]/5 rounded-full blur-[60px] pointer-events-none"></div>
                         <h2 className="font-display text-xl font-bold text-white mb-4 flex items-center gap-2.5">
                             <span className="material-symbols-outlined text-[#ffb0cd] text-[22px]">subject</span>
                             Narrative Arc
                         </h2>
-                        {isEditing ? (
-                            <textarea
-                                value={plotInput}
-                                onChange={(e) => setPlotInput(e.target.value)}
-                                rows={5}
-                                className="w-full bg-[#131b2e]/80 border border-[#494456]/30 rounded-xl px-4 py-3 text-white leading-relaxed focus:outline-none focus:border-[#ddb7ff]/50"
-                            />
-                        ) : (
-                            <p className="font-body text-[#dae2fd]/85 leading-relaxed text-base">
-                                {episode.plotSummary || "No plot summary available for this episode yet. Provide a summary using the Edit Details console."}
-                            </p>
-                        )}
-                    </div>
-                </div>
 
-                {/* Right Column (Narrow) */}
-                <div className="w-full lg:w-[320px] flex flex-col gap-6">
-                    {/* Stats Card */}
-                    <div className="bg-[#131b2e]/40 backdrop-blur-xl rounded-xl p-6 border border-[#494456]/15 flex flex-col gap-6">
-                        <h3 className="font-display text-lg font-bold text-white border-b border-[#494456]/15 pb-4">
-                            Metadata Specifications
-                        </h3>
-                        <div className="flex flex-col gap-4 font-label">
-                            <div className="flex justify-between items-center">
-                                <span className="text-white/50 text-sm flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-[#4cd7f6]">aspect_ratio</span> Resolution
-                                </span>
-                                <span className="text-white font-medium text-xs bg-[#171f33] border border-[#494456]/20 px-2.5 py-1 rounded-md">
-                                    {videoSource ? '3840 x 2160' : '4K UHD Draft'}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-white/50 text-sm flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-[#4cd7f6]">timer</span> Duration
-                                </span>
-                                <span className="text-white font-medium text-sm">
-                                    {videoSource ? '02:45' : `${(scenes.length * scenePacing).toString().padStart(2, '0')}:00`}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-white/50 text-sm flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-[#4cd7f6]">calendar_today</span> Created
-                                </span>
-                                <span className="text-white font-medium text-sm">
-                                    {formatDate(episode.createdAt)}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-white/50 text-sm flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px] text-[#ddb7ff]">memory</span> Render Time
-                                </span>
-                                <span className="text-[#ddb7ff] font-medium text-sm">
-                                    {videoSource ? '1h 12m' : 'Pending Synthesis'}
-                                </span>
-                            </div>
-                        </div>
+                        <p className="font-body text-[#dae2fd]/85 leading-relaxed text-base">
+                            {episode.plotSummary || "No plot summary available for this episode yet. Provide a summary using the Edit Details console."}
+                        </p>
                     </div>
-
-                    {/* Series Context navigation card */}
-                    <button
-                        onClick={() => navigate(`/dashboard/series/${show.id}`)}
-                        className="group bg-[#2d3449]/40 backdrop-blur-xl border border-[#494456]/15 rounded-xl p-6 flex flex-col gap-3 relative overflow-hidden text-left transition-all hover:bg-[#222a3d]/60"
-                    >
-                        <div className="absolute right-0 top-0 w-full h-full bg-gradient-to-l from-[#4cd7f6]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="text-[10px] font-label text-[#dae2fd]/40 uppercase tracking-widest font-black">
-                            Part of Series
-                        </span>
-                        <div className="flex items-center justify-between w-full">
-                            <h4 className="font-display font-bold text-white text-lg group-hover:text-[#4cd7f6] transition-colors leading-tight">
-                                {show.title}
-                            </h4>
-                            <span className="material-symbols-outlined text-white/50 group-hover:text-[#4cd7f6] transition-colors group-hover:translate-x-1 duration-300">
-                                arrow_forward
-                            </span>
-                        </div>
-                    </button>
                 </div>
             </div>
 
@@ -706,13 +341,7 @@ export default function EpisodeDetails() {
             <div className="mt-8 flex flex-col gap-6">
                 <div className="flex items-center justify-between">
                     <h2 className="font-display text-2xl font-bold text-white">Sequence Layout</h2>
-                    <button
-                        onClick={() => navigate(`/dashboard/series/${show.id}/episodes/${episode.id}/scenes/new`)}
-                        className="bg-[#222a3d] hover:bg-[#2d3449] text-[#ddb7ff] border border-[#ddb7ff]/20 transition-all duration-300 px-4 py-2 rounded-lg font-label font-medium flex items-center gap-2 text-sm"
-                    >
-                        <span className="material-symbols-outlined text-[18px]">add</span>
-                        Add Scene
-                    </button>
+
                 </div>
 
                 {/* Bento Grid for Scenes */}
@@ -724,41 +353,8 @@ export default function EpisodeDetails() {
                     ) : (
                         <>
                             {scenes.map((scene, index) => {
-                                // Provide premium cyberpunk default placeholders matching their index if no visual URL is configured
-                                const placeholders = [
-                                    "https://lh3.googleusercontent.com/aida-public/AB6AXuAHw9a_UB67T31LDm_GJKLM7r7jqV9-lkkx65gtOXmUaHyP83QSxsEqYKDffL7fAiW9PayohXVZEY6sHM1K1IXFxwokq4xD7ZAlEjIgPtbzTtBx8urfU9IlcY3adycIRUBv0tzzbApTjOIEMkbPOEW8YUgKFE0aR5XjPaJUryxsrdnFEopYWZuM2ABjXGBTgAEAjUFprHWgMoq0X6jdinIn6ZLxdlkI6wBil_GNkZuhL-WER1vXz47PnJ5vH96dDGJtZ2ev7lEP678",
-                                    "https://lh3.googleusercontent.com/aida-public/AB6AXuA3DQ1NRwY6LISm_bpeT9VtXzPpXjmgYK1CXmIowZqfxvuko3aqyseDDYaTrQwfOnS1DywfHeOrFu3dqygdjr13UxsUFQh0odsbmILpNXjCBs-g-nTfD1ELNGn5QgKAW36NSQjs43Suml9cFbYbJUF8FjFkcqYMSQd38gvXToiDqn-nXIOAXnBukAtUozdWevAsFz-Zr35ZAOtXJGr75No-YCdRJulgPzgrxHbFctW3JOL44Z4AfbTs0EFfuNZP6DIQDEMQQaoga28",
-                                    "https://lh3.googleusercontent.com/aida-public/AB6AXuD60Xtn6SvwQV_kOKWbOrWoAVWT0_KI0N45ruCljAx8T9P9057dUH-hAPga7CYFxvYMqi1O1nEwDvvXr9cypPe5pUc60uoKP9nSAVN5FWEaAUn7fsfiut8ziDvZsv5D1TGjj3H0QYI57FEWRm9k3kCEtFp4tEiT28kFcHru65NTjc0smAuch5hPsjtm0TSKwAbgytEYUME8aFEsIdw09VnwfXX7A2W4VXoF1_T94MXQEKy1GSN5bAzSdIu7jV8EktsZjTGPO3I9EJE",
-                                    "https://lh3.googleusercontent.com/aida-public/AB6AXuBViEDLqZ9c_m_tukMmEhnTBRSjIqZeWHLgfwHwr9KIXF_UP7SSXyr0FX72fal5UYIaEPcS3p01S-rtTqTvkRiNMbGacmZK1aKeISOleQo7ERmzLossHcMUAVuQ1zX_Du-y5T21EhlCt9tRUQdQ1Mkk4-AxzuIwvG9WFJrdw5Bpsj2k_QSsxps6jBhyztzHpF2axT4nbnofvfG0CH0b1gW_iGcHePq55j_clM5Udm-UA_O067F5iK--ZRIhlL4G7cvlBgOqzhdi-sI"
-                                ];
-                                const sceneThumbnail = scene.aiVideo?.thumbnailUrl || placeholders[index % placeholders.length];
-                                const visualDescription = scene.aiScript?.visualPrompt || scene.aiScript?.environmentDescription || "Cinematic sequence parameters.";
-
                                 return (
-                                    <div
-                                        key={scene.id}
-                                        onClick={() => navigate(`/dashboard/series/${show.id}/episodes/${episode.id}/scenes`)}
-                                        className="bg-[#131b2e]/40 rounded-xl overflow-hidden border border-[#494456]/15 group cursor-pointer hover:border-[#ddb7ff]/30 transition-all duration-300 flex flex-col h-full"
-                                    >
-                                        <div className="h-32 bg-[#222a3d] relative overflow-hidden">
-                                            <img
-                                                src={sceneThumbnail}
-                                                alt={`Scene ${scene.order} Thumbnail`}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-70"
-                                            />
-                                            <div className="absolute top-2 left-2 bg-[#0b1326]/80 backdrop-blur text-[10px] font-black tracking-widest px-2.5 py-1 rounded text-white border border-white/5">
-                                                SCENE {scene.order.toString().padStart(2, '0')}
-                                            </div>
-                                        </div>
-                                        <div className="p-4 flex flex-col gap-2 flex-1 justify-between">
-                                            <h4 className="font-label font-bold text-white text-sm group-hover:text-[#ddb7ff] transition-colors line-clamp-1">
-                                                {scene.aiScript?.location?.name || `Sequence Event ${scene.order}`}
-                                            </h4>
-                                            <p className="text-xs text-white/50 line-clamp-2 leading-relaxed font-body">
-                                                {visualDescription}
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <SceneCard key={index} scene={scene} onClick={() => navigate(`/dashboard/series/${show.id}/episodes/${episode.id}/scenes/${scene.id}`)} />
                                 );
                             })}
 

@@ -39,14 +39,17 @@ export interface Episode extends BaseEntity {
   title: string;
   plotSummary: string;
   thumbnailUrl: string;
+  videoUrl: string;
   showId: string;
   videoId: string;
   scenes?: Scene[];
+  aiVideo?: AiVideo;
 }
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
 export interface Scene extends BaseEntity {
   order: number;
+  name: string;
   episodeId: string;
   aiScriptId?: string;
   aiScript?: AiScript;

@@ -67,7 +67,8 @@ public class ScenesService : IScenesService
     {
         var entity = await _repository.Query()
             .Include(s => s.AiScript)
-                .ThenInclude(x => x.Location)
+                .ThenInclude(x => x != null ? x.Location : null)
+                .Include(x => x.AiScript != null ? x.AiScript.ScriptLines : null)
             .Include(s => s.AiVideo)
             .Include(s => s.SceneCharacters)
                 .ThenInclude(sc => sc.Character)
@@ -80,7 +81,7 @@ public class ScenesService : IScenesService
     {
         IQueryable<Scene> query = _repository.Query()
             .Include(s => s.AiScript)
-                .ThenInclude(x => x.Location)
+                .ThenInclude(x => x != null ? x.Location : null)
             .Include(s => s.AiVideo)
             .Include(s => s.SceneCharacters)
                 .ThenInclude(sc => sc.Character);

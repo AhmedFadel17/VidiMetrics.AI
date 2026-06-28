@@ -13,6 +13,11 @@ using VidiMetrics.Application.Providers.NotificationsProviders;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Episodes;
 using VidiMetrics.DataAccess.Repositories.StoryEngine.Shows;
 using VidiMetrics.Domain.Enums.Infra;
+using VidiMetrics.Application.Interfaces.Infra;
+using VidiMetrics.Application.Providers.VideoProviders;
+using VidiMetrics.DataAccess.Repositories.Ai.AiVideos;
+using VidiMetrics.Domain.Enums.Ai;
+using VidiMetrics.Domain.Models.Ai;
 using VidiMetrics.Domain.Models.StoryEngine;
 
 namespace VidiMetrics.Application.Services.StoryEngine;
@@ -25,6 +30,9 @@ public class EpisodesService : IEpisodesService
     private readonly IValidator<CreateEpisodeDto> _createValidator;
     private readonly IValidator<UpdateEpisodeDto> _updateValidator;
     private readonly INotificationProvider _notificationProvider;
+    private readonly IAiVideosRepository _aiVideosRepository;
+    private readonly IVideoProvider _videoProvider;
+    private readonly ICreditTransactionManager _creditManager;
 
     public EpisodesService(
         IEpisodesRepository repository,
@@ -32,7 +40,10 @@ public class EpisodesService : IEpisodesService
         IMapper mapper,
         IValidator<CreateEpisodeDto> createValidator,
         IValidator<UpdateEpisodeDto> updateValidator,
-        INotificationProvider notificationProvider)
+        INotificationProvider notificationProvider,
+        IAiVideosRepository aiVideosRepository,
+        IVideoProvider videoProvider,
+        ICreditTransactionManager creditManager)
     {
         _repository = repository;
         _showsRepository = showsRepository;
@@ -40,6 +51,9 @@ public class EpisodesService : IEpisodesService
         _createValidator = createValidator;
         _updateValidator = updateValidator;
         _notificationProvider = notificationProvider;
+        _aiVideosRepository = aiVideosRepository;
+        _videoProvider = videoProvider;
+        _creditManager = creditManager;
     }
 
     public async Task<EpisodeResponseDto> GetByIdAsync(Guid userId, Guid id, CancellationToken ct = default)
@@ -132,5 +146,102 @@ public class EpisodesService : IEpisodesService
             );
         }
         return isSuccess;
+    }
+
+    public async Task<EpisodeResponseDto> GenerateEpisodeVideoAsync(Guid userId, Guid episodeId)
+    {
+        var episode = await _repository.Query()
+            .Include(e => e.Show)
+            .Include(e => e.Scenes.OrderBy(s => s.Order))
+                .ThenInclude(s => s.AiScript)
+            .FirstOrDefaultAsync(e => e.Id == episodeId && e.Show.UserId == userId);
+
+        if (episode == null)
+            throw new KeyNotFoundException("Episode not found.");
+
+        if (episode.Scenes == null || !episode.Scenes.Any())
+            throw new InvalidOperationException("Cannot generate video for an episode with no scenes.");
+
+        var promptBuilder = new System.Text.StringBuilder();
+        promptBuilder.Append($"Cinematic cut for {episode.Title} (Style: {episode.Show.VisualStyle}). Plot: {episode.PlotSummary}. ");
+
+        foreach (var scene in episode.Scenes)
+        {
+            promptBuilder.Append($"Scene {scene.Order}: {scene.Name}. ");
+            if (scene.AiScript != null && !string.IsNullOrWhiteSpace(scene.AiScript.VisualPrompt))
+            {
+                promptBuilder.Append($"{scene.AiScript.VisualPrompt} ");
+            }
+        }
+
+        string combinedPrompt = promptBuilder.ToString();
+        if (combinedPrompt.Length > 2000)
+        {
+            combinedPrompt = combinedPrompt.Substring(0, 2000);
+        }
+
+        var seed = new Random().Next(1, 999999);
+
+        return await _creditManager.ExecuteWithCreditsAsync(
+            userId,
+            CreditActionType.GenerateVideo,
+            "Episode Video Generation",
+            async () =>
+            {
+                var providerResult = await _videoProvider.GenerateVideoAsync(combinedPrompt, seed);
+
+                var aiVideo = new AiVideo
+                {
+                    VideoUrl = providerResult.VideoUrl,
+                    ThumbnailUrl = providerResult.ThumbnailUrl,
+                    Duration = providerResult.Duration,
+                    Size = providerResult.SizeInBytes,
+                    Seed = seed,
+                    UserId = userId,
+                    AssetType = AssetType.Episode,
+                    IsLinked = true
+                };
+
+                await _aiVideosRepository.AddAsync(aiVideo);
+
+                episode.AiVideo = aiVideo;
+                _repository.Update(episode);
+
+                await _repository.SaveChangesAsync();
+
+                await _notificationProvider.SendInAppNotificationAsync(
+                    userId,
+                    "Episode Video Generated",
+                    $"Your video for episode '{episode.Title}' has been generated successfully.",
+                    NotificationType.Success,
+                    true,
+                    $"User {userId} generated a new Episode Video."
+                );
+
+                return _mapper.Map<EpisodeResponseDto>(episode);
+            });
+    }
+
+    public async Task<bool> ReorderScenesAsync(Guid userId, Guid episodeId, List<Guid> sceneIds)
+    {
+        var episode = await _repository.Query()
+            .Include(e => e.Scenes)
+            .FirstOrDefaultAsync(e => e.Id == episodeId && e.Show.UserId == userId);
+
+        if (episode == null)
+            throw new KeyNotFoundException("Episode not found.");
+
+        var sceneMap = episode.Scenes.ToDictionary(s => s.Id);
+
+        for (int i = 0; i < sceneIds.Count; i++)
+        {
+            var sceneId = sceneIds[i];
+            if (sceneMap.TryGetValue(sceneId, out var scene))
+            {
+                scene.Order = i + 1;
+            }
+        }
+
+        return await _repository.SaveChangesAsync();
     }
 }

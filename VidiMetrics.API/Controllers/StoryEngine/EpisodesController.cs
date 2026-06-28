@@ -8,6 +8,7 @@ using VidiMetrics.API.Factories;
 using VidiMetrics.Application.DTOs.Common;
 using VidiMetrics.Application.DTOs.StoryEngine.Episodes;
 using VidiMetrics.Application.Interfaces.StoryEngine;
+using VidiMetrics.Application.DTOs.StoryEngine.Scenes;
 
 namespace VidiMetrics.API.Controllers.StoryEngine;
 
@@ -59,5 +60,19 @@ public class EpisodesController : ApiBaseController
     {
         await _service.DeleteAsync(CurrentUserGuid, id);
         return Ok(ApiResponseFactory.Success<object?>(null, "Episode deleted successfully."));
+    }
+
+    [HttpPost("{id}/generate-video")]
+    public async Task<ActionResult<SuccessResponseDto<EpisodeResponseDto>>> GenerateVideo(Guid id)
+    {
+        var result = await _service.GenerateEpisodeVideoAsync(CurrentUserGuid, id);
+        return Ok(ApiResponseFactory.Success(result, "Episode video generated successfully."));
+    }
+
+    [HttpPut("{id}/scenes/reorder")]
+    public async Task<ActionResult<SuccessResponseDto<bool>>> ReorderScenes(Guid id, [FromBody] ReorderScenesDto dto)
+    {
+        var result = await _service.ReorderScenesAsync(CurrentUserGuid, id, dto.SceneIds);
+        return Ok(ApiResponseFactory.Success(result, "Scenes reordered successfully."));
     }
 }

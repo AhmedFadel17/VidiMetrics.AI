@@ -48,7 +48,7 @@ public class PollinationsVideoProvider : IVideoProvider
             throw new ArgumentException("Prompt cannot be empty.", nameof(prompt));
 
         string encodedPrompt = Uri.EscapeDataString(prompt);
-        string targetUrl = $"{_settings.BaseUrl}video/{encodedPrompt}?seed={seed}&width={width}&height={height}&model=ltx-2&audio=true";
+        string targetUrl = $"{_settings.BaseUrl}/video/{encodedPrompt}?seed={seed}&width={width}&height={height}&model=ltx-2&audio=true";
 
         var result = new VideoGenerationResult();
 

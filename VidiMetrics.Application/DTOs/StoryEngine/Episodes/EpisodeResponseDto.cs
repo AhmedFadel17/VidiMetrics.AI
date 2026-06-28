@@ -1,4 +1,5 @@
 using System;
+using VidiMetrics.Application.DTOs.Ai.AiVideos;
 using VidiMetrics.Application.DTOs.Common;
 
 namespace VidiMetrics.Application.DTOs.StoryEngine.Episodes
@@ -11,5 +12,6 @@ namespace VidiMetrics.Application.DTOs.StoryEngine.Episodes
         public Guid ShowId { get; set; }
         public string? ThumbnailUrl { get; set; }
         public string? VideoUrl { get; set; }
+        public AiVideoResponseDto? AiVideo { get; set; }
     }
 }

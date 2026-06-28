@@ -1,55 +1,39 @@
 import { Scene } from "@/types/models/storyEngine";
-import { Link } from "react-router-dom";
 
 interface SceneCardProps {
     scene: Scene;
+    onClick: () => void;
 }
 
-export default function SceneCard({ scene }: SceneCardProps) {
+export default function SceneCard({ scene, onClick }: SceneCardProps) {
+    const { id, order, name, aiScript } = scene;
+    const sceneThumbnail = scene.aiVideo?.thumbnailUrl || "";
+
+    const visualDescription = aiScript?.visualPrompt || "";
     return (
-        <Link 
-            to={`/dashboard/scenes/${scene.id}`}
-            className="group block"
+        <div
+            key={id}
+            onClick={() => onClick()}
+            className="bg-[#131b2e]/40 rounded-xl overflow-hidden border border-[#494456]/15 group cursor-pointer hover:border-[#ddb7ff]/30 transition-all duration-300 flex flex-col h-full"
         >
-            <div className="glass-card rounded-[2rem] p-6 border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-500 space-y-4">
-                <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-accent-cyan">Scene {scene.order}</span>
-                        <h4 className="text-white font-bold line-clamp-1">{scene.visualPrompt || "Untitled Scene"}</h4>
-                    </div>
-                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-accent-cyan/20 transition-colors">
-                        <span className="material-symbols-outlined text-white/40 group-hover:text-accent-cyan text-sm">movie_edit</span>
-                    </div>
-                </div>
-
-                <div className="space-y-3">
-                    <p className="text-white/40 text-xs line-clamp-3 leading-relaxed italic">
-                        "{scene.script}"
-                    </p>
-                </div>
-
-                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                    <div className="flex -space-x-2">
-                        {scene.characters?.slice(0, 3).map((char, i) => (
-                            <div key={i} className="w-6 h-6 rounded-full border border-surface bg-neutral-800 flex items-center justify-center overflow-hidden">
-                                {char.referenceImageUrl ? (
-                                    <img src={char.referenceImageUrl} alt={char.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <span className="text-[8px] font-black text-white/40">{char.name[0]}</span>
-                                )}
-                            </div>
-                        ))}
-                        {(scene.characters?.length || 0) > 3 && (
-                            <div className="w-6 h-6 rounded-full border border-surface bg-white/5 flex items-center justify-center text-[8px] font-black text-white/40">
-                                +{scene.characters!.length - 3}
-                            </div>
-                        )}
-                    </div>
-                    <span className="text-[9px] font-bold text-white/20 uppercase tracking-tighter">
-                        {scene.characters?.length || 0} Characters
-                    </span>
+            <div className="h-32 bg-[#222a3d] relative overflow-hidden">
+                <img
+                    src={sceneThumbnail}
+                    alt={`Scene ${order} Thumbnail`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-70"
+                />
+                <div className="absolute top-2 left-2 bg-[#0b1326]/80 backdrop-blur text-[10px] font-black tracking-widest px-2.5 py-1 rounded text-white border border-white/5">
+                    SCENE {order.toString().padStart(2, '0')}
                 </div>
             </div>
-        </Link>
+            <div className="p-4 flex flex-col gap-2 flex-1 justify-between">
+                <h4 className="font-label font-bold text-white text-sm group-hover:text-[#ddb7ff] transition-colors line-clamp-1">
+                    {name || `Sequence Event ${order}`}
+                </h4>
+                <p className="text-xs text-white/50 line-clamp-2 leading-relaxed font-body">
+                    {visualDescription}
+                </p>
+            </div>
+        </div>
     );
 }
