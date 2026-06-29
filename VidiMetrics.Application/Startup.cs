@@ -83,7 +83,7 @@ namespace VidiMetrics.Application
             // ---- SignalR ----
             services.AddSignalR();
             services.AddScoped<INotificationProvider, NotificationProvider>();
-
+            services.AddScoped<IFFmpegVideoProvider, FFmpegVideoProvider>();
             // --- Copilot HttpClient Configuration ---
             var apisSettings = configuration.GetSection("ApisSettings").Get<ApisSettings>();
 

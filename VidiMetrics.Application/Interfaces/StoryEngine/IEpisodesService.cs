@@ -13,6 +13,6 @@ public interface IEpisodesService
     Task<EpisodeResponseDto> CreateAsync(Guid userId, CreateEpisodeDto dto);
     Task<EpisodeResponseDto> UpdateAsync(Guid userId, Guid id, UpdateEpisodeDto dto);
     Task<bool> DeleteAsync(Guid userId, Guid id);
-    Task<EpisodeResponseDto> GenerateEpisodeVideoAsync(Guid userId, Guid episodeId);
+    Task<EpisodeResponseDto> StitchEpisodeVideoAsync(Guid userId, Guid episodeId);
     Task<bool> ReorderScenesAsync(Guid userId, Guid episodeId, List<Guid> sceneIds);
 }

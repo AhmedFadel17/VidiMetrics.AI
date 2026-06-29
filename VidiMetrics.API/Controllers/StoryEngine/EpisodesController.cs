@@ -62,11 +62,11 @@ public class EpisodesController : ApiBaseController
         return Ok(ApiResponseFactory.Success<object?>(null, "Episode deleted successfully."));
     }
 
-    [HttpPost("{id}/generate-video")]
-    public async Task<ActionResult<SuccessResponseDto<EpisodeResponseDto>>> GenerateVideo(Guid id)
+    [HttpPost("{id}/stitch")]
+    public async Task<ActionResult<SuccessResponseDto<EpisodeResponseDto>>> StitchEpisode(Guid id)
     {
-        var result = await _service.GenerateEpisodeVideoAsync(CurrentUserGuid, id);
-        return Ok(ApiResponseFactory.Success(result, "Episode video generated successfully."));
+        var result = await _service.StitchEpisodeVideoAsync(CurrentUserGuid, id);
+        return Ok(ApiResponseFactory.Success(result, "Episode video stitched successfully."));
     }
 
     [HttpPut("{id}/scenes/reorder")]

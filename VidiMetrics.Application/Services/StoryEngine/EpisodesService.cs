@@ -32,6 +32,7 @@ public class EpisodesService : IEpisodesService
     private readonly INotificationProvider _notificationProvider;
     private readonly IAiVideosRepository _aiVideosRepository;
     private readonly IVideoProvider _videoProvider;
+    private readonly IFFmpegVideoProvider _ffmpegVideoProvider;
     private readonly ICreditTransactionManager _creditManager;
 
     public EpisodesService(
@@ -43,6 +44,7 @@ public class EpisodesService : IEpisodesService
         INotificationProvider notificationProvider,
         IAiVideosRepository aiVideosRepository,
         IVideoProvider videoProvider,
+        IFFmpegVideoProvider ffmpegVideoProvider,
         ICreditTransactionManager creditManager)
     {
         _repository = repository;
@@ -53,6 +55,7 @@ public class EpisodesService : IEpisodesService
         _notificationProvider = notificationProvider;
         _aiVideosRepository = aiVideosRepository;
         _videoProvider = videoProvider;
+        _ffmpegVideoProvider = ffmpegVideoProvider;
         _creditManager = creditManager;
     }
 
@@ -148,12 +151,13 @@ public class EpisodesService : IEpisodesService
         return isSuccess;
     }
 
-    public async Task<EpisodeResponseDto> GenerateEpisodeVideoAsync(Guid userId, Guid episodeId)
+    public async Task<EpisodeResponseDto> StitchEpisodeVideoAsync(Guid userId, Guid episodeId)
     {
         var episode = await _repository.Query()
             .Include(e => e.Show)
             .Include(e => e.Scenes.OrderBy(s => s.Order))
-                .ThenInclude(s => s.AiScript)
+                .ThenInclude(s => s.AiVideo)
+
             .FirstOrDefaultAsync(e => e.Id == episodeId && e.Show.UserId == userId);
 
         if (episode == null)
@@ -162,25 +166,18 @@ public class EpisodesService : IEpisodesService
         if (episode.Scenes == null || !episode.Scenes.Any())
             throw new InvalidOperationException("Cannot generate video for an episode with no scenes.");
 
-        var promptBuilder = new System.Text.StringBuilder();
-        promptBuilder.Append($"Cinematic cut for {episode.Title} (Style: {episode.Show.VisualStyle}). Plot: {episode.PlotSummary}. ");
+        var paths = new List<string>();
 
         foreach (var scene in episode.Scenes)
         {
-            promptBuilder.Append($"Scene {scene.Order}: {scene.Name}. ");
-            if (scene.AiScript != null && !string.IsNullOrWhiteSpace(scene.AiScript.VisualPrompt))
+            if (scene.AiVideo != null && !string.IsNullOrWhiteSpace(scene.AiVideo.VideoUrl))
             {
-                promptBuilder.Append($"{scene.AiScript.VisualPrompt} ");
+                paths.Add(scene.AiVideo.VideoUrl);
             }
         }
 
-        string combinedPrompt = promptBuilder.ToString();
-        if (combinedPrompt.Length > 2000)
-        {
-            combinedPrompt = combinedPrompt.Substring(0, 2000);
-        }
-
-        var seed = new Random().Next(1, 999999);
+        if (paths.Count == 0)
+            throw new InvalidOperationException("Cannot generate video for an episode with no videos.");
 
         return await _creditManager.ExecuteWithCreditsAsync(
             userId,
@@ -188,8 +185,8 @@ public class EpisodesService : IEpisodesService
             "Episode Video Generation",
             async () =>
             {
-                var providerResult = await _videoProvider.GenerateVideoAsync(combinedPrompt, seed);
-
+        var seed = new Random().Next(1, 999999);
+                var providerResult = await _ffmpegVideoProvider.StitchVideosAsync(paths,seed);
                 var aiVideo = new AiVideo
                 {
                     VideoUrl = providerResult.VideoUrl,

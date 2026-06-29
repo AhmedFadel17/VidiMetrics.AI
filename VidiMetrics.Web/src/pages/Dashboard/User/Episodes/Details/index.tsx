@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useGetShowByIdQuery, useGetEpisodeByIdQuery, useUpdateEpisodeMutation, useGetScenesQuery, useGenerateEpisodeVideoMutation, useReorderScenesMutation } from '@/store/apis'
+import { useGetShowByIdQuery, useGetEpisodeByIdQuery, useGetScenesQuery, useStitchEpisodeVideoMutation, useReorderScenesMutation } from '@/store/apis'
 import Breadcrumbs from '@/components/ui/Breadcrumbs'
 import { toast } from 'sonner'
 import { ErrorScreen, LoadingScreen } from '@/components/ui/Feedback/StatusScreens'
@@ -17,7 +17,7 @@ export default function EpisodeDetails() {
     // Queries & Mutations
     const { data: showResponse, isLoading: isShowLoading } = useGetShowByIdQuery(showId || '');
     const { data: episodeResponse, isLoading: isEpisodeLoading } = useGetEpisodeByIdQuery(id || '');
-    const [generateEpisodeVideo, { isLoading: isGeneratingVideo }] = useGenerateEpisodeVideoMutation();
+    const [stitchEpisodeVideo, { isLoading: isGeneratingVideo }] = useStitchEpisodeVideoMutation();
     const [reorderScenes, { isLoading: isSavingOrder }] = useReorderScenesMutation();
     const { data: scenesResponse, isLoading: isScenesLoading } = useGetScenesQuery({
         episodeId: id || '',
@@ -105,7 +105,7 @@ export default function EpisodeDetails() {
         }, 400);
 
         try {
-            await generateEpisodeVideo(episode.id).unwrap();
+            await stitchEpisodeVideo(episode.id).unwrap();
             clearInterval(interval);
             setSynthesisProgress(100);
             setSynthesisStatus('Synthesis complete!');

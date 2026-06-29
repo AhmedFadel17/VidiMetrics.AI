@@ -9,7 +9,7 @@ export interface CreateEpisodeRequest {
   showId: string;
 }
 
-export interface UpdateEpisodeRequest extends Partial<CreateEpisodeRequest> {}
+export interface UpdateEpisodeRequest extends Partial<CreateEpisodeRequest> { }
 
 export interface EpisodeFilter extends PaginationFilter {
   showId?: string;
@@ -38,9 +38,9 @@ export const episodesApi = mainApi.injectEndpoints({
       providesTags: (result) =>
         result?.data?.items
           ? [
-              ...result.data.items.map(({ id }) => ({ type: 'Episode' as const, id })),
-              { type: 'Episode', id: 'LIST' },
-            ]
+            ...result.data.items.map(({ id }) => ({ type: 'Episode' as const, id })),
+            { type: 'Episode', id: 'LIST' },
+          ]
           : [{ type: 'Episode', id: 'LIST' }],
     }),
 
@@ -70,8 +70,8 @@ export const episodesApi = mainApi.injectEndpoints({
       ],
     }),
 
-    generateEpisodeVideo: builder.mutation<ApiResponse<Episode>, string>({
-      query: (id) => ({ url: `/api/episodes/${id}/generate-video`, method: 'POST' }),
+    stitchEpisodeVideo: builder.mutation<ApiResponse<Episode>, string>({
+      query: (id) => ({ url: `/api/episodes/${id}/stitch`, method: 'POST' }),
       invalidatesTags: (_result, _err, id) => [
         { type: 'Episode', id },
         { type: 'Episode', id: 'LIST' },
@@ -98,6 +98,6 @@ export const {
   useCreateEpisodeMutation,
   useUpdateEpisodeMutation,
   useDeleteEpisodeMutation,
-  useGenerateEpisodeVideoMutation,
+  useStitchEpisodeVideoMutation,
   useReorderScenesMutation,
 } = episodesApi;
