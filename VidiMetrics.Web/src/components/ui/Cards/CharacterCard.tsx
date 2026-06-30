@@ -18,12 +18,6 @@ export default function CharacterCard({ character }: CharacterCardProps) {
 
     const thumbnail = referenceImageUrl || 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?w=400&auto=format&fit=crop&q=60';
 
-    const traits = Array.isArray(personalityTraits)
-        ? personalityTraits
-        : typeof personalityTraits === 'string'
-            ? personalityTraits.split(',').map(t => t.trim()).filter(Boolean)
-            : [];
-
     return (
         <div className="w-full rounded-2xl bg-gradient-to-r from-white/[0.04] to-white/[0.01] border border-white/5 p-3 group hover:border-accent-purple/40 hover:bg-white/[0.05] transition-all duration-300 shadow-lg relative overflow-hidden backdrop-blur-md">
             <Link to={`/dashboard/series/${showId}/characters/${id}`} className="flex gap-4 items-center h-28">
@@ -53,9 +47,9 @@ export default function CharacterCard({ character }: CharacterCardProps) {
                         </div>
 
                         {/* Trait Tags Row (Single line, hidden if empty) */}
-                        {traits.length > 0 && (
+                        {personalityTraits.length > 0 && (
                             <div className="flex flex-wrap gap-1 overflow-hidden h-4.5 items-center">
-                                {traits
+                                {personalityTraits
                                     .slice(0, 2) // Kept to 2 tags max for compact spacing
                                     .map((trait, idx) => (
                                         <span
