@@ -11,13 +11,13 @@ namespace VidiMetrics.IdentityServer.Pages.Account
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
-        private readonly Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.IdentityServerSettings> _identitySettings;
+        private readonly Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.ConfigSettings> _identitySettings;
 
         public LoginModel(
             SignInManager<ApplicationUser> signInManager,
 
             ILogger<LoginModel> logger,
-            Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.IdentityServerSettings> identitySettings)
+            Microsoft.Extensions.Options.IOptions<VidiMetrics.IdentityServer.Configuration.ConfigSettings> identitySettings)
         {
             _signInManager = signInManager;
             _logger = logger;

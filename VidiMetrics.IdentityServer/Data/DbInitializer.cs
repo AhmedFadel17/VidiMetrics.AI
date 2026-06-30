@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using VidiMetrics.IdentityServer.Configuration;
@@ -8,64 +10,88 @@ namespace VidiMetrics.IdentityServer.Data;
 
 public static class DbInitializer
 {
+    private static readonly string[] StandardScopes = [
+        Scopes.OpenId,
+        Scopes.Profile,
+        Scopes.Email,
+        Scopes.Roles,
+        Scopes.OfflineAccess
+    ];
+
     public static async Task SeedAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var services = scope.ServiceProvider;
+
+        var context = services.GetRequiredService<AppDbContext>();
         await context.Database.EnsureCreatedAsync();
 
-        // 1. Get Services and Configuration
-        var manager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
-        var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        
-        // Pull settings from appsettings.json
-        var settings = scope.ServiceProvider
-            .GetRequiredService<IOptions<IdentityServerSettings>>().Value;
+        var settings = services.GetRequiredService<IOptions<ConfigSettings>>().Value;
+        var adminSettings = services.GetRequiredService<IOptions<AdminUserSettings>>().Value;
 
-        // 2. Seed Roles
-        var roles = settings.Clients.SelectMany(c => c.Roles).Distinct();
-        foreach (var role in roles)
-        {
-            if (!await roleManager.RoleExistsAsync(role))
-                await roleManager.CreateAsync(new IdentityRole(role));
-        }
+        await SeedRolesAsync(services, settings);
+        await SeedAdminUserAsync(services, adminSettings);
+        await SeedScopesAsync(services, settings);
+        await SeedClientsAsync(services, settings);
+    }
 
-        // 3. Seed Admin User
-        var adminInfo = settings.AdminUser;
-        if (!string.IsNullOrEmpty(adminInfo.Email) && await userManager.FindByEmailAsync(adminInfo.Email) == null)
+    private static async Task SeedRolesAsync(IServiceProvider services, ConfigSettings settings)
+    {
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+        var roles = settings.Clients
+            .SelectMany(c => c.Roles ?? [])
+            .Append("Admin")
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var roleName in roles)
         {
-            var adminUser = new ApplicationUser
+            if (!string.IsNullOrWhiteSpace(roleName) && !await roleManager.RoleExistsAsync(roleName))
             {
-                UserName = adminInfo.Email,
-                Email = adminInfo.Email,
-                FirstName = adminInfo.FirstName,
-                LastName = adminInfo.LastName,
-                EmailConfirmed = true
-            };
-    
-            var result = await userManager.CreateAsync(adminUser, adminInfo.Password);
-    
-            if (result.Succeeded)
-            {
-                await userManager.AddToRoleAsync(adminUser, "Admin");
-            }
-            else 
-            {
-                // Log errors if password requirements aren't met
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"Failed to seed admin user: {errors}");
+                await roleManager.CreateAsync(new IdentityRole(roleName));
             }
         }
+    }
 
-        // 4. Seed Custom Scopes from JSON
-        // We look at all clients and ensure every unique scope is registered
-        var uniqueScopes = settings.Clients.SelectMany(c => c.Scopes).Distinct();
-        foreach (var scopeName in uniqueScopes)
+    private static async Task SeedAdminUserAsync(IServiceProvider services, AdminUserSettings? adminSettings)
+    {
+        if (adminSettings == null || string.IsNullOrWhiteSpace(adminSettings.Email)) return;
+
+        var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+        var existingUser = await userManager.FindByEmailAsync(adminSettings.Email);
+
+        if (existingUser != null) return;
+
+        var adminUser = new ApplicationUser
         {
-            // Skip OIDC built-in scopes
-            if (new[] { "openid", "profile", "email", "roles", "offline_access" }.Contains(scopeName))
+            UserName = adminSettings.Email,
+            Email = adminSettings.Email,
+            FirstName = adminSettings.FirstName,
+            LastName = adminSettings.LastName,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(adminUser, adminSettings.Password);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to seed admin user: {errors}");
+        }
+
+        await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+
+    private static async Task SeedScopesAsync(IServiceProvider services, ConfigSettings settings)
+    {
+        var scopeManager = services.GetRequiredService<IOpenIddictScopeManager>();
+
+        var customScopes = settings.Clients
+            .SelectMany(c => c.Scopes ?? [])
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var scopeName in customScopes)
+        {
+            if (string.IsNullOrWhiteSpace(scopeName) || StandardScopes.Contains(scopeName, StringComparer.OrdinalIgnoreCase))
                 continue;
 
             if (await scopeManager.FindByNameAsync(scopeName) == null)
@@ -78,19 +104,25 @@ public static class DbInitializer
                 });
             }
         }
+    }
 
-        // 5. Seed/Update OpenIddict Clients from JSON
+    private static async Task SeedClientsAsync(IServiceProvider services, ConfigSettings settings)
+    {
+        var manager = services.GetRequiredService<IOpenIddictApplicationManager>();
+
         foreach (var clientConfig in settings.Clients)
         {
+            if (string.IsNullOrWhiteSpace(clientConfig.ClientId)) continue;
+
             var application = await manager.FindByClientIdAsync(clientConfig.ClientId);
-            
+
             var descriptor = new OpenIddictApplicationDescriptor
             {
                 ClientId = clientConfig.ClientId,
                 DisplayName = clientConfig.DisplayName,
                 ClientType = ClientTypes.Public,
-                RedirectUris = { new Uri($"{clientConfig.BaseUrl}/callback") },
-                PostLogoutRedirectUris = { new Uri(clientConfig.BaseUrl) },
+                RedirectUris = { new Uri($"{clientConfig.BaseUrl.TrimPostFix("/")}/callback") },
+                PostLogoutRedirectUris = { new Uri(clientConfig.BaseUrl.TrimPostFix("/")) },
                 Permissions =
                 {
                     Permissions.Endpoints.Authorization,
@@ -103,10 +135,12 @@ public static class DbInitializer
                 Requirements = { Requirements.Features.ProofKeyForCodeExchange }
             };
 
-            // Add Scopes from JSON
-            foreach (var s in clientConfig.Scopes)
+            if (clientConfig.Scopes != null)
             {
-                descriptor.Permissions.Add(Permissions.Prefixes.Scope + s);
+                foreach (var scope in clientConfig.Scopes)
+                {
+                    descriptor.Permissions.Add(Permissions.Prefixes.Scope + scope);
+                }
             }
 
             if (application == null)
@@ -115,9 +149,15 @@ public static class DbInitializer
             }
             else
             {
-                // Update existing client to match JSON (Sync URIs and Permissions)
                 await manager.UpdateAsync(application, descriptor);
             }
         }
+    }
+
+    private static string TrimPostFix(this string value, string postfix)
+    {
+        if (value.EndsWith(postfix))
+            return value.Substring(0, value.Length - postfix.Length);
+        return value;
     }
 }

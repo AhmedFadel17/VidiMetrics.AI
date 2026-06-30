@@ -9,13 +9,14 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<IdentityServerSettings>(
-    builder.Configuration.GetSection("IdentityServer"));
+var configSettingsSection = builder.Configuration.GetSection("ConfigSettings");
+builder.Services.Configure<ConfigSettings>(configSettingsSection);
+var configSettings = configSettingsSection.Get<ConfigSettings>()
+    ?? throw new InvalidOperationException("ConfigSettings section is missing or invalid in configuration.");
 
-var identitySettings = builder.Configuration.GetSection("IdentityServer").Get<IdentityServerSettings>()
-
-                      ?? new IdentityServerSettings();
+builder.Services.Configure<AdminUserSettings>(builder.Configuration.GetSection("AdminUserSettings"));
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("SmtpSettings"));
+
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddMemoryCache();
@@ -24,10 +25,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        var firstClientUrl = identitySettings.Clients.FirstOrDefault()?.BaseUrl ?? "http://localhost:5173";
-        policy.WithOrigins(firstClientUrl)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        foreach (var client in configSettings.Clients)
+        {
+            policy.WithOrigins(client.BaseUrl)
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        }
     });
 });
 
@@ -37,13 +40,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseOpenIddict();
 });
 
-builder.Services.AddScoped<IEmailSender<ApplicationUser>, EmailSender>();
+builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.User.RequireUniqueEmail = true;
     options.Password.RequiredLength = 8;
-    options.SignIn.RequireConfirmedEmail = true;
 })
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
@@ -55,26 +57,24 @@ builder.Services.AddOpenIddict()
     })
     .AddServer(options =>
     {
-        // Using JSON-defined endpoints
-        options.SetTokenEndpointUris(identitySettings.Endpoints.Token)
-               .SetAuthorizationEndpointUris(identitySettings.Endpoints.Authorization)
-               .SetEndSessionEndpointUris(identitySettings.Endpoints.Logout)
-               .SetUserInfoEndpointUris(identitySettings.Endpoints.UserInfo);
+        options.SetTokenEndpointUris(configSettings.Endpoints.Token)
+               .SetAuthorizationEndpointUris(configSettings.Endpoints.Authorization)
+               .SetEndSessionEndpointUris(configSettings.Endpoints.Logout)
+               .SetUserInfoEndpointUris(configSettings.Endpoints.UserInfo);
 
         options.AllowAuthorizationCodeFlow().AllowRefreshTokenFlow();
-
-        // Register default scopes + any custom ones from your JSON clients
         options.RegisterScopes(Scopes.OpenId, Scopes.Email, Scopes.Profile, Scopes.Roles, Scopes.OfflineAccess);
-
-        // Allow 'register' prompt for registration flow
         options.RegisterPromptValues("register");
 
-
-        foreach (var client in identitySettings.Clients)
+        if (configSettings.Clients != null)
         {
-            foreach (var scope in client.Scopes)
+            foreach (var client in configSettings.Clients)
             {
-                options.RegisterScopes(scope);
+                if (client.Scopes == null) continue;
+                foreach (var scope in client.Scopes)
+                {
+                    options.RegisterScopes(scope);
+                }
             }
         }
 
@@ -98,11 +98,9 @@ builder.Services.AddOpenIddict()
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Using the Login path from JSON
-    options.LoginPath = identitySettings.Endpoints.Login;
-
-    options.LogoutPath = identitySettings.Endpoints.Logout;
-    options.AccessDeniedPath = identitySettings.Endpoints.AccessDenied;
+    options.LoginPath = configSettings.Endpoints.Login;
+    options.LogoutPath = configSettings.Endpoints.Logout;
+    options.AccessDeniedPath = configSettings.Endpoints.AccessDenied;
     options.ExpireTimeSpan = TimeSpan.FromDays(14);
     options.SlidingExpiration = true;
     options.Cookie.HttpOnly = true;
@@ -110,14 +108,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
 });
-builder.Services.AddTransient<IEmailSender<ApplicationUser>, EmailSender>();
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddEntityFrameworkOutbox<AppDbContext>(o =>
     {
         o.UseSqlServer();
         o.UseBusOutbox();
-
     });
 
     x.UsingRabbitMq((context, cfg) =>
@@ -130,7 +127,10 @@ builder.Services.AddMassTransit(x =>
 
 var app = builder.Build();
 
-await DbInitializer.SeedAsync(app.Services);
+using (var scope = app.Services.CreateScope())
+{
+    await DbInitializer.SeedAsync(scope.ServiceProvider);
+}
 
 if (app.Environment.IsDevelopment())
 {
