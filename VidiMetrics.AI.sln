@@ -13,6 +13,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidiMetrics.DataAccess", "V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidiMetrics.IdentityServer", "VidiMetrics.IdentityServer\VidiMetrics.IdentityServer.csproj", "{17C5CDF9-FE38-4B19-B2CF-B7A0A1BA73AE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidiMetrics.UnitTests", "VidiMetrics.UnitTests\VidiMetrics.UnitTests.csproj", "{7575491A-671C-4578-A140-46F79E9E616C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VidiMetrics.IntegrationTests", "VidiMetrics.IntegrationTests\VidiMetrics.IntegrationTests.csproj", "{03FE33ED-6B4A-412D-A1EA-8325036C4742}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,9 +45,21 @@ Global
 		{17C5CDF9-FE38-4B19-B2CF-B7A0A1BA73AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17C5CDF9-FE38-4B19-B2CF-B7A0A1BA73AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17C5CDF9-FE38-4B19-B2CF-B7A0A1BA73AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7575491A-671C-4578-A140-46F79E9E616C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7575491A-671C-4578-A140-46F79E9E616C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7575491A-671C-4578-A140-46F79E9E616C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7575491A-671C-4578-A140-46F79E9E616C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03FE33ED-6B4A-412D-A1EA-8325036C4742}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03FE33ED-6B4A-412D-A1EA-8325036C4742}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03FE33ED-6B4A-412D-A1EA-8325036C4742}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03FE33ED-6B4A-412D-A1EA-8325036C4742}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7575491A-671C-4578-A140-46F79E9E616C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{03FE33ED-6B4A-412D-A1EA-8325036C4742} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4BCD2FA6-62CB-4446-A2F9-D093E1E25E20}
