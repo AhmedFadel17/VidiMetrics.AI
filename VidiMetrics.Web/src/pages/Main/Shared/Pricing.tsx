@@ -1,5 +1,8 @@
 import { Button } from '@/components/ui/Button';
 import { PricingPlan } from '@/types/pricing';
+import { showToast } from "@/utils/toast"
+import { useAuth } from 'react-oidc-context'
+import { useNavigate } from 'react-router-dom';
 
 const plans: PricingPlan[] = [
     {
@@ -57,6 +60,15 @@ const plans: PricingPlan[] = [
     }
 ]
 export default function Pricing() {
+    const auth = useAuth();
+    const navigate = useNavigate();
+    const handleRegister = async () => {
+        try {
+            await auth.signinRedirect({ extraQueryParams: { prompt: 'register' } })
+        } catch (error: any) {
+            showToast.error("Register redirect failed", "Something went wrong while registering. Please try again.")
+        }
+    }
     return (
         <div className="max-w-screen-2xl mx-auto">
             <div className="text-center mb-20 space-y-4">
@@ -90,6 +102,7 @@ export default function Pricing() {
                                 className="mt-auto"
                                 variant={plan.isPopular ? "primary" : "secondary"}
                                 size="lg"
+                                onClick={() => auth.isAuthenticated ? navigate('/dashboard') : handleRegister()}
                             >
                                 {plan.startAction}
                             </Button>

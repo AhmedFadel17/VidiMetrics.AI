@@ -57,8 +57,8 @@ export default function TopNavBar() {
             <NavLink
               key={index}
               className={({ isActive }: { isActive: boolean }) =>
-                `text-sm uppercase tracking-widest font-bold transition-colors ${isActive
-                  ? 'text-primary border-b border-primary pb-1'
+                `text-base capitalize tracking-widest font-medium transition-colors ${isActive
+                  ? 'text-primary'
                   : 'text-white/60 hover:text-white'
                 }`
               }

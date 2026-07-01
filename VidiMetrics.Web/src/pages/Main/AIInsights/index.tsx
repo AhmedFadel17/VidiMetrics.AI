@@ -1,252 +1,190 @@
-import React from 'react';
+import { useState } from "react";
 
-const AIInsights: React.FC = () => {
+export default function AiInsights() {
+  const [selectedModel, setSelectedModel] = useState("All Active Nodes");
+
+  const globalMetrics = [
+    { label: "Neural Fidelity Score", value: "94.8%", sub: "+1.2% variance", trend: "up" },
+    { label: "Avg Node Processing Temp", value: "62°C", sub: "Optimal range", trend: "stable" },
+    { label: "Token Parsing Velocity", value: "1.4k /s", sub: "Zero queue latency", trend: "up" },
+    { label: "AI Resource Yield", value: "98.2%", sub: "Minimal loss", trend: "up" }
+  ];
+
+  const layerInsights = [
+    {
+      id: "LYR-09",
+      scene: "Scene 1: Neon Cluster Intro",
+      modelUsed: "VidiDiffusion-v2.5",
+      accuracy: 96,
+      renderTime: "4.2s",
+      status: "Optimized"
+    },
+    {
+      id: "LYR-12",
+      scene: "Scene 2: Holographic Grid Analytics",
+      modelUsed: "VidiDiffusion-v2.5",
+      accuracy: 91,
+      renderTime: "7.8s",
+      status: "Optimized"
+    },
+    {
+      id: "LYR-14",
+      scene: "Scene 3: Deep Space Rendering Loop",
+      modelUsed: "Custom-Sora-Node",
+      accuracy: 88,
+      renderTime: "12.1s",
+      status: "Heavy Load"
+    }
+  ];
+
   return (
-    <div className="bg-[#0b1326] text-white min-h-screen">
-      {/* Hero Section */}
-      <section className="relative pt-44 pb-32 px-8 overflow-hidden">
-        <div className="max-w-screen-2xl mx-auto relative z-10 text-center lg:text-left">
-          <div className="w-full space-y-8">
-            <h1 className="font-headline font-bold text-7xl lg:text-8xl leading-[0.9] tracking-tighter">
-              The Future of <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ddb7ff] via-[#3da9fc] to-[#7818c6] pr-4">Visual</span>
-              Narratives.
+    <div className="bg-surface text-white min-h-screen pt-36 pb-20 px-6 md:px-12 transition-all duration-300">
+      <div className="max-w-6xl mx-auto space-y-16">
+
+        {/* Top Header & Filter Controller */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-white/5 pb-6">
+          <div className="space-y-1.5">
+            <span className="text-xs font-mono font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
+              Real-Time Neural Logs
+            </span>
+            <h1 className="text-3xl md:text-4xl font-headline font-black tracking-tight">
+              AI Insights Engine
             </h1>
-            <div className='grid grid-cols-2 gap-4'>
-              <p className="text-xl text-white/50 max-w-2xl leading-relaxed font-body">
-                Moving beyond simple metrics into deep generative intelligence. VidiMetrics.Ai synthesizes audience data into actionable storyboards, character arcs, and cinematic production workflows.
+            <p className="text-white/50 text-xs md:text-sm">
+              Audit cognitive visual consistency, token vector parameters, and real-time node computational performance.
+            </p>
+          </div>
+
+          {/* Selector Filter */}
+          <div className="bg-white/[0.02] border border-white/5 rounded-xl p-1.5 flex gap-1 self-start md:self-center font-mono text-xs">
+            {["All Active Nodes", "VidiDiffusion", "Sora Cluster"].map((node) => (
+              <button
+                key={node}
+                onClick={() => setSelectedModel(node)}
+                className={`px-3 py-1.5 rounded-lg transition-all duration-300 font-medium ${selectedModel === node
+                    ? "bg-white/5 text-primary-light font-bold border border-white/10"
+                    : "text-white/40 hover:text-white"
+                  }`}
+              >
+                {node}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Global Statistics Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {globalMetrics.map((metric, idx) => (
+            <div key={idx} className="bg-white/[0.01] border border-white/5 p-5 rounded-2xl space-y-2 hover:border-white/10 transition-colors duration-300">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-white/40 block">
+                {metric.label}
+              </span>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl md:text-3xl font-mono font-black text-white">{metric.value}</span>
+                <span className={`text-[10px] font-mono font-medium ${metric.trend === "up" ? "text-emerald-400" : "text-white/30"
+                  }`}>
+                  {metric.trend === "up" ? "↑" : "•"}
+                </span>
+              </div>
+              <p className="text-[11px] text-white/30 font-sans">{metric.sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Neural Analytics Progress Tracking & Table Split */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+          {/* Left Table Section: Active Layer Performance (8 Columns) */}
+          <div className="lg:col-span-8 bg-white/[0.01] border border-white/5 rounded-2xl overflow-hidden">
+            <div className="p-4 bg-white/[0.02] border-b border-white/5 flex items-center justify-between">
+              <h3 className="text-xs font-headline font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-sm">analytics</span>
+                Scene Architecture Audit logs
+              </h3>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs font-medium">
+                <thead className="bg-black/20 text-white/40 font-mono text-[10px] tracking-wider uppercase border-b border-white/5">
+                  <tr>
+                    <th className="p-4">Layer ID</th>
+                    <th className="p-4">Target Scene</th>
+                    <th className="p-4">Model Pipeline</th>
+                    <th className="p-4">Prompt Sync</th>
+                    <th className="p-4">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-white/70">
+                  {layerInsights.map((layer) => (
+                    <tr key={layer.id} className="hover:bg-white/[0.01] transition-colors group">
+                      <td className="p-4 font-mono text-white/40 group-hover:text-primary-light transition-colors">{layer.id}</td>
+                      <td className="p-4 font-bold text-white max-w-[180px] truncate">{layer.scene}</td>
+                      <td className="p-4 font-mono text-[11px]">{layer.modelUsed}</td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-12 bg-white/5 h-1.5 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${layer.accuracy >= 90 ? "bg-emerald-400" : "bg-amber-400"}`}
+                              style={{ width: `${layer.accuracy}%` }}
+                            />
+                          </div>
+                          <span className="font-mono text-[11px] text-white/80">{layer.accuracy}%</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold ${layer.status === "Optimized" ? "text-emerald-400 bg-emerald-500/5" : "text-amber-400 bg-amber-500/5"
+                          }`}>
+                          {layer.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Right Section: Node Health Diagnostic Widget (4 Columns) */}
+          <div className="lg:col-span-4 bg-gradient-to-b from-white/[0.02] to-transparent border border-white/5 p-6 rounded-2xl space-y-6">
+            <h3 className="text-xs font-headline font-bold text-white uppercase tracking-wider border-b border-white/5 pb-3">
+              Cluster Vitals Status
+            </h3>
+
+            <div className="space-y-4">
+              {/* Metric Card 1 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-white/50">GPU Memory Allocation</span>
+                  <span className="font-mono text-white/80">14.2 GB / 24 GB</span>
+                </div>
+                <div className="w-full bg-white/5 h-2 rounded-xl overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-primary to-primary-light w-[60%] rounded-xl" />
+                </div>
+              </div>
+
+              {/* Metric Card 2 */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs">
+                  <span className="text-white/50">Active Batch Queue Load</span>
+                  <span className="font-mono text-white/80">32% Capacity</span>
+                </div>
+                <div className="w-full bg-white/5 h-2 rounded-xl overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-primary to-primary-light w-[32%] rounded-xl" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-black/30 border border-white/5 p-4 rounded-xl flex gap-3 items-start">
+              <span className="material-symbols-outlined text-primary-light text-lg">verified_user</span>
+              <p className="text-[11px] text-white/40 leading-relaxed">
+                Analytical layers are fully certified against the VidiMetrics safety architecture protocol, ensuring no invalid frame noise corruption.
               </p>
-              <div className='relative'>
-                <div className="absolute bottom-2 right-2 flex gap-4 pt-4">
-                  <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest font-bold text-[#3da9fc]">Real-time Engine</span>
-                  <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-widest font-bold text-[#7818c6]">Generative Logic</span>
-                </div>
-              </div>
-
             </div>
-
           </div>
+
         </div>
-        {/* Background Gradients */}
-        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-primary/10 blur-[180px] rounded-full -mr-96 -mt-96 pointer-events-none"></div>
-      </section>
 
-      {/* Bento Grid Features */}
-      <section className="py-20 px-8">
-        <div className="max-w-screen-2xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[300px]">
-
-            {/* YouTube Analytics Integration */}
-            <div className="md:col-span-8 group relative overflow-hidden rounded-3xl bg-[#161f35] border border-white/5 p-10 hover:border-white/10 transition-all duration-500">
-              <div className="relative z-10 max-w-md">
-                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-8 border border-white/10 group-hover:bg-[#3da9fc]/10 transition-colors">
-                  <span className="material-symbols-outlined text-[#3da9fc]">analytics</span>
-                </div>
-                <h3 className="text-3xl font-headline font-bold mb-4">YouTube Analytics Integration</h3>
-                <p className="text-white/40 leading-relaxed mb-8">
-                  Deep-link your channel data to uncover the hidden narrative patterns. We don't just show views; we map the emotional resonance of every frame.
-                </p>
-                <ul className="space-y-4">
-                  <li className="flex items-center gap-3 text-sm text-white/60">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3da9fc]"></span>
-                    Retention-to-Story Correlation
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-white/60">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#3da9fc]"></span>
-                    Demographic Sentiment Mapping
-                  </li>
-                </ul>
-                <div className="mt-10">
-                  <a href="#" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#3da9fc] hover:gap-4 transition-all">
-                    Explore Data Engine <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                  </a>
-                </div>
-              </div>
-              {/* Abstract Wavy Graph Mockup */}
-              <div className="absolute right-0 bottom-0 top-0 w-1/2 opacity-20 group-hover:opacity-40 transition-opacity pointer-events-none">
-                <svg viewBox="0 0 400 400" className="w-full h-full">
-                  <path d="M0,200 Q100,100 200,200 T400,200" fill="none" stroke="#3da9fc" strokeWidth="2" />
-                  <path d="M0,220 Q100,120 200,220 T400,220" fill="none" stroke="#3da9fc" strokeWidth="1" opacity="0.5" />
-                  <path d="M0,240 Q100,140 200,240 T400,240" fill="none" stroke="#3da9fc" strokeWidth="0.5" opacity="0.2" />
-                </svg>
-              </div>
-            </div>
-
-            {/* Live Transcripts */}
-            <div className="md:col-span-4 group relative overflow-hidden rounded-3xl bg-[#161f35] border border-white/5 p-10 hover:border-white/10 transition-all duration-500">
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-8 border border-white/10 group-hover:bg-[#ddb7ff]/10 transition-colors">
-                <span className="material-symbols-outlined text-[#ddb7ff]">description</span>
-              </div>
-              <h3 className="text-2xl font-headline font-bold mb-4">Live Transcripts</h3>
-              <p className="text-white/40 text-sm leading-relaxed mb-8">
-                Convert every word into structured data. Our engine parses dialogue for thematic consistency and brand safety in real-time.
-              </p>
-              {/* Mock Transcript Lines */}
-              <div className="space-y-3 opacity-20 group-hover:opacity-40 transition-opacity">
-                <div className="h-2 bg-white/40 rounded-full w-full"></div>
-                <div className="h-2 bg-white/40 rounded-full w-3/4"></div>
-                <div className="h-2 bg-white/40 rounded-full w-5/6"></div>
-              </div>
-            </div>
-
-            {/* AI Storyboarding */}
-            <div className="md:col-span-4 group relative overflow-hidden rounded-3xl bg-[#161f35] border border-white/5 p-10 hover:border-white/10 transition-all duration-500 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-8 border border-white/10 group-hover:bg-[#7818c6]/10 transition-colors">
-                  <span className="material-symbols-outlined text-[#7818c6]">auto_fix</span>
-                </div>
-                <h3 className="text-2xl font-headline font-bold mb-4">AI Storyboarding</h3>
-                <p className="text-white/40 text-sm leading-relaxed mb-6">
-                  Transform abstract ideas into visual reality. Character sheets, scene layouts, and episode arcs generated in seconds.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 mt-4">
-                <div className="aspect-square rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 border border-white/5">
-                  <img src="/src/assets/images/AIInsights/character1.png" alt="Character 1" className="w-full h-full object-cover" />
-                </div>
-                <div className="aspect-square rounded-xl overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 border border-white/5">
-                  <img src="/src/assets/images/AIInsights/scene1.png" alt="Scene 1" className="w-full h-full object-cover" />
-                </div>
-              </div>
-            </div>
-
-            {/* Precision Prompt Engineering */}
-            <div className="md:col-span-8 group relative overflow-hidden rounded-3xl bg-[#161f35] border border-white/5 p-10 hover:border-white/10 transition-all duration-500 flex flex-col md:flex-row gap-10">
-              <div className="flex-1">
-                <h3 className="text-3xl font-headline font-bold mb-6">Precision Prompt Engineering</h3>
-                <p className="text-white/40 leading-relaxed mb-10">
-                  Take absolute control over the creative output. Our advanced command center allows for granular adjustments to lighting, mood, and camera movement.
-                </p>
-                <div className="flex gap-8">
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">Atmosphere</span>
-                    <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="w-[70%] h-full bg-[#7818c6]"></div>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/30">Contrast</span>
-                    <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="w-[45%] h-full bg-[#3da9fc]"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex-1 bg-black/40 rounded-2xl p-6 border border-white/5 font-mono text-[11px] text-white/40 leading-relaxed">
-                <div className="flex gap-2 mb-4">
-                  <div className="w-2 h-2 rounded-full bg-red-400 opacity-50"></div>
-                  <div className="w-2 h-2 rounded-full bg-yellow-400 opacity-50"></div>
-                  <div className="w-2 h-2 rounded-full bg-green-400 opacity-50"></div>
-                </div>
-                <p><span className="text-[#ddb7ff]">/render</span> <span className="text-white/70">cinematic --mood "noir" --lighting "volumetric" --subject "Protagonist_A" --environment "City_Core_v2"</span></p>
-                <p className="mt-2 text-white/20">// Processing metadata...</p>
-                <p className="text-white/20">// Engine sequence initiated.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Workflow Orchestration Timeline */}
-      <section className="py-32 px-8">
-        <div className="max-w-screen-2xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl font-headline font-bold tracking-tight">Workflow Orchestration</h2>
-          </div>
-
-          <div className="relative max-w-4xl mx-auto">
-            {/* Center Line */}
-            <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-[#7818c6] via-[#3da9fc] to-[#7818c6] -translate-x-1/2 hidden md:block"></div>
-
-            <div className="space-y-32">
-              {/* Step 1 */}
-              <div className="relative flex flex-col md:flex-row items-center md:justify-between group">
-                <div className="md:w-[45%] text-center md:text-right">
-                  <h4 className="text-[#ddb7ff] font-bold mb-1">01. Intake</h4>
-                  <p className="text-white/40 text-sm leading-relaxed">Sync your YouTube channel and ingest previous performance data.</p>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-[#161f35] border-2 border-[#7818c6] flex items-center justify-center relative z-10 my-6 md:my-0">
-                  <div className="w-2 h-2 rounded-full bg-[#7818c6] animate-ping"></div>
-                </div>
-                <div className="md:w-[45%]"></div>
-              </div>
-
-              {/* Step 2 */}
-              <div className="relative flex flex-col md:flex-row items-center md:justify-between group">
-                <div className="md:w-[45%]"></div>
-                <div className="w-8 h-8 rounded-full bg-[#161f35] border-2 border-[#3da9fc] flex items-center justify-center relative z-10 my-6 md:my-0">
-                  <div className="w-2 h-2 rounded-full bg-[#3da9fc]"></div>
-                </div>
-                <div className="md:w-[45%] text-center md:text-left">
-                  <h4 className="text-[#3da9fc] font-bold mb-1">02. Synthesis</h4>
-                  <p className="text-white/40 text-sm leading-relaxed">AI generates characters and scene structures based on high-retention cues.</p>
-                </div>
-              </div>
-
-              {/* Step 3 */}
-              <div className="relative flex flex-col md:flex-row items-center md:justify-between group">
-                <div className="md:w-[45%] text-center md:text-right">
-                  <h4 className="text-[#7818c6] font-bold mb-1">03. Production</h4>
-                  <p className="text-white/40 text-sm leading-relaxed">Export prompts, scripts, and visual references for your creative team.</p>
-                </div>
-                <div className="w-8 h-8 rounded-full bg-[#161f35] border-2 border-[#7818c6] flex items-center justify-center relative z-10 my-6 md:my-0">
-                  <div className="w-2 h-2 rounded-full bg-[#7818c6]"></div>
-                </div>
-                <div className="md:w-[45%]"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Branding */}
-      <footer className="py-20 px-8 border-t border-white/5">
-        <div className="max-w-screen-2xl mx-auto flex flex-col md:flex-row justify-between items-start gap-12">
-          <div className="max-w-sm space-y-6">
-            <h2 className="text-2xl font-headline font-bold">VidiMetrics.Ai</h2>
-            <p className="text-white/40 text-xs leading-relaxed">Elevating content creation through the lens of algorithmic narrative and cinematic intelligence.</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-[10px] font-bold uppercase tracking-widest text-white/40">
-            <div className="space-y-4">
-              <span className="text-white/20">Platform</span>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Storyboarding</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Insights</a></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <span className="text-white/20">Resources</span>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Reference</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Press Kit</a></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <span className="text-white/20">Company</span>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
-            <div className="space-y-4">
-              <span className="text-white/20">Legal</span>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Cookie Policy</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-screen-2xl mx-auto mt-20 pt-8 border-t border-white/5 flex justify-between items-center text-[10px] text-white/20 font-bold tracking-widest uppercase">
-          <span>© 2024 VidiMetrics.Ai. All rights reserved.</span>
-        </div>
-      </footer>
+      </div>
     </div>
   );
-};
-
-export default AIInsights;
+}

@@ -40,6 +40,7 @@ import CoPilotPage from "@/pages/Dashboard/User/CoPilot";
 import AdminHome from "@/pages/Dashboard/Admin/Home";
 import AdminPricing from "@/pages/Dashboard/Admin/Pricing";
 import AdminUsers from "@/pages/Dashboard/Admin/Users";
+import WatchDemo from "@/pages/Main/Demo";
 
 // =============================
 // 🚀 MAIN ROUTES
@@ -51,6 +52,8 @@ export const MainRoutes: AppRoute[] = [
   { path: "/storyboarder", label: "Storyboarder", element: <Storyboarder /> },
   { path: "/pricing", label: "Pricing", element: <PricingPage /> },
   { path: "/api", label: "API", element: <API /> },
+  { path: "/demo", label: "Demo", element: <WatchDemo /> },
+
   {
     path: "/documentation",
     label: "Documentation",
