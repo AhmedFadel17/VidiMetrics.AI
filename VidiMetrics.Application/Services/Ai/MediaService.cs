@@ -21,11 +21,11 @@ public class MediaService : IMediaService
         _videoRepository = videoRepository;
     }
 
-    public async Task<MediaStatsResponseDto> GetStatsAsync(Guid userGuid, CancellationToken ct)
+    public async Task<MediaStatsResponseDto> GetStatsAsync(Guid userGuid, bool isAdmin, CancellationToken ct)
     {
-        var videosQuery = _videoRepository.Query().Where(v => v.UserId == userGuid);
-        var scriptsQuery = _scriptRepository.Query().Where(s => s.UserId == userGuid);
-        var imagesQuery = _imageRepository.Query().Where(m => m.UserId == userGuid);
+        var videosQuery = _videoRepository.Query().Where(v => (v.UserId == userGuid || isAdmin));
+        var scriptsQuery = _scriptRepository.Query().Where(s => (s.UserId == userGuid || isAdmin));
+        var imagesQuery = _imageRepository.Query().Where(m => (m.UserId == userGuid || isAdmin));
 
 
         var totalVideos = videosQuery.Count();

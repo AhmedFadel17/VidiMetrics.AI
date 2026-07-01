@@ -11,6 +11,6 @@ public interface ICopilotService
     Task<CopilotChatResponseDto> GetChatByIdAsync(Guid userId, Guid chatId, CancellationToken ct = default);
     Task<List<CopilotMessageResponseDto>> GetChatMessagesAsync(Guid userId, Guid chatId, CancellationToken ct = default);
     Task<List<CopilotDraftResponseDto>> GetChatDraftsAsync(Guid userId, Guid chatId, CancellationToken ct = default);
-    Task<CopilotStatsResponseDto> GetStatsAsync(Guid userId, CancellationToken ct = default);
+    Task<CopilotStatsResponseDto> GetStatsAsync(Guid userId, bool isAdmin, CancellationToken ct = default);
 
 }

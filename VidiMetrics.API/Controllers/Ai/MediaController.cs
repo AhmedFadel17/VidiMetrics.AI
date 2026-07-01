@@ -20,7 +20,7 @@ public class MediaController : ApiBaseController
     [HttpGet("stats")]
     public async Task<ActionResult<SuccessResponseDto<MediaStatsResponseDto>>> GetStats(CancellationToken ct)
     {
-        var result = await _service.GetStatsAsync(CurrentUserGuid, ct);
+        var result = await _service.GetStatsAsync(CurrentUserGuid, IsAdmin, ct);
         return Ok(ApiResponseFactory.Success(result, "Stats retrieved successfully."));
     }
 }

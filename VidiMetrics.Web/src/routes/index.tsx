@@ -37,6 +37,9 @@ import AccountPage from "@/pages/Dashboard/User/Account";
 import SocialLinksPage from "@/pages/Dashboard/User/SocialLinks";
 import NotificationsPage from "@/pages/Dashboard/User/Notifications";
 import CoPilotPage from "@/pages/Dashboard/User/CoPilot";
+import AdminHome from "@/pages/Dashboard/Admin/Home";
+import AdminPricing from "@/pages/Dashboard/Admin/Pricing";
+import AdminUsers from "@/pages/Dashboard/Admin/Users";
 
 // =============================
 // 🚀 MAIN ROUTES
@@ -182,4 +185,22 @@ export const AuthRoutes: AppRoute[] = [
 // =============================
 // 🚀 ADMIN ROUTES
 // =============================
-export const AppAdminRoutes: AppRoute[] = [];
+export const AppAdminRoutes: AppRoute[] = [
+  {
+    path: "/dashboard/admin",
+    label: "Admin Dashboard",
+    element: <AdminHome />,
+  },
+  {
+    path: "/dashboard/admin/users",
+    label: "Admin Users",
+    element: <AdminUsers />,
+  },
+
+  {
+    path: "/dashboard/admin/pricing",
+    label: "Admin Pricing",
+    element: <AdminPricing />,
+  },
+
+];

@@ -155,11 +155,15 @@ public class ShowsService : IShowsService
         return isSuccess;
     }
 
-    public async Task<StoryEngineStatsResponseDto> GetStatsAsync(Guid userId, CancellationToken ct = default)
+    public async Task<StoryEngineStatsResponseDto> GetStatsAsync(Guid userId, bool isAdmin, CancellationToken ct = default)
     {
-        var userShowsQuery = _repository.Query().Where(x => x.UserId == userId);
+        var showsQuery = _repository.Query();
+        if (!isAdmin)
+        {
+            showsQuery = showsQuery.Where(x => x.UserId == userId);
+        }
 
-        var stats = await userShowsQuery
+        var stats = await showsQuery
             .Select(show => new
             {
                 EpisodesCount = show.Episodes.Count,

@@ -15,6 +15,6 @@ public interface IShowsService
     Task<ShowResponseDto> CreateAsync(Guid userId, CreateShowDto dto);
     Task<ShowResponseDto> UpdateAsync(Guid userId, Guid id, UpdateShowDto dto);
     Task<bool> DeleteAsync(Guid userId, Guid id);
-    Task<StoryEngineStatsResponseDto> GetStatsAsync(Guid userId, CancellationToken ct = default);
+    Task<StoryEngineStatsResponseDto> GetStatsAsync(Guid userId, bool isAdmin, CancellationToken ct = default);
 
 }

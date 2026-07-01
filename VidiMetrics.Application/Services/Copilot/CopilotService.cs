@@ -307,17 +307,17 @@ public class CopilotService : ICopilotService
             .ToListAsync(ct);
     }
 
-    public async Task<CopilotStatsResponseDto> GetStatsAsync(Guid userId, CancellationToken ct = default)
+    public async Task<CopilotStatsResponseDto> GetStatsAsync(Guid userId, bool isAdmin, CancellationToken ct = default)
     {
 
         var totalChats = _chatRepository.Query()
-           .Where(x => x.UserId == userId && !x.IsDeleted)
+           .Where(x => (x.UserId == userId || isAdmin) && !x.IsDeleted)
            .Count();
         var totalMessages = _messageRepository.Query()
-                   .Where(x => x.Chat.UserId == userId && !x.IsDeleted)
+                   .Where(x => (x.Chat.UserId == userId || isAdmin) && !x.IsDeleted)
                    .Count();
         var draftsQuery = _draftRepository.Query()
-           .Where(x => x.UserId == userId && !x.IsDeleted);
+           .Where(x => (x.UserId == userId || isAdmin) && !x.IsDeleted);
 
         var totalDrafts = draftsQuery.Count();
         var totalDraftsPending = draftsQuery.Where(x => x.Status == CopilotDraftStatus.Pending).Count();

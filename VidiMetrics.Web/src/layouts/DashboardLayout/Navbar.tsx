@@ -1,10 +1,10 @@
-import { useGetUserProfileQuery, useGetBalanceQuery } from "@/store/apis";
+import { useGetUserProfileQuery } from "@/store/apis";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect } from "react";
 import { useAuth } from "react-oidc-context";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import NotificationsDropdown from "@/components/ui/NotificationsDropdown";
-import { SidebarRoutes } from "@/routes/sidebar";
+import { AdminSidebarRoutes, SidebarRoutes } from "@/routes/sidebar";
 import logo from "@/assets/images/logos/logo.png";
 
 export default function DashboardNavbar({
@@ -12,11 +12,13 @@ export default function DashboardNavbar({
   setIsSidebarCollapsed,
   isMobileMenuOpen,
   setIsMobileMenuOpen,
+  isAdmin
 }: {
   isSidebarCollapsed: boolean;
   setIsSidebarCollapsed: (collapsed: boolean) => void;
   isMobileMenuOpen: boolean;
   setIsMobileMenuOpen: (open: boolean) => void;
+  isAdmin: boolean;
 }) {
   const auth = useAuth();
   const user = auth.user;
@@ -26,14 +28,10 @@ export default function DashboardNavbar({
   const { data: profileData } = useGetUserProfileQuery();
   const profile = profileData?.data;
 
-  const { data: balanceData, isLoading: isBalanceLoading, isError: isBalanceError } = useGetBalanceQuery();
-  const wallet = balanceData?.data;
-  const total = wallet?.totalCreditsAvailable ?? 0;
-  const used = wallet?.creditsUsed ?? 0;
-  const remaining = Math.max(0, total - used);
-  const fillPercentage = total > 0 ? (remaining / total) * 100 : 0;
+
 
   const [isMobile, setIsMobile] = useState(false);
+  const routes = isAdmin ? AdminSidebarRoutes : SidebarRoutes;
 
   useEffect(() => {
     const handleResize = () => {
@@ -56,15 +54,15 @@ export default function DashboardNavbar({
     }
   };
 
-  const iconName = isMobile 
-    ? (isMobileMenuOpen ? 'close' : 'menu') 
+  const iconName = isMobile
+    ? (isMobileMenuOpen ? 'close' : 'menu')
     : (isSidebarCollapsed ? 'menu' : 'menu_open');
 
   return (
-    <header className="sticky top-0 z-30 bg-dashboard-bg/80 backdrop-blur-md border-b border-white/5">
+    <header className={`sticky top-0 z-30 ${isAdmin ? "bg-surface-container/80" : "bg-dashboard-bg/80"} backdrop-blur-md border-b border-white/5`}>
       {/* Header Container */}
       <div className="h-20 px-6 md:px-10 flex items-center justify-between">
-        
+
         {/* Left Section: Menu Toggle + Mobile Logo */}
         <div className="flex items-center gap-4">
           <button
@@ -76,7 +74,7 @@ export default function DashboardNavbar({
               {iconName}
             </span>
           </button>
-          
+
           {/* Logo visible only on mobile/tablet because sidebar is hidden */}
           <div className="lg:hidden text-xl font-headline font-bold text-white tracking-tight flex items-center">
             <div className='flex items-center gap-2 cursor-pointer' onClick={() => navigate('/')}>
@@ -94,6 +92,8 @@ export default function DashboardNavbar({
           <div className="flex items-center gap-4 border-r border-white/5 pr-4">
             {/* Notifications Dropdown */}
             <NotificationsDropdown user={user} />
+
+
           </div>
 
           {/* User Dropdown */}
@@ -209,49 +209,10 @@ export default function DashboardNavbar({
       {/* Mobile & Medium Overlay Menu */}
       {isMobile && isMobileMenuOpen && (
         <div className="lg:hidden bg-dashboard-bg border-t border-white/5 px-6 py-6 flex flex-col gap-6 animate-in fade-in slide-in-from-top-5 duration-200 overflow-y-auto max-h-[calc(100vh-5rem)]">
-          {/* Credit Wallet Information Box for mobile */}
-          <div className="bg-white/[0.02] rounded-3xl p-5 relative overflow-hidden border border-white/5">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-accent-purple/5 blur-3xl -mr-8 -mt-8"></div>
-            <div className="relative z-10 space-y-3">
-              {isBalanceLoading ? (
-                <div className="animate-pulse space-y-2">
-                  <div className="h-3 bg-white/10 rounded w-1/2"></div>
-                  <div className="h-2 bg-white/5 rounded w-full"></div>
-                  <div className="h-3 bg-white/10 rounded w-3/4"></div>
-                </div>
-              ) : isBalanceError || !wallet ? (
-                <div className="flex flex-col items-center justify-center py-1 text-center">
-                  <span className="material-symbols-outlined text-white/20 text-xl mb-1">cloud_off</span>
-                  <span className="text-[11px] text-white/30 font-medium">Failed to update credits</span>
-                </div>
-              ) : (
-                <>
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Render Balance</span>
-                    <span className="text-sm font-black text-white tracking-tight">
-                      {remaining.toLocaleString()} <span className="text-[10px] text-white/40 font-normal">left</span>
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-accent-purple to-primary rounded-full shadow-[0_0_8px_rgba(138,43,226,0.4)] transition-all duration-1000 ease-out"
-                      style={{ width: `${fillPercentage}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-medium text-white/40 tracking-tight">
-                    <span>Quota usage metrics</span>
-                    <span className="text-white/60 font-mono">
-                      {used.toLocaleString()} / {total.toLocaleString()}
-                    </span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
 
           {/* Navigation Links */}
           <nav className="flex flex-col gap-2">
-            {SidebarRoutes.map((route) => {
+            {routes.map((route) => {
               const isActive = pathname === route.path;
               return (
                 <Link

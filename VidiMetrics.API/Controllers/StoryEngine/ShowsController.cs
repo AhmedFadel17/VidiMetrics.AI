@@ -66,7 +66,7 @@ public class ShowsController : ApiBaseController
     [HttpGet("stats")]
     public async Task<ActionResult<SuccessResponseDto<StoryEngineStatsResponseDto>>> GetStats(CancellationToken ct)
     {
-        var result = await _service.GetStatsAsync(CurrentUserGuid, ct);
+        var result = await _service.GetStatsAsync(CurrentUserGuid, IsAdmin, ct);
         return Ok(ApiResponseFactory.Success(result, "Stats retrieved successfully."));
     }
 }

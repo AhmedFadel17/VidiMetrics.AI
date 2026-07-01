@@ -7,7 +7,6 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     if (!auth.isLoading && !auth.isAuthenticated) {
-      // Redirect to Identity Server authorize endpoint
       auth.signinRedirect();
     }
   }, [auth.isLoading, auth.isAuthenticated]);
@@ -21,7 +20,6 @@ const ProtectedRoute = () => {
   }
 
   if (!auth.isAuthenticated) {
-    // Return null or a placeholder while the redirect is in progress
     return null;
   }
 

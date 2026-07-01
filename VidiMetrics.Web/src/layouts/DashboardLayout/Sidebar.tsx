@@ -1,31 +1,27 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { SidebarRoutes } from '@/routes/sidebar';
+import { SidebarRoutes, AdminSidebarRoutes } from '@/routes/sidebar';
 import { useGetBalanceQuery } from '@/store/apis';
 import logo from '@/assets/images/logos/logo.png';
 
 export default function Sidebar({
   isCollapsed,
+  isAdmin,
 }: {
   isCollapsed: boolean;
+  isAdmin: boolean;
 }) {
   const [isHovered, setIsHovered] = useState(false);
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { data, isLoading, isError } = useGetBalanceQuery();
 
-  const wallet = data?.data;
-
-  const total = wallet?.totalCreditsAvailable ?? 0;
-  const used = wallet?.creditsUsed ?? 0;
-  const remaining = Math.max(0, total - used);
-  const fillPercentage = total > 0 ? (remaining / total) * 100 : 0;
-
+  const routes = isAdmin ? AdminSidebarRoutes : SidebarRoutes;
   return (
     <aside
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={`h-screen fixed left-0 top-0 z-40 bg-dashboard-bg border-r border-white/5 flex flex-col py-8 overflow-y-auto transition-all duration-300 ease-in-out hidden lg:flex
+      className={`h-screen fixed left-0 top-0 z-40 ${isAdmin ? "bg-surface-container" : "bg-dashboard-bg"
+        } border-r border-white/5 flex flex-col py-8 overflow-y-auto transition-all duration-300 ease-in-out hidden lg:flex
         ${isCollapsed && !isHovered ? 'w-20' : 'w-72'}`}
     >
       {/* Logo Section */}
@@ -43,7 +39,7 @@ export default function Sidebar({
 
       {/* Navigation Links */}
       <nav className={`flex-1 space-y-1 transition-all duration-300 ${isCollapsed && !isHovered ? 'px-2' : 'px-4'}`}>
-        {SidebarRoutes.map((item) => {
+        {routes.map((item) => {
           const isActive = pathname === item.path;
           return (
             <Link
@@ -69,54 +65,68 @@ export default function Sidebar({
         })}
       </nav>
 
-      {/* Credit Wallet Information Box Footer */}
-      <div className={`transition-all duration-300 overflow-hidden ${isCollapsed && !isHovered ? 'opacity-0 scale-95 h-0 my-0 pointer-events-none' : 'px-4 mt-8 mb-6 h-auto opacity-100'}`}>
-        <div className="bg-white/[0.02] rounded-3xl p-5 relative overflow-hidden group border border-white/5">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-accent-purple/5 blur-3xl -mr-8 -mt-8 group-hover:bg-accent-purple/10 transition-all duration-500"></div>
+      {!isAdmin && renderWalletInfo(isCollapsed, isHovered)}
 
-          <div className="relative z-10 space-y-3">
-            {isLoading ? (
-              /* Skeleton Loading Placeholder */
-              <div className="animate-pulse space-y-2">
-                <div className="h-3 bg-white/10 rounded w-1/2"></div>
-                <div className="h-2 bg-white/5 rounded w-full"></div>
-                <div className="h-3 bg-white/10 rounded w-3/4"></div>
-              </div>
-            ) : isError || !wallet ? (
-              /* Graceful State Recovery Handler */
-              <div className="flex flex-col items-center justify-center py-1 text-center">
-                <span className="material-symbols-outlined text-white/20 text-xl mb-1">cloud_off</span>
-                <span className="text-[11px] text-white/30 font-medium">Failed to update credits</span>
-              </div>
-            ) : (
-              /* Real-time Content Display */
-              <>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Render Balance</span>
-                  <span className="text-sm font-black text-white tracking-tight">
-                    {remaining.toLocaleString()} <span className="text-[10px] text-white/40 font-normal">left</span>
-                  </span>
-                </div>
-
-                {/* Progress Bar with Dynamic Width Inline Assignment */}
-                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-accent-purple to-primary rounded-full shadow-[0_0_8px_rgba(138,43,226,0.4)] transition-all duration-1000 ease-out"
-                    style={{ width: `${fillPercentage}%` }}
-                  ></div>
-                </div>
-
-                <div className="flex justify-between items-center text-[11px] font-medium text-white/40 tracking-tight">
-                  <span>Quota usage metrics</span>
-                  <span className="text-white/60 font-mono">
-                    {used.toLocaleString()} / {total.toLocaleString()}
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
     </aside>
   );
+}
+
+function renderWalletInfo(isCollapsed: boolean, isHovered: boolean) {
+  const { data, isLoading, isError } = useGetBalanceQuery();
+
+  const wallet = data?.data;
+
+  const total = wallet?.totalCreditsAvailable ?? 0;
+  const used = wallet?.creditsUsed ?? 0;
+  const remaining = Math.max(0, total - used);
+  const fillPercentage = total > 0 ? (remaining / total) * 100 : 0;
+  return (
+    <div className={`transition-all duration-300 overflow-hidden ${isCollapsed && !isHovered ? 'opacity-0 scale-95 h-0 my-0 pointer-events-none' : 'px-4 mt-8 mb-6 h-auto opacity-100'}`}>
+      <div className="bg-white/[0.02] rounded-3xl p-5 relative overflow-hidden group border border-white/5">
+        <div className="absolute top-0 right-0 w-24 h-24 bg-accent-purple/5 blur-3xl -mr-8 -mt-8 group-hover:bg-accent-purple/10 transition-all duration-500"></div>
+
+        <div className="relative z-10 space-y-3">
+          {isLoading ? (
+            /* Skeleton Loading Placeholder */
+            <div className="animate-pulse space-y-2">
+              <div className="h-3 bg-white/10 rounded w-1/2"></div>
+              <div className="h-2 bg-white/5 rounded w-full"></div>
+              <div className="h-3 bg-white/10 rounded w-3/4"></div>
+            </div>
+          ) : isError || !wallet ? (
+            /* Graceful State Recovery Handler */
+            <div className="flex flex-col items-center justify-center py-1 text-center">
+              <span className="material-symbols-outlined text-white/20 text-xl mb-1">cloud_off</span>
+              <span className="text-[11px] text-white/30 font-medium">Failed to update credits</span>
+            </div>
+          ) : (
+            /* Real-time Content Display */
+            <>
+              <div className="flex justify-between items-baseline">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Render Balance</span>
+                <span className="text-sm font-black text-white tracking-tight">
+                  {remaining.toLocaleString()} <span className="text-[10px] text-white/40 font-normal">left</span>
+                </span>
+              </div>
+
+              {/* Progress Bar with Dynamic Width Inline Assignment */}
+              <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-accent-purple to-primary rounded-full shadow-[0_0_8px_rgba(138,43,226,0.4)] transition-all duration-1000 ease-out"
+                  style={{ width: `${fillPercentage}%` }}
+                ></div>
+              </div>
+
+              <div className="flex justify-between items-center text-[11px] font-medium text-white/40 tracking-tight">
+                <span>Quota usage metrics</span>
+                <span className="text-white/60 font-mono">
+                  {used.toLocaleString()} / {total.toLocaleString()}
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
 }
